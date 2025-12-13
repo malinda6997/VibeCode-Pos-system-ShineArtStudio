@@ -1,0 +1,39 @@
+END-USER LICENSE AGREEMENT (EULA)
+===============================================
+
+Shine Art Studio POS System
+Version 1.0.0
+
+Copyright (c) 2025 Shine Art Studio. All rights reserved.
+
+This End-User License Agreement ("EULA") is a legal agreement between you (either an individual or a single entity) and Shine Art Studio for the Shine Art Studio POS System software product.
+
+BY INSTALLING, COPYING, OR OTHERWISE USING THE SOFTWARE, YOU AGREE TO BE BOUND BY THE TERMS OF THIS EULA.
+
+1. GRANT OF LICENSE
+Shine Art Studio grants you the following rights:
+- Installation and Use: You may install and use the Software on a single computer.
+- Backup Copy: You may make one backup copy of the Software for archival purposes.
+
+2. DESCRIPTION OF OTHER RIGHTS AND LIMITATIONS
+- You may not reverse engineer, decompile, or disassemble the Software.
+- You may not rent, lease, or lend the Software.
+- You may not use the Software for any illegal purpose.
+
+3. COPYRIGHT
+The Software is protected by copyright laws and international copyright treaties, as well as other intellectual property laws and treaties.
+
+4. LIMITED WARRANTY
+The Software is provided "AS IS" without warranty of any kind. Shine Art Studio does not warrant that the Software will meet your requirements or that operation of the Software will be uninterrupted or error-free.
+
+5. LIMITATION OF LIABILITY
+In no event shall Shine Art Studio be liable for any damages whatsoever arising out of the use of or inability to use this Software.
+
+6. TERMINATION
+This EULA is effective until terminated. Your rights under this EULA will terminate automatically without notice if you fail to comply with any term of this EULA.
+
+If you have any questions regarding this EULA, please contact:
+Email: support@shineartstudio.com
+Website: https://github.com/malinda6997/Shine-art-Studio-post-system
+
+BY CLICKING "I ACCEPT" OR INSTALLING THE SOFTWARE, YOU ACKNOWLEDGE THAT YOU HAVE READ THIS AGREEMENT, UNDERSTAND IT, AND AGREE TO BE BOUND BY ITS TERMS AND CONDITIONS.
