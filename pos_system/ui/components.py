@@ -5,15 +5,20 @@ import os
 import random
 
 
-class ModernToast(ctk.CTkFrame):
+class ModernToast(ctk.CTkToplevel):
     """Modern toast notification that appears and auto-dismisses"""
     
-    def __init__(self, parent, message: str, toast_type: str = "info", duration: int = 2500):
+    def __init__(self, parent, message: str, toast_type: str = "info", duration: int = 700):
         # Get the root window
         self.root = parent.winfo_toplevel()
-        super().__init__(self.root, corner_radius=12)
+        super().__init__(self.root)
         
         self.duration = duration
+        
+        # Remove window decorations
+        self.overrideredirect(True)
+        self.attributes('-topmost', True)
+        self.configure(fg_color="#1a1a2e")
         
         # Colors based on type
         colors = {
@@ -25,75 +30,72 @@ class ModernToast(ctk.CTkFrame):
         
         style = colors.get(toast_type, colors["info"])
         
-        self.configure(fg_color=style["bg"], border_width=2, border_color=style["accent"])
+        # Main frame with styling
+        main_frame = ctk.CTkFrame(self, fg_color=style["bg"], corner_radius=12, 
+                                   border_width=2, border_color=style["accent"])
+        main_frame.pack(fill="both", expand=True, padx=2, pady=2)
         
         # Content
-        content = ctk.CTkFrame(self, fg_color="transparent")
-        content.pack(padx=20, pady=15)
+        content = ctk.CTkFrame(main_frame, fg_color="transparent")
+        content.pack(padx=25, pady=18)
         
         # Icon
         icon_label = ctk.CTkLabel(
             content,
             text=style["icon"],
-            font=ctk.CTkFont(size=20, weight="bold"),
+            font=ctk.CTkFont(size=26, weight="bold"),
             text_color=style["accent"],
-            width=30
+            width=35
         )
-        icon_label.pack(side="left", padx=(0, 12))
+        icon_label.pack(side="left", padx=(0, 15))
         
         # Message
         msg_label = ctk.CTkLabel(
             content,
             text=message,
-            font=ctk.CTkFont(size=14),
+            font=ctk.CTkFont(size=15, weight="bold"),
             text_color="white"
         )
         msg_label.pack(side="left")
         
-        # Position at top center and lift to front
-        self.place(relx=0.5, y=-80, anchor="n")
-        self.lift()
+        # Position toast at top center of root window
+        self.update_idletasks()
         
-        # Animate in
-        self.animate_in()
+        toast_width = self.winfo_reqwidth()
+        root_x = self.root.winfo_x()
+        root_width = self.root.winfo_width()
+        root_y = self.root.winfo_y()
+        
+        x = root_x + (root_width // 2) - (toast_width // 2)
+        self.target_y = root_y + 30
+        self.current_y = root_y - 100
+        
+        self.geometry(f"+{x}+{self.current_y}")
+        
+        # Start animation
+        self.after(10, self.animate_in)
     
     def animate_in(self):
         """Slide in animation"""
-        self.update_idletasks()
-        self._animate_to_y(20, self.start_dismiss_timer)
-    
-    def _animate_to_y(self, target_y: int, callback=None):
-        """Animate to target Y position"""
         try:
-            current_y = self.winfo_y()
-            if current_y < target_y:
-                new_y = min(current_y + 10, target_y)
-                self.place(relx=0.5, y=new_y, anchor="n")
-                self.lift()
-                if new_y < target_y:
-                    self.after(8, lambda: self._animate_to_y(target_y, callback))
-                elif callback:
-                    callback()
-            elif callback:
-                callback()
+            if self.current_y < self.target_y:
+                self.current_y += 20
+                x = self.winfo_x()
+                self.geometry(f"+{x}+{self.current_y}")
+                self.after(5, self.animate_in)
+            else:
+                self.after(self.duration, self.animate_out)
         except:
             pass
     
-    def start_dismiss_timer(self):
-        """Start timer to dismiss toast"""
-        self.after(self.duration, self.animate_out)
-    
     def animate_out(self):
         """Slide out animation"""
-        self._animate_out_y()
-    
-    def _animate_out_y(self):
-        """Animate out"""
         try:
-            current_y = self.winfo_y()
-            if current_y > -80:
-                self.place(relx=0.5, y=current_y - 10, anchor="n")
-                self.after(8, self._animate_out_y)
+            if self.current_y > self.root.winfo_y() - 100:
+                self.current_y -= 20
+                x = self.winfo_x()
+                self.geometry(f"+{x}+{self.current_y}")
+                self.after(5, self.animate_out)
             else:
                 self.destroy()
         except:
@@ -211,22 +213,22 @@ class Toast:
     """Static class to show toast notifications"""
     
     @staticmethod
-    def success(parent, message: str, duration: int = 2500):
+    def success(parent, message: str, duration: int = 700):
         """Show success toast"""
         ModernToast(parent, message, "success", duration)
     
     @staticmethod
-    def error(parent, message: str, duration: int = 3000):
+    def error(parent, message: str, duration: int = 700):
         """Show error toast"""
         ModernToast(parent, message, "error", duration)
     
     @staticmethod
-    def warning(parent, message: str, duration: int = 3000):
+    def warning(parent, message: str, duration: int = 700):
         """Show warning toast"""
         ModernToast(parent, message, "warning", duration)
     
     @staticmethod
-    def info(parent, message: str, duration: int = 2500):
+    def info(parent, message: str, duration: int = 700):
         """Show info toast"""
         ModernToast(parent, message, "info", duration)
     

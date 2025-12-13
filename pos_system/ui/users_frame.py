@@ -199,44 +199,47 @@ class UsersManagementFrame(ctk.CTkFrame):
         confirm = self.confirm_password_entry.get()
         role = self.role_combo.get()
         
-        print(f"DEBUG: Adding user - fullname='{fullname}', username='{username}', password='{password}'")
-        
-        if not fullname or not username or not password:
-            print("DEBUG: Validation failed - empty fields")
-            Toast.error(self, "Please fill all required fields")
+        if not fullname:
+            Toast.error(self, "Please enter full name")
             return
         
-        if password != confirm:
-            print("DEBUG: Validation failed - passwords don't match")
-            Toast.error(self, "Passwords do not match")
+        if not username:
+            Toast.error(self, "Please enter username")
+            return
+        
+        if len(username) < 3:
+            Toast.error(self, "Username must be at least 3 characters")
+            return
+            
+        if not password:
+            Toast.error(self, "Please enter password")
             return
         
         if len(password) < 6:
-            print("DEBUG: Validation failed - password too short")
             Toast.error(self, "Password must be at least 6 characters")
             return
         
+        if password != confirm:
+            Toast.error(self, "Passwords do not match")
+            return
+        
         if self.user_service.username_exists(username):
-            print("DEBUG: Validation failed - username exists")
             Toast.error(self, "Username already exists")
             return
         
-        print("DEBUG: Creating user...")
         user_id = self.user_service.create_user(username, password, role, fullname)
-        print(f"DEBUG: user_id = {user_id}")
         
         if user_id:
-            print("DEBUG: User created successfully, showing toast")
-            Toast.success(self, "User created successfully")
+            Toast.success(self, "User created successfully!")
             self.clear_form()
             self.load_users()
         else:
-            print("DEBUG: Failed to create user")
             Toast.error(self, "Failed to create user")
     
     def update_user(self):
         """Update selected user"""
         if not self.selected_user_id:
+            Toast.error(self, "Please select a user to update")
             return
         
         fullname = self.fullname_entry.get().strip()
@@ -244,8 +247,16 @@ class UsersManagementFrame(ctk.CTkFrame):
         role = self.role_combo.get()
         status = 1 if self.status_combo.get() == "Active" else 0
         
-        if not fullname or not username:
-            Toast.error(self, "Please fill all required fields")
+        if not fullname:
+            Toast.error(self, "Please enter full name")
+            return
+        
+        if not username:
+            Toast.error(self, "Please enter username")
+            return
+        
+        if len(username) < 3:
+            Toast.error(self, "Username must be at least 3 characters")
             return
         
         if self.user_service.username_exists(username, self.selected_user_id):
@@ -261,16 +272,16 @@ class UsersManagementFrame(ctk.CTkFrame):
         password = self.password_entry.get()
         if password:
             confirm = self.confirm_password_entry.get()
-            if password != confirm:
-                Toast.error(self, "Passwords do not match")
-                return
             if len(password) < 6:
                 Toast.error(self, "Password must be at least 6 characters")
+                return
+            if password != confirm:
+                Toast.error(self, "Passwords do not match")
                 return
             self.user_service.update_password(self.selected_user_id, password)
         
         if success:
-            Toast.success(self, "User updated successfully")
+            Toast.success(self, "User updated successfully!")
             self.clear_form()
             self.load_users()
         else:
