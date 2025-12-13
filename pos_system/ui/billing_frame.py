@@ -66,8 +66,9 @@ class BillingFrame(BaseFrame):
             command=self.add_new_customer,
             width=120,
             height=30,
-            fg_color="green",
-            hover_color="darkgreen"
+            fg_color="#00d4ff",
+            text_color="#1a1a2e",
+            hover_color="#00a8cc"
         ).pack(side="left", padx=5)
         
         # Customer details display
@@ -165,8 +166,8 @@ class BillingFrame(BaseFrame):
             command=self.remove_from_cart,
             width=150,
             height=30,
-            fg_color="red",
-            hover_color="darkred"
+            fg_color="#ff4757",
+            hover_color="#ff3344"
         ).pack(pady=(0, 10))
         
         # Right panel - Payment
@@ -260,8 +261,8 @@ class BillingFrame(BaseFrame):
             command=self.clear_all,
             width=200,
             height=35,
-            fg_color="gray40",
-            hover_color="gray30"
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a"
         ).pack(pady=10)
         
         # Load initial items

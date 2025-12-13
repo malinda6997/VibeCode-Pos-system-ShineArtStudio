@@ -76,8 +76,8 @@ class FrameManagementFrame(BaseFrame):
             width=120,
             height=35,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="orange",
-            hover_color="darkorange",
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a",
             state="disabled"
         )
         self.update_btn.pack(side="left", padx=5)
@@ -89,8 +89,8 @@ class FrameManagementFrame(BaseFrame):
             width=120,
             height=35,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="red",
-            hover_color="darkred",
+            fg_color="#ff4757",
+            hover_color="#ff3344",
             state="disabled"
         )
         self.delete_btn.pack(side="left", padx=5)
@@ -101,8 +101,8 @@ class FrameManagementFrame(BaseFrame):
             command=self.clear_form,
             width=120,
             height=35,
-            fg_color="gray40",
-            hover_color="gray30"
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a"
         )
         clear_btn.pack(side="left", padx=5)
         

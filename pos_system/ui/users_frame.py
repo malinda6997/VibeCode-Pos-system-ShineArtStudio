@@ -36,21 +36,25 @@ class UsersManagementFrame(ctk.CTkFrame):
         main = ctk.CTkFrame(self, fg_color="transparent")
         main.pack(fill="both", expand=True, padx=30, pady=10)
         
-        # Left panel - Form
+        # Left panel - Form (Scrollable)
         left = ctk.CTkFrame(main, fg_color="#1e1e3f", corner_radius=15, width=400)
         left.pack(side="left", fill="y", padx=(0, 15), pady=0)
         left.pack_propagate(False)
         
+        # Scrollable container for form
+        left_scroll = ctk.CTkScrollableFrame(left, fg_color="transparent")
+        left_scroll.pack(fill="both", expand=True, padx=5, pady=5)
+        
         form_title = ctk.CTkLabel(
-            left,
+            left_scroll,
             text="User Details",
             font=ctk.CTkFont(size=18, weight="bold")
         )
-        form_title.pack(pady=(20, 20))
+        form_title.pack(pady=(15, 15))
         
         # Form fields
-        form = ctk.CTkFrame(left, fg_color="transparent")
-        form.pack(fill="x", padx=25)
+        form = ctk.CTkFrame(left_scroll, fg_color="transparent")
+        form.pack(fill="x", padx=20)
         
         # Full Name
         ctk.CTkLabel(form, text="Full Name:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(10, 5))
@@ -93,12 +97,12 @@ class UsersManagementFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13),
             state="readonly"
         )
-        self.status_combo.pack(fill="x", pady=(0, 20))
+        self.status_combo.pack(fill="x", pady=(0, 15))
         self.status_combo.set("Active")
         
         # Buttons
-        btn_frame = ctk.CTkFrame(left, fg_color="transparent")
-        btn_frame.pack(fill="x", padx=25, pady=20)
+        btn_frame = ctk.CTkFrame(left_scroll, fg_color="transparent")
+        btn_frame.pack(fill="x", padx=20, pady=(10, 20))
         
         self.add_btn = ctk.CTkButton(
             btn_frame,

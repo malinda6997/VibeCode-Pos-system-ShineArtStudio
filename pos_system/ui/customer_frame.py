@@ -60,8 +60,8 @@ class CustomerManagementFrame(BaseFrame):
             command=self.clear_form,
             width=150,
             height=35,
-            fg_color="gray40",
-            hover_color="gray30"
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a"
         )
         clear_btn.pack(side="left", padx=10)
         

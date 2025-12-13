@@ -29,44 +29,53 @@ class BookingManagementFrame(BaseFrame):
         container = ctk.CTkFrame(self, fg_color="transparent")
         container.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
-        # Left panel - Form
-        left_panel = ctk.CTkFrame(container, fg_color="#1e1e3f", corner_radius=15)
-        left_panel.pack(side="left", fill="both", expand=True, padx=(0, 10))
+        # Left panel - Form (Scrollable)
+        left_panel = ctk.CTkFrame(container, fg_color="#1e1e3f", corner_radius=15, width=450)
+        left_panel.pack(side="left", fill="y", padx=(0, 10))
+        left_panel.pack_propagate(False)
         
-        form_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
-        form_frame.pack(fill="both", expand=True, padx=15, pady=15)
+        # Scrollable form container
+        form_scroll = ctk.CTkScrollableFrame(left_panel, fg_color="#252545", corner_radius=10)
+        form_scroll.pack(fill="both", expand=True, padx=15, pady=15)
+        
+        # Form title
+        ctk.CTkLabel(
+            form_scroll,
+            text="📝 Booking Details",
+            font=ctk.CTkFont(size=16, weight="bold")
+        ).pack(pady=(10, 15))
         
         # Customer name
         ctk.CTkLabel(
-            form_frame,
+            form_scroll,
             text="Customer Name:",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.name_entry = ctk.CTkEntry(form_frame, width=250, height=35)
-        self.name_entry.grid(row=0, column=1, padx=10, pady=10)
+        self.name_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.name_entry.pack(fill="x", padx=15, pady=(0, 10))
         
         # Mobile number
         ctk.CTkLabel(
-            form_frame,
+            form_scroll,
             text="Mobile Number:",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.mobile_entry = ctk.CTkEntry(form_frame, width=250, height=35)
-        self.mobile_entry.grid(row=1, column=1, padx=10, pady=10)
+        self.mobile_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.mobile_entry.pack(fill="x", padx=15, pady=(0, 10))
         
         # Photoshoot category
         ctk.CTkLabel(
-            form_frame,
+            form_scroll,
             text="Photoshoot Category:",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=2, column=0, padx=10, pady=10, sticky="w")
+        ).pack(anchor="w", padx=15, pady=(10, 5))
         
         self.category_combo = ctk.CTkComboBox(
-            form_frame,
-            width=250,
-            height=35,
+            form_scroll,
+            height=38,
+            font=ctk.CTkFont(size=13),
             values=[
                 "Wedding Photography",
                 "Pre-Wedding",
@@ -78,149 +87,148 @@ class BookingManagementFrame(BaseFrame):
                 "Other"
             ]
         )
-        self.category_combo.grid(row=2, column=1, padx=10, pady=10)
+        self.category_combo.pack(fill="x", padx=15, pady=(0, 10))
         self.category_combo.set("Wedding Photography")
         
         # Full amount
         ctk.CTkLabel(
-            form_frame,
+            form_scroll,
             text="Full Amount (LKR):",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=3, column=0, padx=10, pady=10, sticky="w")
+        ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.full_amount_entry = ctk.CTkEntry(form_frame, width=250, height=35)
-        self.full_amount_entry.grid(row=3, column=1, padx=10, pady=10)
+        self.full_amount_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.full_amount_entry.pack(fill="x", padx=15, pady=(0, 10))
         self.full_amount_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
         
-        # Advance payment
-        ctk.CTkLabel(
-            form_frame,
-            text="Advance Payment (LKR):",
-            font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=4, column=0, padx=10, pady=10, sticky="w")
-        
-        self.advance_entry = ctk.CTkEntry(form_frame, width=250, height=35)
-        self.advance_entry.grid(row=4, column=1, padx=10, pady=10)
+        self.advance_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.advance_entry.pack(fill="x", padx=15, pady=(0, 10))
         self.advance_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
         
         # Balance display
+        balance_frame = ctk.CTkFrame(form_scroll, fg_color="transparent")
+        balance_frame.pack(fill="x", padx=15, pady=10)
+        
         ctk.CTkLabel(
-            form_frame,
+            balance_frame,
             text="Balance Amount:",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=5, column=0, padx=10, pady=10, sticky="w")
+        ).pack(side="left")
         
         self.balance_label = ctk.CTkLabel(
-            form_frame,
+            balance_frame,
             text="LKR 0.00",
             font=ctk.CTkFont(size=13, weight="bold"),
-            text_color="yellow"
+            text_color="#ffd93d"
         )
-        self.balance_label.grid(row=5, column=1, padx=10, pady=10, sticky="w")
+        self.balance_label.pack(side="right")
         
         # Booking date
         ctk.CTkLabel(
-            form_frame,
+            form_scroll,
             text="Booking Date:",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=6, column=0, padx=10, pady=10, sticky="w")
+        ).pack(anchor="w", padx=15, pady=(10, 5))
+        
+        date_container = ctk.CTkFrame(form_scroll, fg_color="transparent")
+        date_container.pack(fill="x", padx=15, pady=(0, 10))
         
         self.date_entry = DateEntry(
-            form_frame,
-            width=30,
-            background='darkblue',
+            date_container,
+            width=25,
+            background='#2d2d5a',
             foreground='white',
             borderwidth=2,
             date_pattern='yyyy-mm-dd'
         )
-        self.date_entry.grid(row=6, column=1, padx=10, pady=10, sticky="w")
+        self.date_entry.pack(anchor="w")
         
         # Location
         ctk.CTkLabel(
-            form_frame,
+            form_scroll,
             text="Location:",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=7, column=0, padx=10, pady=10, sticky="w")
+        ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.location_entry = ctk.CTkEntry(form_frame, width=250, height=35)
-        self.location_entry.grid(row=7, column=1, padx=10, pady=10)
+        self.location_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.location_entry.pack(fill="x", padx=15, pady=(0, 10))
         
         # Description
         ctk.CTkLabel(
-            form_frame,
+            form_scroll,
             text="Description:",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=8, column=0, padx=10, pady=10, sticky="nw")
+        ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.description_text = ctk.CTkTextbox(form_frame, width=250, height=80)
-        self.description_text.grid(row=8, column=1, padx=10, pady=10)
+        self.description_text = ctk.CTkTextbox(form_scroll, height=70, font=ctk.CTkFont(size=13))
+        self.description_text.pack(fill="x", padx=15, pady=(0, 10))
         
         # Status
         ctk.CTkLabel(
-            form_frame,
+            form_scroll,
             text="Status:",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).grid(row=9, column=0, padx=10, pady=10, sticky="w")
+        ).pack(anchor="w", padx=15, pady=(10, 5))
         
         self.status_combo = ctk.CTkComboBox(
-            form_frame,
-            width=250,
-            height=35,
+            form_scroll,
+            height=38,
+            font=ctk.CTkFont(size=13),
             values=["Pending", "Completed", "Cancelled"]
         )
-        self.status_combo.grid(row=9, column=1, padx=10, pady=10)
+        self.status_combo.pack(fill="x", padx=15, pady=(0, 15))
         self.status_combo.set("Pending")
         
         # Buttons
-        btn_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
-        btn_frame.grid(row=10, column=0, columnspan=2, pady=20)
+        btn_frame = ctk.CTkFrame(form_scroll, fg_color="transparent")
+        btn_frame.pack(fill="x", padx=15, pady=(10, 20))
         
         self.add_btn = ctk.CTkButton(
             btn_frame,
-            text="Add Booking",
+            text="➕ Add",
             command=self.add_booking,
-            width=120,
-            height=35,
-            font=ctk.CTkFont(size=13, weight="bold")
+            height=38,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color="#00d4ff",
+            text_color="#1a1a2e",
+            hover_color="#00a8cc"
         )
-        self.add_btn.pack(side="left", padx=5)
+        self.add_btn.pack(side="left", expand=True, fill="x", padx=2)
         
         self.update_btn = ctk.CTkButton(
             btn_frame,
-            text="Update Booking",
+            text="✏️ Update",
             command=self.update_booking,
-            width=120,
-            height=35,
-            font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="orange",
-            hover_color="darkorange",
+            height=38,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a",
             state="disabled"
         )
-        self.update_btn.pack(side="left", padx=5)
+        self.update_btn.pack(side="left", expand=True, fill="x", padx=2)
         
         self.delete_btn = ctk.CTkButton(
             btn_frame,
-            text="Delete Booking",
+            text="🗑️ Delete",
             command=self.delete_booking,
-            width=120,
-            height=35,
-            font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="red",
-            hover_color="darkred",
+            height=38,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color="#ff4757",
+            hover_color="#ff3344",
             state="disabled"
         )
-        self.delete_btn.pack(side="left", padx=5)
+        self.delete_btn.pack(side="left", expand=True, fill="x", padx=2)
         
         clear_btn = ctk.CTkButton(
             btn_frame,
-            text="Clear",
+            text="🔄 Clear",
             command=self.clear_form,
-            width=120,
-            height=35,
-            fg_color="gray40",
-            hover_color="gray30"
+            height=38,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a"
         )
-        clear_btn.pack(side="left", padx=5)
+        clear_btn.pack(side="left", expand=True, fill="x", padx=2)
         
         # Right panel - Table
         right_panel = ctk.CTkFrame(container, fg_color="#1e1e3f", corner_radius=15)

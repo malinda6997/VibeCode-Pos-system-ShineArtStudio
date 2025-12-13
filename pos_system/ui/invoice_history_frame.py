@@ -52,8 +52,8 @@ class InvoiceHistoryFrame(BaseFrame):
             command=self.view_invoice_details,
             width=120,
             height=35,
-            fg_color="blue",
-            hover_color="darkblue"
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a"
         ).pack(side="left", padx=10)
         
         ctk.CTkButton(
@@ -62,8 +62,9 @@ class InvoiceHistoryFrame(BaseFrame):
             command=self.reprint_invoice,
             width=140,
             height=35,
-            fg_color="green",
-            hover_color="darkgreen"
+            fg_color="#00d4ff",
+            text_color="#1a1a2e",
+            hover_color="#00a8cc"
         ).pack(side="left", padx=10)
         
         # Invoices table
