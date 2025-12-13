@@ -1,6 +1,7 @@
 import customtkinter as ctk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 from services.user_service import UserService
+from ui.components import Toast
 
 
 class UsersManagementFrame(ctk.CTkFrame):
@@ -195,29 +196,29 @@ class UsersManagementFrame(ctk.CTkFrame):
         role = self.role_combo.get()
         
         if not fullname or not username or not password:
-            messagebox.showerror("Error", "Please fill all required fields")
+            Toast.error(self, "Please fill all required fields")
             return
         
         if password != confirm:
-            messagebox.showerror("Error", "Passwords do not match")
+            Toast.error(self, "Passwords do not match")
             return
         
         if len(password) < 6:
-            messagebox.showerror("Error", "Password must be at least 6 characters")
+            Toast.error(self, "Password must be at least 6 characters")
             return
         
         if self.user_service.username_exists(username):
-            messagebox.showerror("Error", "Username already exists")
+            Toast.error(self, "Username already exists")
             return
         
         user_id = self.user_service.create_user(username, password, role, fullname)
         
         if user_id:
-            messagebox.showinfo("Success", "User created successfully")
+            Toast.success(self, "User created successfully")
             self.clear_form()
             self.load_users()
         else:
-            messagebox.showerror("Error", "Failed to create user")
+            Toast.error(self, "Failed to create user")
     
     def update_user(self):
         """Update selected user"""
@@ -230,11 +231,11 @@ class UsersManagementFrame(ctk.CTkFrame):
         status = 1 if self.status_combo.get() == "Active" else 0
         
         if not fullname or not username:
-            messagebox.showerror("Error", "Please fill all required fields")
+            Toast.error(self, "Please fill all required fields")
             return
         
         if self.user_service.username_exists(username, self.selected_user_id):
-            messagebox.showerror("Error", "Username already exists")
+            Toast.error(self, "Username already exists")
             return
         
         # Update user details
@@ -247,19 +248,19 @@ class UsersManagementFrame(ctk.CTkFrame):
         if password:
             confirm = self.confirm_password_entry.get()
             if password != confirm:
-                messagebox.showerror("Error", "Passwords do not match")
+                Toast.error(self, "Passwords do not match")
                 return
             if len(password) < 6:
-                messagebox.showerror("Error", "Password must be at least 6 characters")
+                Toast.error(self, "Password must be at least 6 characters")
                 return
             self.user_service.update_password(self.selected_user_id, password)
         
         if success:
-            messagebox.showinfo("Success", "User updated successfully")
+            Toast.success(self, "User updated successfully")
             self.clear_form()
             self.load_users()
         else:
-            messagebox.showerror("Error", "Failed to update user")
+            Toast.error(self, "Failed to update user")
     
     def delete_user(self):
         """Delete selected user"""
@@ -269,20 +270,21 @@ class UsersManagementFrame(ctk.CTkFrame):
         # Prevent deleting yourself
         current_user = self.auth_manager.get_current_user()
         if current_user and current_user['id'] == self.selected_user_id:
-            messagebox.showerror("Error", "You cannot delete your own account")
+            Toast.error(self, "You cannot delete your own account")
             return
         
-        if not messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this user?\n\nThis action cannot be undone."):
+        if not Toast.confirm(self, "Delete User", "Are you sure you want to delete this user?", 
+                            "Delete", "Cancel", "🗑️", "#ff6b6b"):
             return
         
         success = self.user_service.delete_user(self.selected_user_id)
         
         if success:
-            messagebox.showinfo("Success", "User deleted successfully")
+            Toast.success(self, "User deleted successfully")
             self.clear_form()
             self.load_users()
         else:
-            messagebox.showerror("Error", "Failed to delete user")
+            Toast.error(self, "Failed to delete user")
     
     def clear_form(self):
         """Clear all form fields"""

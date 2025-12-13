@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from tkinter import messagebox
+from ui.components import Toast
 import webbrowser
 
 
@@ -244,13 +244,9 @@ class SupportFrame(ctk.CTkFrame):
         issue = self.issue_text.get("1.0", "end-1c").strip()
         
         if not issue:
-            messagebox.showerror("Error", "Please describe the issue")
+            Toast.error(self, "Please describe the issue")
             return
         
         # In a real app, this would send to a server or email
-        messagebox.showinfo(
-            "Issue Reported", 
-            "Your issue has been recorded. Our support team will contact you soon.\n\n"
-            "For urgent issues, please contact us directly via phone or WhatsApp."
-        )
+        Toast.success(self, "Issue submitted! We'll contact you soon.")
         self.issue_text.delete("1.0", "end")

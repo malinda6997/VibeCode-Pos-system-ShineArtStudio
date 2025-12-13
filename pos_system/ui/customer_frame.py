@@ -23,7 +23,7 @@ class CustomerManagementFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Input section
-        input_frame = ctk.CTkFrame(self)
+        input_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
         input_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         # Full name
@@ -66,7 +66,7 @@ class CustomerManagementFrame(BaseFrame):
         clear_btn.pack(side="left", padx=10)
         
         # Search section
-        search_frame = ctk.CTkFrame(self)
+        search_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
         search_frame.pack(fill="x", padx=20, pady=(0, 10))
         
         search_label = ctk.CTkLabel(search_frame, text="Search:", font=ctk.CTkFont(size=13, weight="bold"))
@@ -86,7 +86,7 @@ class CustomerManagementFrame(BaseFrame):
         refresh_btn.pack(side="left", padx=10)
         
         # Table section
-        table_frame = ctk.CTkFrame(self)
+        table_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Create Treeview

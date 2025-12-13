@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from database import DatabaseManager
 from auth import AuthManager
-from ui.components import LoginWindow
+from ui.components import LoginWindow, Toast, MessageDialog
 from ui.sidebar import Sidebar
 from PIL import Image
 import os
@@ -75,14 +75,23 @@ class MainApplication(ctk.CTk):
         self.create_main_interface()
     
     def load_profile_image(self, user_id: int, size: tuple = (40, 40)):
-        """Load user profile image or return default"""
+        """Load user profile image with circular mask or return default"""
         try:
             profile_path = self.user_service.get_profile_picture(user_id)
             if profile_path and os.path.exists(profile_path):
                 img = Image.open(profile_path)
-                # Make it circular by creating a mask
+                # Make it square first
                 img = img.resize(size, Image.Resampling.LANCZOS)
-                return ctk.CTkImage(light_image=img, dark_image=img, size=size)
+                # Create circular mask
+                mask = Image.new('L', size, 0)
+                from PIL import ImageDraw
+                draw = ImageDraw.Draw(mask)
+                draw.ellipse((0, 0, size[0], size[1]), fill=255)
+                # Apply mask to create circular image
+                output = Image.new('RGBA', size, (0, 0, 0, 0))
+                img = img.convert('RGBA')
+                output.paste(img, (0, 0), mask)
+                return ctk.CTkImage(light_image=output, dark_image=output, size=size)
         except Exception as e:
             print(f"Error loading profile image: {e}")
         return None
@@ -198,6 +207,9 @@ class MainApplication(ctk.CTk):
         
         # Show default view (Dashboard)
         self.navigate_to("dashboard")
+        
+        # Set parent for MessageDialog toasts
+        MessageDialog.set_parent(self.content_frame)
     
     def update_profile_display(self):
         """Update profile picture in top bar"""
@@ -245,16 +257,19 @@ class MainApplication(ctk.CTk):
     
     def logout(self):
         """Logout and return to login screen"""
-        self.auth_manager.logout()
-        self.current_user = None
-        
-        # Clear main container
-        if self.main_container:
-            self.main_container.destroy()
-            self.main_container = None
-        
-        # Show login
-        self.show_login()
+        # Show confirmation dialog
+        if Toast.confirm(self, "Logout", "Are you sure you want to logout?", 
+                        "Yes, Logout", "Cancel", "🚪", "#ff4757"):
+            self.auth_manager.logout()
+            self.current_user = None
+            
+            # Clear main container
+            if self.main_container:
+                self.main_container.destroy()
+                self.main_container = None
+            
+            # Show login
+            self.show_login()
 
 
 def main():

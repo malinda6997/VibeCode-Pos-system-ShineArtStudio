@@ -25,7 +25,7 @@ class InvoiceHistoryFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Search and controls
-        controls_frame = ctk.CTkFrame(self)
+        controls_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
         controls_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         ctk.CTkLabel(
@@ -67,7 +67,7 @@ class InvoiceHistoryFrame(BaseFrame):
         ).pack(side="left", padx=10)
         
         # Invoices table
-        table_frame = ctk.CTkFrame(self)
+        table_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         columns = ("Invoice #", "Date", "Customer", "Mobile", "Total", "Paid", "Balance")

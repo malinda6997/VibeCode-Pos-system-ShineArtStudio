@@ -30,10 +30,10 @@ class BookingManagementFrame(BaseFrame):
         container.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Left panel - Form
-        left_panel = ctk.CTkFrame(container)
+        left_panel = ctk.CTkFrame(container, fg_color="#1e1e3f", corner_radius=15)
         left_panel.pack(side="left", fill="both", expand=True, padx=(0, 10))
         
-        form_frame = ctk.CTkFrame(left_panel)
+        form_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
         form_frame.pack(fill="both", expand=True, padx=15, pady=15)
         
         # Customer name
@@ -223,11 +223,11 @@ class BookingManagementFrame(BaseFrame):
         clear_btn.pack(side="left", padx=5)
         
         # Right panel - Table
-        right_panel = ctk.CTkFrame(container)
+        right_panel = ctk.CTkFrame(container, fg_color="#1e1e3f", corner_radius=15)
         right_panel.pack(side="right", fill="both", expand=True, padx=(10, 0))
         
         # Search
-        search_frame = ctk.CTkFrame(right_panel)
+        search_frame = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=10)
         search_frame.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(search_frame, text="Search:", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left", padx=5)
@@ -244,7 +244,7 @@ class BookingManagementFrame(BaseFrame):
         ).pack(side="left", padx=5)
         
         # Table
-        table_frame = ctk.CTkFrame(right_panel)
+        table_frame = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=10)
         table_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
         
         columns = ("ID", "Customer", "Mobile", "Category", "Amount", "Date", "Status")

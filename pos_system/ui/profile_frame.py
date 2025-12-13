@@ -1,6 +1,7 @@
 import customtkinter as ctk
-from tkinter import messagebox, filedialog
+from tkinter import filedialog
 from services.user_service import UserService
+from ui.components import Toast
 from PIL import Image
 import os
 
@@ -314,12 +315,12 @@ class ProfileFrame(ctk.CTkFrame):
                     if self.main_app:
                         self.main_app.update_profile_display()
                     
-                    messagebox.showinfo("Success", "Profile picture updated successfully!")
+                    Toast.success(self, "Profile picture updated successfully!")
                 else:
-                    messagebox.showerror("Error", "Failed to update profile picture")
+                    Toast.error(self, "Failed to update profile picture")
                     
             except Exception as e:
-                messagebox.showerror("Error", f"Failed to upload image: {e}")
+                Toast.error(self, f"Failed to upload image: {e}")
     
     def remove_profile_picture(self):
         """Remove profile picture"""
@@ -327,7 +328,7 @@ class ProfileFrame(ctk.CTkFrame):
         if not user:
             return
         
-        if messagebox.askyesno("Confirm", "Remove your profile picture?"):
+        def do_remove():
             # Get current picture path
             current_path = self.user_service.get_profile_picture(user['id'])
             
@@ -347,7 +348,10 @@ class ProfileFrame(ctk.CTkFrame):
                 if self.main_app:
                     self.main_app.update_profile_display()
                 
-                messagebox.showinfo("Success", "Profile picture removed")
+                Toast.success(self, "Profile picture removed")
+        
+        Toast.confirm(self, "Remove Picture", "Remove your profile picture?", 
+                     "Yes, Remove", "Cancel", "🗑️", "#e74c3c", do_remove)
     
     def change_password(self):
         """Handle password change"""
@@ -356,15 +360,15 @@ class ProfileFrame(ctk.CTkFrame):
         confirm = self.confirm_password.get()
         
         if not current or not new or not confirm:
-            messagebox.showerror("Error", "Please fill in all password fields")
+            Toast.error(self, "Please fill in all password fields")
             return
         
         if new != confirm:
-            messagebox.showerror("Error", "New passwords do not match")
+            Toast.error(self, "New passwords do not match")
             return
         
         if len(new) < 6:
-            messagebox.showerror("Error", "Password must be at least 6 characters")
+            Toast.error(self, "Password must be at least 6 characters")
             return
         
         # Verify current password
@@ -372,7 +376,7 @@ class ProfileFrame(ctk.CTkFrame):
         # Re-authenticate to verify current password
         verified = self.auth_manager.authenticate(user['username'], current)
         if not verified:
-            messagebox.showerror("Error", "Current password is incorrect")
+            Toast.error(self, "Current password is incorrect")
             # Restore user session since authenticate clears it on failure
             self.auth_manager.current_user = user
             return
@@ -381,9 +385,9 @@ class ProfileFrame(ctk.CTkFrame):
         success = self.user_service.update_password(user['id'], new)
         
         if success:
-            messagebox.showinfo("Success", "Password updated successfully!")
+            Toast.success(self, "Password updated successfully!")
             self.current_password.delete(0, "end")
             self.new_password.delete(0, "end")
             self.confirm_password.delete(0, "end")
         else:
-            messagebox.showerror("Error", "Failed to update password")
+            Toast.error(self, "Failed to update password")

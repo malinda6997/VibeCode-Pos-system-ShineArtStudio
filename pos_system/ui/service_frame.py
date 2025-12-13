@@ -24,7 +24,7 @@ class ServiceManagementFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Input section
-        input_frame = ctk.CTkFrame(self)
+        input_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
         input_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         # Service name
@@ -97,7 +97,7 @@ class ServiceManagementFrame(BaseFrame):
             self.delete_btn.configure(state="disabled")
         
         # Table section
-        table_frame = ctk.CTkFrame(self)
+        table_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Create Treeview

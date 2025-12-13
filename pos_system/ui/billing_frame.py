@@ -30,11 +30,11 @@ class BillingFrame(BaseFrame):
         main_container.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Left panel - Customer and items
-        left_panel = ctk.CTkFrame(main_container)
+        left_panel = ctk.CTkFrame(main_container, fg_color="#1e1e3f", corner_radius=15)
         left_panel.pack(side="left", fill="both", expand=True, padx=(0, 10))
         
         # Customer section
-        customer_frame = ctk.CTkFrame(left_panel)
+        customer_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
         customer_frame.pack(fill="x", padx=15, pady=15)
         
         customer_label = ctk.CTkLabel(
@@ -80,7 +80,7 @@ class BillingFrame(BaseFrame):
         self.customer_info.pack(pady=10)
         
         # Add items section
-        items_frame = ctk.CTkFrame(left_panel)
+        items_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
         items_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
         
         items_label = ctk.CTkLabel(
@@ -130,7 +130,7 @@ class BillingFrame(BaseFrame):
         ).pack(side="left", padx=5)
         
         # Cart table
-        cart_frame = ctk.CTkFrame(left_panel)
+        cart_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
         cart_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
         
         cart_label = ctk.CTkLabel(
@@ -170,7 +170,7 @@ class BillingFrame(BaseFrame):
         ).pack(pady=(0, 10))
         
         # Right panel - Payment
-        right_panel = ctk.CTkFrame(main_container, width=350)
+        right_panel = ctk.CTkFrame(main_container, width=350, fg_color="#1e1e3f", corner_radius=15)
         right_panel.pack(side="right", fill="y", padx=(10, 0))
         right_panel.pack_propagate(False)
         
