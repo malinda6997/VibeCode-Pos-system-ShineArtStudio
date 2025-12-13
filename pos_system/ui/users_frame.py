@@ -36,69 +36,73 @@ class UsersManagementFrame(ctk.CTkFrame):
         main = ctk.CTkFrame(self, fg_color="transparent")
         main.pack(fill="both", expand=True, padx=30, pady=10)
         
-        # Left panel - Form
+        # Left panel - Form (scrollable)
         left = ctk.CTkFrame(main, fg_color="#1e1e3f", corner_radius=15, width=400)
         left.pack(side="left", fill="y", padx=(0, 15), pady=0)
         left.pack_propagate(False)
         
+        # Scrollable container for form
+        left_scroll = ctk.CTkScrollableFrame(left, fg_color="transparent")
+        left_scroll.pack(fill="both", expand=True, padx=5, pady=5)
+        
         form_title = ctk.CTkLabel(
-            left,
+            left_scroll,
             text="User Details",
             font=ctk.CTkFont(size=18, weight="bold")
         )
-        form_title.pack(pady=(20, 15))
+        form_title.pack(pady=(15, 10))
         
         # Form fields container
-        form = ctk.CTkFrame(left, fg_color="transparent")
-        form.pack(fill="x", padx=25)
+        form = ctk.CTkFrame(left_scroll, fg_color="transparent")
+        form.pack(fill="x", padx=20)
         
         # Full Name
         ctk.CTkLabel(form, text="Full Name:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
         self.fullname_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13))
-        self.fullname_entry.pack(fill="x", pady=(0, 8))
+        self.fullname_entry.pack(fill="x", pady=(0, 5))
         
         # Username
         ctk.CTkLabel(form, text="Username:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
-        self.username_entry = ctk.CTkEntry(form, height=40, font=ctk.CTkFont(size=13))
-        self.username_entry.pack(fill="x", pady=(0, 10))
+        self.username_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13))
+        self.username_entry.pack(fill="x", pady=(0, 5))
         
         # Password
-        ctk.CTkLabel(form, text="Password:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(10, 5))
-        self.password_entry = ctk.CTkEntry(form, height=40, font=ctk.CTkFont(size=13), show="●")
-        self.password_entry.pack(fill="x", pady=(0, 10))
+        ctk.CTkLabel(form, text="Password:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
+        self.password_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13), show="●")
+        self.password_entry.pack(fill="x", pady=(0, 5))
         
         # Confirm Password
-        ctk.CTkLabel(form, text="Confirm Password:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(10, 5))
-        self.confirm_password_entry = ctk.CTkEntry(form, height=40, font=ctk.CTkFont(size=13), show="●")
-        self.confirm_password_entry.pack(fill="x", pady=(0, 10))
+        ctk.CTkLabel(form, text="Confirm Password:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
+        self.confirm_password_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13), show="●")
+        self.confirm_password_entry.pack(fill="x", pady=(0, 5))
         
         # Role
-        ctk.CTkLabel(form, text="Role:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(10, 5))
+        ctk.CTkLabel(form, text="Role:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
         self.role_combo = ctk.CTkComboBox(
             form, 
             values=["Admin", "Staff"],
-            height=40,
+            height=38,
             font=ctk.CTkFont(size=13),
             state="readonly"
         )
-        self.role_combo.pack(fill="x", pady=(0, 10))
+        self.role_combo.pack(fill="x", pady=(0, 5))
         self.role_combo.set("Staff")
         
         # Status
-        ctk.CTkLabel(form, text="Status:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(10, 5))
+        ctk.CTkLabel(form, text="Status:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
         self.status_combo = ctk.CTkComboBox(
             form,
             values=["Active", "Disabled"],
-            height=40,
+            height=38,
             font=ctk.CTkFont(size=13),
             state="readonly"
         )
-        self.status_combo.pack(fill="x", pady=(0, 15))
+        self.status_combo.pack(fill="x", pady=(0, 10))
         self.status_combo.set("Active")
         
         # Buttons
         btn_frame = ctk.CTkFrame(left_scroll, fg_color="transparent")
-        btn_frame.pack(fill="x", padx=20, pady=(10, 20))
+        btn_frame.pack(fill="x", padx=15, pady=(5, 15))
         
         self.add_btn = ctk.CTkButton(
             btn_frame,
