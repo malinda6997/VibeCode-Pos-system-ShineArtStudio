@@ -1,6 +1,7 @@
 import customtkinter as ctk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 from services.user_service import UserService
+from ui.components import Toast
 
 
 class UsersManagementFrame(ctk.CTkFrame):
@@ -35,69 +36,73 @@ class UsersManagementFrame(ctk.CTkFrame):
         main = ctk.CTkFrame(self, fg_color="transparent")
         main.pack(fill="both", expand=True, padx=30, pady=10)
         
-        # Left panel - Form
+        # Left panel - Form (scrollable)
         left = ctk.CTkFrame(main, fg_color="#1e1e3f", corner_radius=15, width=400)
         left.pack(side="left", fill="y", padx=(0, 15), pady=0)
         left.pack_propagate(False)
         
+        # Scrollable container for form
+        left_scroll = ctk.CTkScrollableFrame(left, fg_color="transparent")
+        left_scroll.pack(fill="both", expand=True, padx=5, pady=5)
+        
         form_title = ctk.CTkLabel(
-            left,
+            left_scroll,
             text="User Details",
             font=ctk.CTkFont(size=18, weight="bold")
         )
-        form_title.pack(pady=(20, 20))
+        form_title.pack(pady=(15, 10))
         
-        # Form fields
-        form = ctk.CTkFrame(left, fg_color="transparent")
-        form.pack(fill="x", padx=25)
+        # Form fields container
+        form = ctk.CTkFrame(left_scroll, fg_color="transparent")
+        form.pack(fill="x", padx=20)
         
         # Full Name
-        ctk.CTkLabel(form, text="Full Name:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(10, 5))
-        self.fullname_entry = ctk.CTkEntry(form, height=40, font=ctk.CTkFont(size=13))
-        self.fullname_entry.pack(fill="x", pady=(0, 10))
+        ctk.CTkLabel(form, text="Full Name:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
+        self.fullname_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13))
+        self.fullname_entry.pack(fill="x", pady=(0, 5))
         
         # Username
-        ctk.CTkLabel(form, text="Username:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(10, 5))
-        self.username_entry = ctk.CTkEntry(form, height=40, font=ctk.CTkFont(size=13))
-        self.username_entry.pack(fill="x", pady=(0, 10))
+        ctk.CTkLabel(form, text="Username:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
+        self.username_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13))
+        self.username_entry.pack(fill="x", pady=(0, 5))
         
         # Password
-        ctk.CTkLabel(form, text="Password:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(10, 5))
-        self.password_entry = ctk.CTkEntry(form, height=40, font=ctk.CTkFont(size=13), show="●")
-        self.password_entry.pack(fill="x", pady=(0, 10))
+        ctk.CTkLabel(form, text="Password:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
+        self.password_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13), show="●")
+        self.password_entry.pack(fill="x", pady=(0, 5))
         
         # Confirm Password
-        ctk.CTkLabel(form, text="Confirm Password:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(10, 5))
-        self.confirm_password_entry = ctk.CTkEntry(form, height=40, font=ctk.CTkFont(size=13), show="●")
-        self.confirm_password_entry.pack(fill="x", pady=(0, 10))
+        ctk.CTkLabel(form, text="Confirm Password:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
+        self.confirm_password_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13), show="●")
+        self.confirm_password_entry.pack(fill="x", pady=(0, 5))
         
         # Role
-        ctk.CTkLabel(form, text="Role:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(10, 5))
+        ctk.CTkLabel(form, text="Role:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
         self.role_combo = ctk.CTkComboBox(
             form, 
             values=["Admin", "Staff"],
-            height=40,
+            height=38,
             font=ctk.CTkFont(size=13),
             state="readonly"
         )
-        self.role_combo.pack(fill="x", pady=(0, 10))
+        self.role_combo.pack(fill="x", pady=(0, 5))
         self.role_combo.set("Staff")
         
         # Status
-        ctk.CTkLabel(form, text="Status:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(10, 5))
+        ctk.CTkLabel(form, text="Status:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
         self.status_combo = ctk.CTkComboBox(
             form,
             values=["Active", "Disabled"],
-            height=40,
+            height=38,
             font=ctk.CTkFont(size=13),
             state="readonly"
         )
-        self.status_combo.pack(fill="x", pady=(0, 20))
+        self.status_combo.pack(fill="x", pady=(0, 10))
         self.status_combo.set("Active")
         
         # Buttons
-        btn_frame = ctk.CTkFrame(left, fg_color="transparent")
-        btn_frame.pack(fill="x", padx=25, pady=20)
+        btn_frame = ctk.CTkFrame(left_scroll, fg_color="transparent")
+        btn_frame.pack(fill="x", padx=15, pady=(5, 15))
         
         self.add_btn = ctk.CTkButton(
             btn_frame,
@@ -107,7 +112,7 @@ class UsersManagementFrame(ctk.CTkFrame):
             fg_color="#00d4ff",
             text_color="#1a1a2e",
             hover_color="#00a8cc",
-            command=self.add_user
+            command=lambda: self.add_user()
         )
         self.add_btn.pack(fill="x", pady=5)
         
@@ -194,34 +199,47 @@ class UsersManagementFrame(ctk.CTkFrame):
         confirm = self.confirm_password_entry.get()
         role = self.role_combo.get()
         
-        if not fullname or not username or not password:
-            messagebox.showerror("Error", "Please fill all required fields")
+        if not fullname:
+            Toast.error(self, "Please enter full name")
             return
         
-        if password != confirm:
-            messagebox.showerror("Error", "Passwords do not match")
+        if not username:
+            Toast.error(self, "Please enter username")
+            return
+        
+        if len(username) < 3:
+            Toast.error(self, "Username must be at least 3 characters")
+            return
+            
+        if not password:
+            Toast.error(self, "Please enter password")
             return
         
         if len(password) < 6:
-            messagebox.showerror("Error", "Password must be at least 6 characters")
+            Toast.error(self, "Password must be at least 6 characters")
+            return
+        
+        if password != confirm:
+            Toast.error(self, "Passwords do not match")
             return
         
         if self.user_service.username_exists(username):
-            messagebox.showerror("Error", "Username already exists")
+            Toast.error(self, "Username already exists")
             return
         
         user_id = self.user_service.create_user(username, password, role, fullname)
         
         if user_id:
-            messagebox.showinfo("Success", "User created successfully")
+            Toast.success(self, "User created successfully!")
             self.clear_form()
             self.load_users()
         else:
-            messagebox.showerror("Error", "Failed to create user")
+            Toast.error(self, "Failed to create user")
     
     def update_user(self):
         """Update selected user"""
         if not self.selected_user_id:
+            Toast.error(self, "Please select a user to update")
             return
         
         fullname = self.fullname_entry.get().strip()
@@ -229,12 +247,20 @@ class UsersManagementFrame(ctk.CTkFrame):
         role = self.role_combo.get()
         status = 1 if self.status_combo.get() == "Active" else 0
         
-        if not fullname or not username:
-            messagebox.showerror("Error", "Please fill all required fields")
+        if not fullname:
+            Toast.error(self, "Please enter full name")
+            return
+        
+        if not username:
+            Toast.error(self, "Please enter username")
+            return
+        
+        if len(username) < 3:
+            Toast.error(self, "Username must be at least 3 characters")
             return
         
         if self.user_service.username_exists(username, self.selected_user_id):
-            messagebox.showerror("Error", "Username already exists")
+            Toast.error(self, "Username already exists")
             return
         
         # Update user details
@@ -246,20 +272,20 @@ class UsersManagementFrame(ctk.CTkFrame):
         password = self.password_entry.get()
         if password:
             confirm = self.confirm_password_entry.get()
-            if password != confirm:
-                messagebox.showerror("Error", "Passwords do not match")
-                return
             if len(password) < 6:
-                messagebox.showerror("Error", "Password must be at least 6 characters")
+                Toast.error(self, "Password must be at least 6 characters")
+                return
+            if password != confirm:
+                Toast.error(self, "Passwords do not match")
                 return
             self.user_service.update_password(self.selected_user_id, password)
         
         if success:
-            messagebox.showinfo("Success", "User updated successfully")
+            Toast.success(self, "User updated successfully!")
             self.clear_form()
             self.load_users()
         else:
-            messagebox.showerror("Error", "Failed to update user")
+            Toast.error(self, "Failed to update user")
     
     def delete_user(self):
         """Delete selected user"""
@@ -269,20 +295,21 @@ class UsersManagementFrame(ctk.CTkFrame):
         # Prevent deleting yourself
         current_user = self.auth_manager.get_current_user()
         if current_user and current_user['id'] == self.selected_user_id:
-            messagebox.showerror("Error", "You cannot delete your own account")
+            Toast.error(self, "You cannot delete your own account")
             return
         
-        if not messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this user?\n\nThis action cannot be undone."):
+        if not Toast.confirm(self, "Delete User", "Are you sure you want to delete this user?", 
+                            "Delete", "Cancel", "🗑️", "#ff6b6b"):
             return
         
         success = self.user_service.delete_user(self.selected_user_id)
         
         if success:
-            messagebox.showinfo("Success", "User deleted successfully")
+            Toast.success(self, "User deleted successfully")
             self.clear_form()
             self.load_users()
         else:
-            messagebox.showerror("Error", "Failed to delete user")
+            Toast.error(self, "Failed to delete user")
     
     def clear_form(self):
         """Clear all form fields"""

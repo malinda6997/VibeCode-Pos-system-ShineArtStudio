@@ -30,11 +30,11 @@ class BillingFrame(BaseFrame):
         main_container.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Left panel - Customer and items
-        left_panel = ctk.CTkFrame(main_container)
+        left_panel = ctk.CTkFrame(main_container, fg_color="#1e1e3f", corner_radius=15)
         left_panel.pack(side="left", fill="both", expand=True, padx=(0, 10))
         
         # Customer section
-        customer_frame = ctk.CTkFrame(left_panel)
+        customer_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
         customer_frame.pack(fill="x", padx=15, pady=15)
         
         customer_label = ctk.CTkLabel(
@@ -51,6 +51,7 @@ class BillingFrame(BaseFrame):
         ctk.CTkLabel(search_container, text="Mobile Number:").pack(side="left", padx=5)
         self.mobile_search = ctk.CTkEntry(search_container, width=150, height=30)
         self.mobile_search.pack(side="left", padx=5)
+        self.mobile_search.bind("<KeyRelease>", self.on_mobile_search_change)
         
         ctk.CTkButton(
             search_container,
@@ -66,21 +67,80 @@ class BillingFrame(BaseFrame):
             command=self.add_new_customer,
             width=120,
             height=30,
-            fg_color="green",
-            hover_color="darkgreen"
+            fg_color="#00d4ff",
+            text_color="#1a1a2e",
+            hover_color="#00a8cc"
         ).pack(side="left", padx=5)
         
-        # Customer details display
-        self.customer_info = ctk.CTkLabel(
+        # Customer suggestions dropdown (hidden by default)
+        self.suggestions_frame = ctk.CTkFrame(customer_frame, fg_color="#2d2d5a", corner_radius=8)
+        self.suggestion_buttons = []
+        
+        # Customer details display card (hidden by default)
+        self.customer_card = ctk.CTkFrame(customer_frame, fg_color="#1e3a2f", corner_radius=10, border_width=2, border_color="#00ff88")
+        
+        # Card content
+        card_content = ctk.CTkFrame(self.customer_card, fg_color="transparent")
+        card_content.pack(fill="x", padx=15, pady=12)
+        
+        # Left side - Icon
+        icon_frame = ctk.CTkFrame(card_content, fg_color="#00ff88", width=50, height=50, corner_radius=25)
+        icon_frame.pack(side="left", padx=(0, 15))
+        icon_frame.pack_propagate(False)
+        
+        ctk.CTkLabel(
+            icon_frame,
+            text="👤",
+            font=ctk.CTkFont(size=24),
+            text_color="#1a1a2e"
+        ).place(relx=0.5, rely=0.5, anchor="center")
+        
+        # Right side - Customer details
+        details_frame = ctk.CTkFrame(card_content, fg_color="transparent")
+        details_frame.pack(side="left", fill="x", expand=True)
+        
+        self.customer_name_label = ctk.CTkLabel(
+            details_frame,
+            text="",
+            font=ctk.CTkFont(size=15, weight="bold"),
+            text_color="white",
+            anchor="w"
+        )
+        self.customer_name_label.pack(fill="x")
+        
+        self.customer_mobile_label = ctk.CTkLabel(
+            details_frame,
+            text="",
+            font=ctk.CTkFont(size=13),
+            text_color="#00ff88",
+            anchor="w"
+        )
+        self.customer_mobile_label.pack(fill="x")
+        
+        # Clear button
+        self.clear_customer_btn = ctk.CTkButton(
+            card_content,
+            text="✕",
+            width=30,
+            height=30,
+            fg_color="#ff6b6b",
+            hover_color="#e55555",
+            corner_radius=15,
+            command=self.clear_selected_customer
+        )
+        self.clear_customer_btn.pack(side="right", padx=(10, 0))
+        
+        # No customer selected label
+        self.no_customer_label = ctk.CTkLabel(
             customer_frame,
-            text="No customer selected",
+            text="🔍 Search customer by mobile number",
             font=ctk.CTkFont(size=13),
             text_color="gray"
         )
-        self.customer_info.pack(pady=10)
+        self.no_customer_label.pack(pady=10)
         
         # Add items section
-        items_frame = ctk.CTkFrame(left_panel)
+        items_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
         items_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
         
         items_label = ctk.CTkLabel(
@@ -130,7 +190,7 @@ class BillingFrame(BaseFrame):
         ).pack(side="left", padx=5)
         
         # Cart table
-        cart_frame = ctk.CTkFrame(left_panel)
+        cart_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
         cart_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
         
         cart_label = ctk.CTkLabel(
@@ -165,12 +225,12 @@ class BillingFrame(BaseFrame):
             command=self.remove_from_cart,
             width=150,
             height=30,
-            fg_color="red",
-            hover_color="darkred"
+            fg_color="#ff4757",
+            hover_color="#ff3344"
         ).pack(pady=(0, 10))
         
         # Right panel - Payment
-        right_panel = ctk.CTkFrame(main_container, width=350)
+        right_panel = ctk.CTkFrame(main_container, width=350, fg_color="#1e1e3f", corner_radius=15)
         right_panel.pack(side="right", fill="y", padx=(10, 0))
         right_panel.pack_propagate(False)
         
@@ -260,8 +320,8 @@ class BillingFrame(BaseFrame):
             command=self.clear_all,
             width=200,
             height=35,
-            fg_color="gray40",
-            hover_color="gray30"
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a"
         ).pack(pady=10)
         
         # Load initial items
@@ -269,6 +329,7 @@ class BillingFrame(BaseFrame):
     
     def search_customer(self):
         """Search customer by mobile"""
+        self.hide_suggestions()
         mobile = self.mobile_search.get().strip()
         
         if not mobile:
@@ -278,15 +339,80 @@ class BillingFrame(BaseFrame):
         customer = self.db_manager.get_customer_by_mobile(mobile)
         
         if customer:
-            self.selected_customer = customer
-            self.customer_info.configure(
-                text=f"Customer: {customer['full_name']}\nMobile: {customer['mobile_number']}",
-                text_color="white"
-            )
+            self.show_customer_card(customer)
         else:
             MessageDialog.show_error("Not Found", "Customer not found")
             self.selected_customer = None
     
+    def show_customer_card(self, customer):
+        """Display selected customer in a nice card"""
+        self.selected_customer = customer
+        self.customer_name_label.configure(text=customer['full_name'])
+        self.customer_mobile_label.configure(text=f"📱 {customer['mobile_number']}")
+        self.no_customer_label.pack_forget()
+        self.customer_card.pack(fill="x", padx=15, pady=10)
+    
+    def clear_selected_customer(self):
+        """Clear selected customer"""
+        self.selected_customer = None
+        self.customer_card.pack_forget()
+        self.no_customer_label.pack(pady=10)
+        self.mobile_search.delete(0, "end")
+    
+    def on_mobile_search_change(self, event=None):
+        """Auto-search when typing 5+ digits"""
+        mobile = self.mobile_search.get().strip()
+        
+        # Only search if 5 or more digits entered
+        if len(mobile) >= 5:
+            customers = self.db_manager.search_customers(mobile)
+            
+            if customers:
+                self.show_suggestions(customers)
+            else:
+                self.hide_suggestions()
+        else:
+            self.hide_suggestions()
+    
+    def show_suggestions(self, customers):
+        """Show customer suggestions dropdown"""
+        # Clear existing buttons
+        for btn in self.suggestion_buttons:
+            btn.destroy()
+        self.suggestion_buttons = []
+        
+        # Show frame
+        self.suggestions_frame.pack(fill="x", padx=15, pady=(0, 5))
+        
+        # Add customer buttons (max 5)
+        for customer in customers[:5]:
+            btn = ctk.CTkButton(
+                self.suggestions_frame,
+                text=f"📱 {customer['mobile_number']}  -  {customer['full_name']}",
+                font=ctk.CTkFont(size=12),
+                fg_color="transparent",
+                hover_color="#3d3d6a",
+                anchor="w",
+                height=35,
+                command=lambda c=customer: self.select_suggestion(c)
+            )
+            btn.pack(fill="x", padx=5, pady=2)
+            self.suggestion_buttons.append(btn)
+    
+    def hide_suggestions(self):
+        """Hide suggestions dropdown"""
+        for btn in self.suggestion_buttons:
+            btn.destroy()
+        self.suggestion_buttons = []
+        self.suggestions_frame.pack_forget()
+    
+    def select_suggestion(self, customer):
+        """Select a customer from suggestions"""
+        self.hide_suggestions()
+        self.mobile_search.delete(0, "end")
+        self.mobile_search.insert(0, customer['mobile_number'])
+        self.show_customer_card(customer)
+
     def add_new_customer(self):
         """Add new customer dialog"""
         dialog = ctk.CTkToplevel(self)

@@ -37,7 +37,7 @@ class UserService:
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             cursor.execute('''
-                SELECT id, username, role, full_name, is_active, created_at 
+                SELECT id, username, role, full_name, is_active, created_at, profile_picture 
                 FROM users WHERE id = ?
             ''', (user_id,))
             user = cursor.fetchone()
@@ -45,6 +45,34 @@ class UserService:
             return dict(user) if user else None
         except sqlite3.Error as e:
             print(f"Error getting user: {e}")
+            return None
+    
+    def update_profile_picture(self, user_id: int, picture_path: str) -> bool:
+        """Update user profile picture"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute('''
+                UPDATE users SET profile_picture = ? WHERE id = ?
+            ''', (picture_path, user_id))
+            conn.commit()
+            conn.close()
+            return True
+        except sqlite3.Error as e:
+            print(f"Error updating profile picture: {e}")
+            return False
+    
+    def get_profile_picture(self, user_id: int) -> Optional[str]:
+        """Get user profile picture path"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute('SELECT profile_picture FROM users WHERE id = ?', (user_id,))
+            result = cursor.fetchone()
+            conn.close()
+            return result[0] if result else None
+        except sqlite3.Error as e:
+            print(f"Error getting profile picture: {e}")
             return None
     
     def create_user(self, username: str, password: str, role: str, 

@@ -30,10 +30,17 @@ class DatabaseSchema:
                 password_hash TEXT NOT NULL,
                 role TEXT NOT NULL CHECK(role IN ('Admin', 'Staff')),
                 full_name TEXT NOT NULL,
+                profile_picture TEXT DEFAULT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 is_active INTEGER DEFAULT 1
             )
         ''')
+        
+        # Add profile_picture column if not exists (for existing databases)
+        try:
+            self.cursor.execute('ALTER TABLE users ADD COLUMN profile_picture TEXT DEFAULT NULL')
+        except sqlite3.OperationalError:
+            pass  # Column already exists
         
         # Customers table
         self.cursor.execute('''

@@ -1,16 +1,21 @@
 import customtkinter as ctk
-from tkinter import messagebox
+from tkinter import filedialog
 from services.user_service import UserService
+from ui.components import Toast
+from PIL import Image
+import os
 
 
 class ProfileFrame(ctk.CTkFrame):
-    """User profile and password change page"""
+    """User profile and password change page with profile picture upload"""
     
-    def __init__(self, parent, auth_manager, db_manager):
+    def __init__(self, parent, auth_manager, db_manager, main_app=None):
         super().__init__(parent, fg_color="transparent")
         self.auth_manager = auth_manager
         self.db_manager = db_manager
         self.user_service = UserService()
+        self.main_app = main_app
+        self.profile_image = None
         
         self.create_widgets()
         self.load_profile()
@@ -29,8 +34,8 @@ class ProfileFrame(ctk.CTkFrame):
         )
         title.pack(side="left")
         
-        # Main container
-        main = ctk.CTkFrame(self, fg_color="transparent")
+        # Scrollable main container
+        main = ctk.CTkScrollableFrame(self, fg_color="transparent")
         main.pack(fill="both", expand=True, padx=30, pady=10)
         
         # Profile Card
@@ -41,13 +46,46 @@ class ProfileFrame(ctk.CTkFrame):
         avatar_frame = ctk.CTkFrame(profile_card, fg_color="transparent")
         avatar_frame.pack(fill="x", padx=30, pady=30)
         
-        # Large avatar icon
-        avatar_label = ctk.CTkLabel(
-            avatar_frame,
+        # Profile picture container
+        self.avatar_container = ctk.CTkFrame(avatar_frame, fg_color="#252545", width=120, height=120, corner_radius=60)
+        self.avatar_container.pack()
+        self.avatar_container.pack_propagate(False)
+        
+        # Large avatar icon/image
+        self.avatar_label = ctk.CTkLabel(
+            self.avatar_container,
             text="👤",
-            font=ctk.CTkFont(size=80)
+            font=ctk.CTkFont(size=50)
         )
-        avatar_label.pack()
+        self.avatar_label.pack(expand=True)
+        
+        # Upload button
+        upload_btn = ctk.CTkButton(
+            avatar_frame,
+            text="📷 Upload Photo",
+            height=35,
+            width=150,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color="#00d4ff",
+            text_color="#1a1a2e",
+            hover_color="#00a8cc",
+            command=self.upload_profile_picture
+        )
+        upload_btn.pack(pady=(15, 5))
+        
+        # Remove photo button
+        remove_btn = ctk.CTkButton(
+            avatar_frame,
+            text="🗑️ Remove Photo",
+            height=30,
+            width=150,
+            font=ctk.CTkFont(size=11),
+            fg_color="#ff6b6b",
+            text_color="white",
+            hover_color="#e55555",
+            command=self.remove_profile_picture
+        )
+        remove_btn.pack(pady=(0, 10))
         
         self.name_label = ctk.CTkLabel(
             avatar_frame,
@@ -216,6 +254,104 @@ class ProfileFrame(ctk.CTkFrame):
             self.username_detail.configure(text=user['username'])
             self.role_detail.configure(text=user['role'])
             self.status_detail.configure(text="Active")
+            
+            # Load profile picture
+            self.load_profile_picture(user['id'])
+    
+    def load_profile_picture(self, user_id: int):
+        """Load and display profile picture"""
+        try:
+            profile_path = self.user_service.get_profile_picture(user_id)
+            if profile_path and os.path.exists(profile_path):
+                img = Image.open(profile_path)
+                img = img.resize((100, 100), Image.Resampling.LANCZOS)
+                self.profile_image = ctk.CTkImage(light_image=img, dark_image=img, size=(100, 100))
+                self.avatar_label.configure(image=self.profile_image, text="")
+            else:
+                self.avatar_label.configure(image=None, text="👤", font=ctk.CTkFont(size=50))
+        except Exception as e:
+            print(f"Error loading profile picture: {e}")
+            self.avatar_label.configure(image=None, text="👤", font=ctk.CTkFont(size=50))
+    
+    def upload_profile_picture(self):
+        """Upload new profile picture"""
+        filetypes = [
+            ("Image files", "*.png *.jpg *.jpeg *.gif *.bmp"),
+            ("PNG files", "*.png"),
+            ("JPEG files", "*.jpg *.jpeg"),
+            ("All files", "*.*")
+        ]
+        
+        filepath = filedialog.askopenfilename(
+            title="Select Profile Picture",
+            filetypes=filetypes
+        )
+        
+        if filepath:
+            try:
+                user = self.auth_manager.get_current_user()
+                if not user:
+                    return
+                
+                # Create profile_pictures directory if not exists
+                profiles_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "profile_pictures")
+                os.makedirs(profiles_dir, exist_ok=True)
+                
+                # Generate unique filename
+                ext = os.path.splitext(filepath)[1]
+                new_filename = f"user_{user['id']}{ext}"
+                new_path = os.path.join(profiles_dir, new_filename)
+                
+                # Copy and resize image
+                img = Image.open(filepath)
+                img = img.resize((200, 200), Image.Resampling.LANCZOS)
+                img.save(new_path)
+                
+                # Update database
+                if self.user_service.update_profile_picture(user['id'], new_path):
+                    self.load_profile_picture(user['id'])
+                    
+                    # Update top bar display
+                    if self.main_app:
+                        self.main_app.update_profile_display()
+                    
+                    Toast.success(self, "Profile picture updated successfully!")
+                else:
+                    Toast.error(self, "Failed to update profile picture")
+                    
+            except Exception as e:
+                Toast.error(self, f"Failed to upload image: {e}")
+    
+    def remove_profile_picture(self):
+        """Remove profile picture"""
+        user = self.auth_manager.get_current_user()
+        if not user:
+            return
+        
+        def do_remove():
+            # Get current picture path
+            current_path = self.user_service.get_profile_picture(user['id'])
+            
+            # Delete file if exists
+            if current_path and os.path.exists(current_path):
+                try:
+                    os.remove(current_path)
+                except:
+                    pass
+            
+            # Clear from database
+            if self.user_service.update_profile_picture(user['id'], None):
+                self.avatar_label.configure(image=None, text="👤", font=ctk.CTkFont(size=50))
+                self.profile_image = None
+                
+                # Update top bar display
+                if self.main_app:
+                    self.main_app.update_profile_display()
+                
+                Toast.success(self, "Profile picture removed")
+        
+        Toast.confirm(self, "Remove Picture", "Remove your profile picture?", 
+                     "Yes, Remove", "Cancel", "🗑️", "#e74c3c", do_remove)
     
     def change_password(self):
         """Handle password change"""
@@ -224,15 +360,15 @@ class ProfileFrame(ctk.CTkFrame):
         confirm = self.confirm_password.get()
         
         if not current or not new or not confirm:
-            messagebox.showerror("Error", "Please fill in all password fields")
+            Toast.error(self, "Please fill in all password fields")
             return
         
         if new != confirm:
-            messagebox.showerror("Error", "New passwords do not match")
+            Toast.error(self, "New passwords do not match")
             return
         
         if len(new) < 6:
-            messagebox.showerror("Error", "Password must be at least 6 characters")
+            Toast.error(self, "Password must be at least 6 characters")
             return
         
         # Verify current password
@@ -240,7 +376,7 @@ class ProfileFrame(ctk.CTkFrame):
         # Re-authenticate to verify current password
         verified = self.auth_manager.authenticate(user['username'], current)
         if not verified:
-            messagebox.showerror("Error", "Current password is incorrect")
+            Toast.error(self, "Current password is incorrect")
             # Restore user session since authenticate clears it on failure
             self.auth_manager.current_user = user
             return
@@ -249,9 +385,9 @@ class ProfileFrame(ctk.CTkFrame):
         success = self.user_service.update_password(user['id'], new)
         
         if success:
-            messagebox.showinfo("Success", "Password updated successfully!")
+            Toast.success(self, "Password updated successfully!")
             self.current_password.delete(0, "end")
             self.new_password.delete(0, "end")
             self.confirm_password.delete(0, "end")
         else:
-            messagebox.showerror("Error", "Failed to update password")
+            Toast.error(self, "Failed to update password")

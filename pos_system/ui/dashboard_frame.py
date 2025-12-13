@@ -58,11 +58,15 @@ class DashboardFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=16),
             text_color="#aaaaaa"
         )
-        welcome.pack(anchor="w", padx=30, pady=(0, 20))
+        welcome.pack(anchor="w", padx=30, pady=(0, 10))
+        
+        # Scrollable stats cards container
+        scroll_container = ctk.CTkScrollableFrame(self, fg_color="transparent")
+        scroll_container.pack(fill="both", expand=True, padx=30, pady=10)
         
         # Stats cards container
-        self.cards_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.cards_frame.pack(fill="both", expand=True, padx=30, pady=10)
+        self.cards_frame = ctk.CTkFrame(scroll_container, fg_color="transparent")
+        self.cards_frame.pack(fill="both", expand=True)
         
         # Row 1 - Main stats
         row1 = ctk.CTkFrame(self.cards_frame, fg_color="transparent")
@@ -121,9 +125,9 @@ class DashboardFrame(ctk.CTkFrame):
         )
         self.total_invoices_card.pack(side="left", fill="both", expand=True, padx=(10, 0))
         
-        # Quick actions
-        actions_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
-        actions_frame.pack(fill="x", padx=30, pady=20)
+        # Quick actions - inside scrollable area
+        actions_frame = ctk.CTkFrame(scroll_container, fg_color="#1e1e3f", corner_radius=15)
+        actions_frame.pack(fill="x", pady=20)
         
         actions_title = ctk.CTkLabel(
             actions_frame,

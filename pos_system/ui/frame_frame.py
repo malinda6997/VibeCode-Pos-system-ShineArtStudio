@@ -24,7 +24,7 @@ class FrameManagementFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Input section
-        input_frame = ctk.CTkFrame(self)
+        input_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
         input_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         # Frame name
@@ -76,8 +76,8 @@ class FrameManagementFrame(BaseFrame):
             width=120,
             height=35,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="orange",
-            hover_color="darkorange",
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a",
             state="disabled"
         )
         self.update_btn.pack(side="left", padx=5)
@@ -89,8 +89,8 @@ class FrameManagementFrame(BaseFrame):
             width=120,
             height=35,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="red",
-            hover_color="darkred",
+            fg_color="#ff4757",
+            hover_color="#ff3344",
             state="disabled"
         )
         self.delete_btn.pack(side="left", padx=5)
@@ -101,8 +101,8 @@ class FrameManagementFrame(BaseFrame):
             command=self.clear_form,
             width=120,
             height=35,
-            fg_color="gray40",
-            hover_color="gray30"
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a"
         )
         clear_btn.pack(side="left", padx=5)
         
@@ -111,7 +111,7 @@ class FrameManagementFrame(BaseFrame):
             self.delete_btn.configure(state="disabled")
         
         # Table section
-        table_frame = ctk.CTkFrame(self)
+        table_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Create Treeview

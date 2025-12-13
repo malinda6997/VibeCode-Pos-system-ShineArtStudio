@@ -25,7 +25,7 @@ class InvoiceHistoryFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Search and controls
-        controls_frame = ctk.CTkFrame(self)
+        controls_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
         controls_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         ctk.CTkLabel(
@@ -52,8 +52,8 @@ class InvoiceHistoryFrame(BaseFrame):
             command=self.view_invoice_details,
             width=120,
             height=35,
-            fg_color="blue",
-            hover_color="darkblue"
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a"
         ).pack(side="left", padx=10)
         
         ctk.CTkButton(
@@ -62,12 +62,13 @@ class InvoiceHistoryFrame(BaseFrame):
             command=self.reprint_invoice,
             width=140,
             height=35,
-            fg_color="green",
-            hover_color="darkgreen"
+            fg_color="#00d4ff",
+            text_color="#1a1a2e",
+            hover_color="#00a8cc"
         ).pack(side="left", padx=10)
         
         # Invoices table
-        table_frame = ctk.CTkFrame(self)
+        table_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         columns = ("Invoice #", "Date", "Customer", "Mobile", "Total", "Paid", "Balance")

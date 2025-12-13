@@ -1,6 +1,7 @@
 import customtkinter as ctk
-from tkinter import messagebox, filedialog
+from tkinter import filedialog
 from services.settings_service import SettingsService
+from ui.components import Toast
 
 
 class SettingsFrame(ctk.CTkFrame):
@@ -277,14 +278,15 @@ class SettingsFrame(ctk.CTkFrame):
         }
         
         self.settings_service.update_multiple_settings(settings)
-        messagebox.showinfo("Success", "Settings saved successfully!")
+        Toast.success(self, "Settings saved successfully!")
     
     def reset_settings(self):
         """Reset to default settings"""
-        if messagebox.askyesno("Confirm", "Reset all settings to default values?"):
+        if Toast.confirm(self, "Reset Settings", "Reset all settings to default values?",
+                        "Reset", "Cancel", "🔄", "#ffd93d"):
             self.settings_service.reset_to_defaults()
             self.load_settings()
-            messagebox.showinfo("Success", "Settings reset to defaults")
+            Toast.success(self, "Settings reset to defaults")
     
     def change_theme(self, theme: str):
         """Change application theme"""
@@ -306,9 +308,9 @@ class SettingsFrame(ctk.CTkFrame):
                 import os
                 db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "pos_database.db")
                 shutil.copy2(db_path, filepath)
-                messagebox.showinfo("Success", f"Database backed up to:\n{filepath}")
+                Toast.success(self, "Database backed up successfully!")
             except Exception as e:
-                messagebox.showerror("Error", f"Backup failed: {e}")
+                Toast.error(self, f"Backup failed: {e}")
     
     def restore_database(self):
         """Restore database from backup"""
@@ -317,12 +319,13 @@ class SettingsFrame(ctk.CTkFrame):
         )
         
         if filepath:
-            if messagebox.askyesno("Warning", "This will replace current data. Continue?"):
+            if Toast.confirm(self, "Restore Database", "This will replace all current data. Continue?",
+                           "Restore", "Cancel", "⚠️", "#ff6b6b"):
                 try:
                     import shutil
                     import os
                     db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "pos_database.db")
                     shutil.copy2(filepath, db_path)
-                    messagebox.showinfo("Success", "Database restored. Please restart the application.")
+                    Toast.success(self, "Database restored! Please restart the app.")
                 except Exception as e:
-                    messagebox.showerror("Error", f"Restore failed: {e}")
+                    Toast.error(self, f"Restore failed: {e}")
