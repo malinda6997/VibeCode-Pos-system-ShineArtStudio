@@ -66,7 +66,7 @@ class Sidebar(ctk.CTkFrame):
             ("billing", "💰", "Billing"),
             ("customers", "👥", "Customers"),
             ("services", "📋", "Services"),
-            ("frames", "🖼️", "Photo Frames"),
+            ("frames", "🖼", "Photo Frames"),
             ("bookings", "📅", "Bookings"),
             ("invoices", "📄", "Invoices"),
         ]
