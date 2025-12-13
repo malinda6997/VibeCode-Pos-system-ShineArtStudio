@@ -99,12 +99,31 @@ class SettingsService:
             cursor = conn.cursor()
             for key, value in settings.items():
                 cursor.execute('''
-                    UPDATE settings SET setting_value = ?, updated_at = CURRENT_TIMESTAMP
-                    WHERE setting_key = ?
-                ''', (value, key))
+                    INSERT INTO settings (setting_key, setting_value, setting_type, description)
+                    VALUES (?, ?, 'string', '')
+                    ON CONFLICT(setting_key) DO UPDATE SET 
+                        setting_value = excluded.setting_value,
+                        updated_at = CURRENT_TIMESTAMP
+                ''', (key, value))
             conn.commit()
             conn.close()
             return True
         except sqlite3.Error as e:
             print(f"Error updating settings: {e}")
             return False
+    
+    def reset_to_defaults(self) -> bool:
+        """Reset all settings to default values"""
+        defaults = {
+            'studio_name': 'Shine Art Studio',
+            'contact_number': '0771234567',
+            'address': '123 Main Street, Colombo',
+            'email': 'info@shineartstudio.com',
+            'invoice_footer': 'Thank you for your business!',
+            'invoice_prefix': 'INV',
+            'currency': 'LKR',
+            'theme_mode': 'Dark',
+            'tax_rate': '0',
+            'low_stock_threshold': '5',
+        }
+        return self.update_multiple_settings(defaults)

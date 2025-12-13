@@ -2,14 +2,23 @@ import customtkinter as ctk
 from database import DatabaseManager
 from auth import AuthManager
 from ui.components import LoginWindow
+from ui.sidebar import Sidebar
 from PIL import Image
 import os
+
+# Import all frames
 from ui.customer_frame import CustomerManagementFrame
 from ui.service_frame import ServiceManagementFrame
 from ui.frame_frame import FrameManagementFrame
 from ui.billing_frame import BillingFrame
 from ui.booking_frame import BookingManagementFrame
 from ui.invoice_history_frame import InvoiceHistoryFrame
+from ui.dashboard_frame import DashboardFrame
+from ui.users_frame import UsersManagementFrame
+from ui.settings_frame import SettingsFrame
+from ui.support_frame import SupportFrame
+from ui.user_guide_frame import UserGuideFrame
+from ui.profile_frame import ProfileFrame
 
 
 class MainApplication(ctk.CTk):
@@ -27,7 +36,8 @@ class MainApplication(ctk.CTk):
         
         # Window setup
         self.title("Shine Art Studio - POS System")
-        self.geometry("1400x800")
+        self.geometry("1500x850")
+        self.minsize(1200, 700)
         
         # Initialize managers
         self.db_manager = DatabaseManager()
@@ -39,6 +49,7 @@ class MainApplication(ctk.CTk):
         # Create main container
         self.main_container = None
         self.content_frame = None
+        self.sidebar = None
         
         # Show login
         self.show_login()
@@ -54,153 +65,108 @@ class MainApplication(ctk.CTk):
         
         # Center window
         self.update_idletasks()
-        x = (self.winfo_screenwidth() // 2) - 700
-        y = (self.winfo_screenheight() // 2) - 400
-        self.geometry(f"1400x800+{x}+{y}")
+        x = (self.winfo_screenwidth() // 2) - 750
+        y = (self.winfo_screenheight() // 2) - 425
+        self.geometry(f"1500x850+{x}+{y}")
         
         self.create_main_interface()
     
     def create_main_interface(self):
-        """Create main application interface"""
+        """Create main application interface with modern sidebar"""
         
         # Main container
-        self.main_container = ctk.CTkFrame(self, fg_color="transparent")
+        self.main_container = ctk.CTkFrame(self, fg_color="#0d0d1a")
         self.main_container.pack(fill="both", expand=True)
         
+        # Create sidebar with navigation
+        self.sidebar = Sidebar(self.main_container, self.auth_manager, self.navigate_to)
+        self.sidebar.pack(fill="y", side="left")
+        
+        # Right side container (top bar + content)
+        right_container = ctk.CTkFrame(self.main_container, fg_color="transparent")
+        right_container.pack(fill="both", expand=True, side="right")
+        
         # Top bar
-        top_bar = ctk.CTkFrame(self.main_container, height=70, fg_color="#1f538d")
+        top_bar = ctk.CTkFrame(right_container, height=60, fg_color="#1a1a2e")
         top_bar.pack(fill="x", side="top")
         top_bar.pack_propagate(False)
         
         # Logo/Title container
         logo_title_frame = ctk.CTkFrame(top_bar, fg_color="transparent")
-        logo_title_frame.pack(side="left", padx=30, pady=15)
+        logo_title_frame.pack(side="left", padx=20, pady=10)
         
         # Logo
         try:
             logo_path = os.path.join(os.path.dirname(__file__), "assets", "logo001.png")
             if os.path.exists(logo_path):
                 logo_image = Image.open(logo_path)
-                logo_photo = ctk.CTkImage(light_image=logo_image, dark_image=logo_image, size=(45, 45))
+                logo_photo = ctk.CTkImage(light_image=logo_image, dark_image=logo_image, size=(40, 40))
                 logo_label = ctk.CTkLabel(logo_title_frame, image=logo_photo, text="")
-                logo_label.pack(side="left", padx=(0, 15))
+                logo_label.pack(side="left", padx=(0, 10))
         except Exception as e:
             print(f"Could not load logo: {e}")
         
         # Title
         title_label = ctk.CTkLabel(
             logo_title_frame,
-            text="Shine Art Studio - POS System",
-            font=ctk.CTkFont(size=22, weight="bold"),
+            text="Shine Art Studio",
+            font=ctk.CTkFont(size=18, weight="bold"),
             text_color="white"
         )
         title_label.pack(side="left")
         
-        # User info
-        user_frame = ctk.CTkFrame(top_bar, fg_color="transparent")
-        user_frame.pack(side="right", padx=30)
+        # Right side of top bar
+        right_frame = ctk.CTkFrame(top_bar, fg_color="transparent")
+        right_frame.pack(side="right", padx=20)
         
-        user_label = ctk.CTkLabel(
-            user_frame,
-            text=f"User: {self.current_user['full_name']} ({self.current_user['role']})",
-            font=ctk.CTkFont(size=13),
-            text_color="white"
-        )
-        user_label.pack(side="left", padx=10)
-        
+        # Logout button
         logout_btn = ctk.CTkButton(
-            user_frame,
-            text="Logout",
+            right_frame,
+            text="🚪 Logout",
             command=self.logout,
             width=100,
             height=35,
-            fg_color="red",
-            hover_color="darkred"
+            fg_color="#ff4757",
+            hover_color="#ff3344",
+            font=ctk.CTkFont(size=12, weight="bold")
         )
-        logout_btn.pack(side="left", padx=10)
-        
-        # Sidebar
-        sidebar = ctk.CTkFrame(self.main_container, width=220, fg_color="#2b2b2b")
-        sidebar.pack(fill="y", side="left")
-        sidebar.pack_propagate(False)
-        
-        # Navigation buttons
-        nav_buttons = [
-            ("💰 Billing", self.show_billing),
-            ("👥 Customers", self.show_customers),
-            ("📋 Services", self.show_services),
-            ("🖼️ Photo Frames", self.show_frames),
-            ("📅 Bookings", self.show_bookings),
-            ("📄 Invoice History", self.show_invoice_history),
-        ]
-        
-        ctk.CTkLabel(
-            sidebar,
-            text="Navigation",
-            font=ctk.CTkFont(size=16, weight="bold")
-        ).pack(pady=(20, 10))
-        
-        for text, command in nav_buttons:
-            btn = ctk.CTkButton(
-                sidebar,
-                text=text,
-                command=command,
-                width=180,
-                height=45,
-                font=ctk.CTkFont(size=14),
-                anchor="w",
-                fg_color="transparent",
-                hover_color="#1f538d"
-            )
-            btn.pack(pady=5, padx=20)
+        logout_btn.pack(side="right", padx=5)
         
         # Content area
-        self.content_frame = ctk.CTkFrame(self.main_container)
-        self.content_frame.pack(fill="both", expand=True, side="right", padx=10, pady=10)
+        self.content_frame = ctk.CTkFrame(right_container, fg_color="#0d0d1a")
+        self.content_frame.pack(fill="both", expand=True, padx=5, pady=5)
         
-        # Show default view (Billing)
-        self.show_billing()
+        # Show default view (Dashboard)
+        self.navigate_to("dashboard")
+    
+    def navigate_to(self, page: str):
+        """Navigate to a specific page"""
+        self.clear_content()
+        
+        frame_classes = {
+            "dashboard": DashboardFrame,
+            "billing": BillingFrame,
+            "customers": CustomerManagementFrame,
+            "services": ServiceManagementFrame,
+            "frames": FrameManagementFrame,
+            "bookings": BookingManagementFrame,
+            "invoices": InvoiceHistoryFrame,
+            "users": UsersManagementFrame,
+            "settings": SettingsFrame,
+            "profile": ProfileFrame,
+            "support": SupportFrame,
+            "guide": UserGuideFrame,
+        }
+        
+        frame_class = frame_classes.get(page)
+        if frame_class:
+            frame = frame_class(self.content_frame, self.auth_manager, self.db_manager)
+            frame.pack(fill="both", expand=True)
     
     def clear_content(self):
         """Clear content frame"""
         for widget in self.content_frame.winfo_children():
             widget.destroy()
-    
-    def show_billing(self):
-        """Show billing frame"""
-        self.clear_content()
-        frame = BillingFrame(self.content_frame, self.auth_manager, self.db_manager)
-        frame.pack(fill="both", expand=True)
-    
-    def show_customers(self):
-        """Show customer management frame"""
-        self.clear_content()
-        frame = CustomerManagementFrame(self.content_frame, self.auth_manager, self.db_manager)
-        frame.pack(fill="both", expand=True)
-    
-    def show_services(self):
-        """Show service management frame"""
-        self.clear_content()
-        frame = ServiceManagementFrame(self.content_frame, self.auth_manager, self.db_manager)
-        frame.pack(fill="both", expand=True)
-    
-    def show_frames(self):
-        """Show photo frame management frame"""
-        self.clear_content()
-        frame = FrameManagementFrame(self.content_frame, self.auth_manager, self.db_manager)
-        frame.pack(fill="both", expand=True)
-    
-    def show_bookings(self):
-        """Show booking management frame"""
-        self.clear_content()
-        frame = BookingManagementFrame(self.content_frame, self.auth_manager, self.db_manager)
-        frame.pack(fill="both", expand=True)
-    
-    def show_invoice_history(self):
-        """Show invoice history frame"""
-        self.clear_content()
-        frame = InvoiceHistoryFrame(self.content_frame, self.auth_manager, self.db_manager)
-        frame.pack(fill="both", expand=True)
     
     def logout(self):
         """Logout and return to login screen"""
