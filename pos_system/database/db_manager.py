@@ -64,6 +64,26 @@ class DatabaseManager:
         '''
         return self.execute_insert(query, (full_name, mobile_number))
     
+    def update_customer(self, customer_id: int, full_name: str, mobile_number: str) -> bool:
+        """Update customer details"""
+        query = '''
+            UPDATE customers 
+            SET full_name = ?, mobile_number = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        '''
+        return self.execute_update(query, (full_name, mobile_number, customer_id))
+    
+    def delete_customer(self, customer_id: int) -> bool:
+        """Delete a customer"""
+        query = 'DELETE FROM customers WHERE id = ?'
+        return self.execute_update(query, (customer_id,))
+    
+    def get_customer_by_id(self, customer_id: int) -> Optional[Dict[str, Any]]:
+        """Get customer by ID"""
+        query = 'SELECT * FROM customers WHERE id = ?'
+        results = self.execute_query(query, (customer_id,))
+        return results[0] if results else None
+    
     def get_customer_by_mobile(self, mobile_number: str) -> Optional[Dict[str, Any]]:
         """Get customer by mobile number"""
         query = 'SELECT * FROM customers WHERE mobile_number = ?'
@@ -85,20 +105,57 @@ class DatabaseManager:
         search_pattern = f'%{search_term}%'
         return self.execute_query(query, (search_pattern, search_pattern))
     
-    # Service operations
-    def add_service(self, service_name: str, price: float) -> Optional[int]:
-        """Add a new service"""
-        query = 'INSERT INTO services (service_name, price) VALUES (?, ?)'
-        return self.execute_insert(query, (service_name, price))
+    # Category operations
+    def add_category(self, category_name: str) -> Optional[int]:
+        """Add a new category"""
+        query = 'INSERT INTO categories (category_name) VALUES (?)'
+        return self.execute_insert(query, (category_name,))
     
-    def update_service(self, service_id: int, service_name: str, price: float) -> bool:
+    def update_category(self, category_id: int, category_name: str) -> bool:
+        """Update a category"""
+        query = '''
+            UPDATE categories 
+            SET category_name = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        '''
+        return self.execute_update(query, (category_name, category_id))
+    
+    def delete_category(self, category_id: int) -> bool:
+        """Delete a category"""
+        query = 'DELETE FROM categories WHERE id = ?'
+        return self.execute_update(query, (category_id,))
+    
+    def get_all_categories(self) -> List[Dict[str, Any]]:
+        """Get all categories"""
+        query = 'SELECT * FROM categories ORDER BY category_name'
+        return self.execute_query(query)
+    
+    def get_category_by_id(self, category_id: int) -> Optional[Dict[str, Any]]:
+        """Get category by ID"""
+        query = 'SELECT * FROM categories WHERE id = ?'
+        results = self.execute_query(query, (category_id,))
+        return results[0] if results else None
+    
+    def get_category_by_name(self, category_name: str) -> Optional[Dict[str, Any]]:
+        """Get category by name"""
+        query = 'SELECT * FROM categories WHERE category_name = ?'
+        results = self.execute_query(query, (category_name,))
+        return results[0] if results else None
+    
+    # Service operations
+    def add_service(self, service_name: str, price: float, category_id: int = None) -> Optional[int]:
+        """Add a new service"""
+        query = 'INSERT INTO services (service_name, price, category_id) VALUES (?, ?, ?)'
+        return self.execute_insert(query, (service_name, price, category_id))
+    
+    def update_service(self, service_id: int, service_name: str, price: float, category_id: int = None) -> bool:
         """Update a service"""
         query = '''
             UPDATE services 
-            SET service_name = ?, price = ?, updated_at = CURRENT_TIMESTAMP
+            SET service_name = ?, price = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         '''
-        return self.execute_update(query, (service_name, price, service_id))
+        return self.execute_update(query, (service_name, price, category_id, service_id))
     
     def delete_service(self, service_id: int) -> bool:
         """Delete a service"""
@@ -106,13 +163,34 @@ class DatabaseManager:
         return self.execute_update(query, (service_id,))
     
     def get_all_services(self) -> List[Dict[str, Any]]:
-        """Get all services"""
-        query = 'SELECT * FROM services ORDER BY service_name'
+        """Get all services with category info"""
+        query = '''
+            SELECT s.*, c.category_name 
+            FROM services s
+            LEFT JOIN categories c ON s.category_id = c.id
+            ORDER BY s.service_name
+        '''
         return self.execute_query(query)
+    
+    def get_services_by_category(self, category_id: int) -> List[Dict[str, Any]]:
+        """Get services filtered by category"""
+        query = '''
+            SELECT s.*, c.category_name 
+            FROM services s
+            LEFT JOIN categories c ON s.category_id = c.id
+            WHERE s.category_id = ?
+            ORDER BY s.service_name
+        '''
+        return self.execute_query(query, (category_id,))
     
     def get_service_by_id(self, service_id: int) -> Optional[Dict[str, Any]]:
         """Get service by ID"""
-        query = 'SELECT * FROM services WHERE id = ?'
+        query = '''
+            SELECT s.*, c.category_name 
+            FROM services s
+            LEFT JOIN categories c ON s.category_id = c.id
+            WHERE s.id = ?
+        '''
         results = self.execute_query(query, (service_id,))
         return results[0] if results else None
     

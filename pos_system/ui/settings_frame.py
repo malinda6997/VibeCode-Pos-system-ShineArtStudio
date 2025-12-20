@@ -1,11 +1,11 @@
 import customtkinter as ctk
 from tkinter import filedialog
 from services.settings_service import SettingsService
-from ui.components import Toast
+from ui.components import Toast, MessageDialog
 
 
 class SettingsFrame(ctk.CTkFrame):
-    """Settings page for admin configuration"""
+    """Settings page for admin configuration - Admin only"""
     
     def __init__(self, parent, auth_manager, db_manager):
         super().__init__(parent, fg_color="transparent")
@@ -13,8 +13,38 @@ class SettingsFrame(ctk.CTkFrame):
         self.db_manager = db_manager
         self.settings_service = SettingsService()
         
+        # Admin check
+        if not self.auth_manager.is_admin():
+            self.show_access_denied()
+            return
+        
         self.create_widgets()
         self.load_settings()
+    
+    def show_access_denied(self):
+        """Show access denied message for non-admin users"""
+        access_frame = ctk.CTkFrame(self, fg_color="transparent")
+        access_frame.pack(expand=True)
+        
+        ctk.CTkLabel(
+            access_frame,
+            text="🚫",
+            font=ctk.CTkFont(size=60)
+        ).pack(pady=(0, 10))
+        
+        ctk.CTkLabel(
+            access_frame,
+            text="Access Denied",
+            font=ctk.CTkFont(size=24, weight="bold"),
+            text_color="#ff6b6b"
+        ).pack(pady=(0, 10))
+        
+        ctk.CTkLabel(
+            access_frame,
+            text="Only administrators can access settings.",
+            font=ctk.CTkFont(size=14),
+            text_color="#aaaaaa"
+        ).pack()
     
     def create_widgets(self):
         """Create settings widgets"""

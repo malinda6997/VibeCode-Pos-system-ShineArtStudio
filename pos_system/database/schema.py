@@ -53,16 +53,34 @@ class DatabaseSchema:
             )
         ''')
         
+        # Categories table
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS categories (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category_name TEXT UNIQUE NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
         # Services table
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS services (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 service_name TEXT NOT NULL,
+                category_id INTEGER,
                 price REAL NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (category_id) REFERENCES categories (id)
             )
         ''')
+        
+        # Add category_id column if not exists (for existing databases)
+        try:
+            self.cursor.execute('ALTER TABLE services ADD COLUMN category_id INTEGER')
+        except sqlite3.OperationalError:
+            pass  # Column already exists
         
         # Photo frames table
         self.cursor.execute('''
@@ -202,7 +220,7 @@ class DatabaseSchema:
         self.connect()
         
         tables = ['invoice_items', 'invoices', 'bookings', 'photo_frames', 
-                  'services', 'customers', 'users']
+                  'services', 'categories', 'customers', 'users']
         
         for table in tables:
             self.cursor.execute(f'DROP TABLE IF EXISTS {table}')

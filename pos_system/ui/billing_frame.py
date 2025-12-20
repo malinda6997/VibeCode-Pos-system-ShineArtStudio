@@ -12,7 +12,10 @@ class BillingFrame(BaseFrame):
         self.invoice_generator = InvoiceGenerator()
         self.selected_customer = None
         self.cart_items = []
+        self.categories_map = {}  # name -> id mapping
+        self.services_map = {}  # name -> service data
         self.create_widgets()
+        self.load_categories()
     
     def create_widgets(self):
         """Create billing widgets"""
@@ -63,13 +66,14 @@ class BillingFrame(BaseFrame):
         
         ctk.CTkButton(
             search_container,
-            text="New Customer",
+            text="➕ Add New Customer",
             command=self.add_new_customer,
-            width=120,
+            width=150,
             height=30,
             fg_color="#00d4ff",
             text_color="#1a1a2e",
-            hover_color="#00a8cc"
+            hover_color="#00a8cc",
+            font=ctk.CTkFont(size=12, weight="bold")
         ).pack(side="left", padx=5)
         
         # Customer suggestions dropdown (hidden by default)
@@ -133,7 +137,7 @@ class BillingFrame(BaseFrame):
         # No customer selected label
         self.no_customer_label = ctk.CTkLabel(
             customer_frame,
-            text="🔍 Search customer by mobile number",
+            text="🔍 Search customer by mobile number or add a new one",
             font=ctk.CTkFont(size=13),
             text_color="gray"
         )
@@ -158,10 +162,26 @@ class BillingFrame(BaseFrame):
         self.item_type = ctk.CTkSegmentedButton(
             type_container,
             values=["Service", "Frame"],
-            command=self.load_items
+            command=self.on_item_type_change
         )
         self.item_type.pack(side="left", padx=10)
         self.item_type.set("Service")
+        
+        # Category selector (for services)
+        category_container = ctk.CTkFrame(items_frame, fg_color="transparent")
+        category_container.pack(fill="x", padx=15, pady=5)
+        
+        ctk.CTkLabel(category_container, text="Category:").pack(side="left", padx=5)
+        self.category_combo = ctk.CTkComboBox(
+            category_container,
+            width=180,
+            height=30,
+            values=["Select Category"],
+            command=self.on_category_change,
+            state="readonly"
+        )
+        self.category_combo.pack(side="left", padx=5)
+        self.category_combo.set("Select Category")
         
         # Item selector
         item_container = ctk.CTkFrame(items_frame, fg_color="transparent")
@@ -323,9 +343,63 @@ class BillingFrame(BaseFrame):
             fg_color="#2d2d5a",
             hover_color="#3d3d7a"
         ).pack(pady=10)
-        
+    
+    def load_categories(self):
+        """Load categories for dropdown"""
+        categories = self.db_manager.get_all_categories()
+        self.categories_map = {cat['category_name']: cat['id'] for cat in categories}
+        category_names = ["Select Category"] + list(self.categories_map.keys())
+        self.category_combo.configure(values=category_names)
         # Load initial items
-        self.load_items()
+        self.on_item_type_change("Service")
+    
+    def on_item_type_change(self, item_type):
+        """Handle item type change"""
+        if item_type == "Service":
+            # Show category selector and reset
+            self.category_combo.set("Select Category")
+            self.item_combo.configure(values=["Select Category First"])
+            self.item_combo.set("Select Category First")
+            self.services_map = {}
+        else:
+            # Load frames directly
+            self.load_frames()
+    
+    def on_category_change(self, selected_category):
+        """Load services when category changes"""
+        if selected_category == "Select Category":
+            self.item_combo.configure(values=["Select Category First"])
+            self.item_combo.set("Select Category First")
+            self.services_map = {}
+            return
+        
+        category_id = self.categories_map.get(selected_category)
+        if category_id:
+            services = self.db_manager.get_services_by_category(category_id)
+            self.services_map = {s['service_name']: s for s in services}
+            service_names = list(self.services_map.keys())
+            if service_names:
+                self.item_combo.configure(values=service_names)
+                self.item_combo.set(service_names[0])
+            else:
+                self.item_combo.configure(values=["No Services in Category"])
+                self.item_combo.set("No Services in Category")
+        else:
+            self.item_combo.configure(values=["No Services"])
+            self.item_combo.set("No Services")
+            self.services_map = {}
+    
+    def load_frames(self):
+        """Load photo frames"""
+        items = self.db_manager.get_all_photo_frames()
+        self.items_data = {f"{item['frame_name']} - {item['size']}": item for item in items}
+        frame_names = list(self.items_data.keys())
+        if frame_names:
+            self.item_combo.configure(values=frame_names)
+            self.item_combo.set(frame_names[0])
+        else:
+            self.item_combo.configure(values=["No Frames"])
+            self.item_combo.set("No Frames")
     
     def search_customer(self):
         """Search customer by mobile"""
@@ -414,81 +488,140 @@ class BillingFrame(BaseFrame):
         self.show_customer_card(customer)
 
     def add_new_customer(self):
-        """Add new customer dialog"""
+        """Add new customer dialog with improved UI"""
         dialog = ctk.CTkToplevel(self)
         dialog.title("Add New Customer")
-        dialog.geometry("400x250")
-        dialog.transient(self)
+        dialog.geometry("450x320")
+        dialog.transient(self.winfo_toplevel())
         dialog.grab_set()
+        dialog.configure(fg_color="#1a1a2e")
+        dialog.resizable(False, False)
         
         # Center dialog
         dialog.update_idletasks()
-        x = (dialog.winfo_screenwidth() // 2) - 200
-        y = (dialog.winfo_screenheight() // 2) - 125
-        dialog.geometry(f"400x250+{x}+{y}")
+        x = (dialog.winfo_screenwidth() // 2) - 225
+        y = (dialog.winfo_screenheight() // 2) - 160
+        dialog.geometry(f"450x320+{x}+{y}")
         
+        # Main frame
+        main_frame = ctk.CTkFrame(dialog, fg_color="#1e1e3f", corner_radius=15)
+        main_frame.pack(fill="both", expand=True, padx=15, pady=15)
+        
+        # Title
         ctk.CTkLabel(
-            dialog,
-            text="Add New Customer",
-            font=ctk.CTkFont(size=18, weight="bold")
-        ).pack(pady=20)
+            main_frame,
+            text="➕ Add New Customer",
+            font=ctk.CTkFont(size=20, weight="bold"),
+            text_color="#00d4ff"
+        ).pack(pady=(20, 25))
         
-        ctk.CTkLabel(dialog, text="Full Name:").pack(pady=5)
-        name_entry = ctk.CTkEntry(dialog, width=300, height=35)
-        name_entry.pack(pady=5)
+        # Form frame
+        form_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        form_frame.pack(fill="x", padx=30)
         
-        ctk.CTkLabel(dialog, text="Mobile Number:").pack(pady=5)
-        mobile_entry = ctk.CTkEntry(dialog, width=300, height=35)
-        mobile_entry.pack(pady=5)
+        # Customer Name
+        ctk.CTkLabel(
+            form_frame,
+            text="Customer Name:",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(anchor="w", pady=(0, 5))
+        
+        name_entry = ctk.CTkEntry(
+            form_frame, 
+            width=350, 
+            height=40,
+            placeholder_text="Enter customer full name"
+        )
+        name_entry.pack(pady=(0, 15))
+        
+        # Mobile Number
+        ctk.CTkLabel(
+            form_frame,
+            text="Mobile Number:",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(anchor="w", pady=(0, 5))
+        
+        mobile_entry = ctk.CTkEntry(
+            form_frame, 
+            width=350, 
+            height=40,
+            placeholder_text="Enter 10-digit mobile number"
+        )
+        mobile_entry.pack(pady=(0, 20))
         
         def save_customer():
             name = name_entry.get().strip()
             mobile = mobile_entry.get().strip()
             
-            if not name or not mobile:
-                MessageDialog.show_error("Error", "Please fill all fields")
+            if not name:
+                MessageDialog.show_error("Error", "Please enter customer name")
+                return
+            
+            if not mobile:
+                MessageDialog.show_error("Error", "Please enter mobile number")
                 return
             
             if not self.validate_mobile(mobile):
-                MessageDialog.show_error("Error", "Mobile must be 10 digits")
+                MessageDialog.show_error("Error", "Mobile number must be 10 digits")
+                return
+            
+            # Check if exists
+            existing = self.db_manager.get_customer_by_mobile(mobile)
+            if existing:
+                MessageDialog.show_error("Error", "Customer with this mobile already exists")
                 return
             
             customer_id = self.db_manager.add_customer(name, mobile)
             if customer_id:
-                MessageDialog.show_success("Success", "Customer added")
+                MessageDialog.show_success("Success", "Customer added successfully")
+                dialog.destroy()
+                # Auto-select the new customer
                 self.mobile_search.delete(0, 'end')
                 self.mobile_search.insert(0, mobile)
-                dialog.destroy()
                 self.search_customer()
             else:
                 MessageDialog.show_error("Error", "Failed to add customer")
         
+        # Button frame
+        btn_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        btn_frame.pack(pady=(10, 20))
+        
         ctk.CTkButton(
-            dialog,
-            text="Save Customer",
+            btn_frame,
+            text="Cancel",
+            command=dialog.destroy,
+            width=120,
+            height=40,
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(side="left", padx=10)
+        
+        ctk.CTkButton(
+            btn_frame,
+            text="➕ Add Customer",
             command=save_customer,
-            width=200,
-            height=40
-        ).pack(pady=20)
+            width=150,
+            height=40,
+            fg_color="#00d4ff",
+            text_color="#1a1a2e",
+            hover_color="#00a8cc",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(side="left", padx=10)
+        
+        # Focus on name entry
+        name_entry.focus()
     
     def load_items(self, value=None):
-        """Load items based on type"""
-        item_type = self.item_type.get()
-        
-        if item_type == "Service":
-            items = self.db_manager.get_all_services()
-            self.items_data = {f"{item['service_name']}": item for item in items}
-        else:
-            items = self.db_manager.get_all_photo_frames()
-            self.items_data = {f"{item['frame_name']} - {item['size']}": item for item in items}
-        
-        self.item_combo.configure(values=list(self.items_data.keys()))
-        if self.items_data:
-            self.item_combo.set(list(self.items_data.keys())[0])
+        """Load items based on type - Now handled by on_item_type_change and on_category_change"""
+        pass  # Keep for compatibility but functionality moved to new methods
     
     def add_to_cart(self):
         """Add item to cart"""
-        if not self.item_combo.get():
+        item_type = self.item_type.get()
+        selected_key = self.item_combo.get()
+        
+        if not selected_key or selected_key in ["Select Category First", "No Services in Category", "No Services", "No Frames"]:
             MessageDialog.show_error("Error", "Please select an item")
             return
         
@@ -502,24 +635,36 @@ class BillingFrame(BaseFrame):
             MessageDialog.show_error("Error", "Quantity must be greater than 0")
             return
         
-        selected_key = self.item_combo.get()
-        item = self.items_data[selected_key]
-        item_type = self.item_type.get()
-        
-        # Check stock for frames
-        if item_type == "Frame" and item['quantity'] < qty:
-            MessageDialog.show_error("Error", f"Insufficient stock. Available: {item['quantity']}")
-            return
-        
-        # Add to cart
-        cart_item = {
-            'type': item_type,
-            'id': item['id'],
-            'name': selected_key if item_type == "Frame" else item['service_name'],
-            'quantity': qty,
-            'unit_price': item['price'],
-            'total': item['price'] * qty
-        }
+        if item_type == "Service":
+            if selected_key not in self.services_map:
+                MessageDialog.show_error("Error", "Please select a valid service")
+                return
+            item = self.services_map[selected_key]
+            cart_item = {
+                'type': 'Service',
+                'id': item['id'],
+                'name': item['service_name'],
+                'quantity': qty,
+                'unit_price': item['price'],
+                'total': item['price'] * qty
+            }
+        else:
+            if not hasattr(self, 'items_data') or selected_key not in self.items_data:
+                MessageDialog.show_error("Error", "Please select a valid frame")
+                return
+            item = self.items_data[selected_key]
+            # Check stock for frames
+            if item['quantity'] < qty:
+                MessageDialog.show_error("Error", f"Insufficient stock. Available: {item['quantity']}")
+                return
+            cart_item = {
+                'type': 'Frame',
+                'id': item['id'],
+                'name': selected_key,
+                'quantity': qty,
+                'unit_price': item['price'],
+                'total': item['price'] * qty
+            }
         
         self.cart_items.append(cart_item)
         self.refresh_cart()
@@ -665,11 +810,17 @@ class BillingFrame(BaseFrame):
         self.selected_customer = None
         self.cart_items = []
         self.mobile_search.delete(0, 'end')
-        self.customer_info.configure(text="No customer selected", text_color="gray")
+        self.clear_selected_customer()
         self.discount_entry.delete(0, 'end')
         self.discount_entry.insert(0, "0")
         self.paid_entry.delete(0, 'end')
         self.quantity_entry.delete(0, 'end')
         self.quantity_entry.insert(0, "1")
+        # Reset category and item selection
+        self.item_type.set("Service")
+        self.category_combo.set("Select Category")
+        self.item_combo.configure(values=["Select Category First"])
+        self.item_combo.set("Select Category First")
+        self.services_map = {}
         self.refresh_cart()
         self.calculate_totals()

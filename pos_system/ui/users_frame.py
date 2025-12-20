@@ -15,8 +15,38 @@ class UsersManagementFrame(ctk.CTkFrame):
         self.selected_user_id = None
         self.editing_mode = False
         
+        # Admin check
+        if not self.auth_manager.is_admin():
+            self.show_access_denied()
+            return
+        
         self.create_widgets()
         self.load_users()
+    
+    def show_access_denied(self):
+        """Show access denied message for non-admin users"""
+        access_frame = ctk.CTkFrame(self, fg_color="transparent")
+        access_frame.pack(expand=True)
+        
+        ctk.CTkLabel(
+            access_frame,
+            text="🚫",
+            font=ctk.CTkFont(size=60)
+        ).pack(pady=(0, 10))
+        
+        ctk.CTkLabel(
+            access_frame,
+            text="Access Denied",
+            font=ctk.CTkFont(size=24, weight="bold"),
+            text_color="#ff6b6b"
+        ).pack(pady=(0, 10))
+        
+        ctk.CTkLabel(
+            access_frame,
+            text="Only administrators can manage users.",
+            font=ctk.CTkFont(size=14),
+            text_color="#aaaaaa"
+        ).pack()
     
     def create_widgets(self):
         """Create user management widgets"""

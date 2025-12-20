@@ -20,6 +20,7 @@ from ui.settings_frame import SettingsFrame
 from ui.support_frame import SupportFrame
 from ui.user_guide_frame import UserGuideFrame
 from ui.profile_frame import ProfileFrame
+from ui.category_frame import CategoryManagementFrame
 from services.user_service import UserService
 
 
@@ -251,6 +252,7 @@ class MainApplication(ctk.CTk):
             "dashboard": DashboardFrame,
             "billing": BillingFrame,
             "customers": CustomerManagementFrame,
+            "categories": CategoryManagementFrame,
             "services": ServiceManagementFrame,
             "frames": FrameManagementFrame,
             "bookings": BookingManagementFrame,
