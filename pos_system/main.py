@@ -162,53 +162,9 @@ class MainApplication(ctk.CTk):
         )
         title_label.pack(side="left")
         
-        # Right side of top bar - User profile section
+        # Right side of top bar - Logout only
         right_frame = ctk.CTkFrame(top_bar, fg_color="transparent")
         right_frame.pack(side="right", padx=20)
-        
-        # User profile container (clickable)
-        user_profile_frame = ctk.CTkFrame(right_frame, fg_color="#252545", corner_radius=25)
-        user_profile_frame.pack(side="right", padx=(10, 0))
-        
-        # Profile picture
-        profile_img = self.load_profile_image(self.current_user['id'], (35, 35))
-        if profile_img:
-            self.profile_image_label = ctk.CTkLabel(user_profile_frame, image=profile_img, text="")
-        else:
-            # Default avatar
-            self.profile_image_label = ctk.CTkLabel(
-                user_profile_frame,
-                text="👤",
-                font=ctk.CTkFont(size=20),
-                width=35,
-                height=35
-            )
-        self.profile_image_label.pack(side="left", padx=(8, 5), pady=5)
-        
-        # User name and role
-        user_info_frame = ctk.CTkFrame(user_profile_frame, fg_color="transparent")
-        user_info_frame.pack(side="left", padx=(0, 10), pady=5)
-        
-        user_name = ctk.CTkLabel(
-            user_info_frame,
-            text=self.current_user['full_name'],
-            font=ctk.CTkFont(size=12, weight="bold"),
-            text_color="white"
-        )
-        user_name.pack(anchor="w")
-        
-        user_role = ctk.CTkLabel(
-            user_info_frame,
-            text=self.current_user['role'],
-            font=ctk.CTkFont(size=10),
-            text_color="#00d4ff"
-        )
-        user_role.pack(anchor="w")
-        
-        # Make profile clickable
-        for widget in [user_profile_frame, self.profile_image_label, user_info_frame, user_name, user_role]:
-            widget.bind("<Button-1>", lambda e: self.navigate_to("profile"))
-            widget.configure(cursor="hand2")
         
         # Logout button
         logout_btn = ctk.CTkButton(
@@ -234,11 +190,9 @@ class MainApplication(ctk.CTk):
         MessageDialog.set_parent(self.content_frame)
     
     def update_profile_display(self):
-        """Update profile picture in top bar"""
-        if self.profile_image_label and self.current_user:
-            profile_img = self.load_profile_image(self.current_user['id'], (35, 35))
-            if profile_img:
-                self.profile_image_label.configure(image=profile_img, text="")
+        """Update profile picture - called when profile is updated"""
+        # Sidebar avatar will be updated on next login
+        pass
     
     def navigate_to(self, page: str):
         """Navigate to a specific page"""

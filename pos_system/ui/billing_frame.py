@@ -488,10 +488,10 @@ class BillingFrame(BaseFrame):
         self.show_customer_card(customer)
 
     def add_new_customer(self):
-        """Add new customer dialog with improved UI"""
+        """Add new customer dialog with proper size and scrolling"""
         dialog = ctk.CTkToplevel(self)
         dialog.title("Add New Customer")
-        dialog.geometry("450x320")
+        dialog.geometry("500x420")
         dialog.transient(self.winfo_toplevel())
         dialog.grab_set()
         dialog.configure(fg_color="#1a1a2e")
@@ -499,25 +499,34 @@ class BillingFrame(BaseFrame):
         
         # Center dialog
         dialog.update_idletasks()
-        x = (dialog.winfo_screenwidth() // 2) - 225
-        y = (dialog.winfo_screenheight() // 2) - 160
-        dialog.geometry(f"450x320+{x}+{y}")
+        x = (dialog.winfo_screenwidth() // 2) - 250
+        y = (dialog.winfo_screenheight() // 2) - 210
+        dialog.geometry(f"500x420+{x}+{y}")
         
-        # Main frame
-        main_frame = ctk.CTkFrame(dialog, fg_color="#1e1e3f", corner_radius=15)
-        main_frame.pack(fill="both", expand=True, padx=15, pady=15)
+        # Main scrollable frame with matching background
+        main_scroll = ctk.CTkScrollableFrame(
+            dialog, 
+            fg_color="#1a1a2e",
+            scrollbar_button_color="#333355",
+            scrollbar_button_hover_color="#444477"
+        )
+        main_scroll.pack(fill="both", expand=True, padx=5, pady=5)
+        
+        # Content frame inside scroll
+        content_frame = ctk.CTkFrame(main_scroll, fg_color="#1e1e3f", corner_radius=15)
+        content_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
         # Title
         ctk.CTkLabel(
-            main_frame,
+            content_frame,
             text="➕ Add New Customer",
             font=ctk.CTkFont(size=20, weight="bold"),
             text_color="#00d4ff"
-        ).pack(pady=(20, 25))
+        ).pack(pady=(25, 30))
         
         # Form frame
-        form_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
-        form_frame.pack(fill="x", padx=30)
+        form_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
+        form_frame.pack(fill="x", padx=35)
         
         # Customer Name
         ctk.CTkLabel(
@@ -528,11 +537,12 @@ class BillingFrame(BaseFrame):
         
         name_entry = ctk.CTkEntry(
             form_frame, 
-            width=350, 
-            height=40,
-            placeholder_text="Enter customer full name"
+            height=45,
+            font=ctk.CTkFont(size=13),
+            placeholder_text="Enter customer full name",
+            corner_radius=8
         )
-        name_entry.pack(pady=(0, 15))
+        name_entry.pack(fill="x", pady=(0, 20))
         
         # Mobile Number
         ctk.CTkLabel(
@@ -543,11 +553,12 @@ class BillingFrame(BaseFrame):
         
         mobile_entry = ctk.CTkEntry(
             form_frame, 
-            width=350, 
-            height=40,
-            placeholder_text="Enter 10-digit mobile number"
+            height=45,
+            font=ctk.CTkFont(size=13),
+            placeholder_text="Enter 10-digit mobile number",
+            corner_radius=8
         )
-        mobile_entry.pack(pady=(0, 20))
+        mobile_entry.pack(fill="x", pady=(0, 25))
         
         def save_customer():
             name = name_entry.get().strip()
@@ -583,17 +594,18 @@ class BillingFrame(BaseFrame):
                 MessageDialog.show_error("Error", "Failed to add customer")
         
         # Button frame
-        btn_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
-        btn_frame.pack(pady=(10, 20))
+        btn_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
+        btn_frame.pack(pady=(10, 30))
         
         ctk.CTkButton(
             btn_frame,
             text="Cancel",
             command=dialog.destroy,
-            width=120,
-            height=40,
+            width=130,
+            height=45,
             fg_color="#2d2d5a",
             hover_color="#3d3d7a",
+            corner_radius=8,
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(side="left", padx=10)
         
@@ -601,11 +613,12 @@ class BillingFrame(BaseFrame):
             btn_frame,
             text="➕ Add Customer",
             command=save_customer,
-            width=150,
-            height=40,
+            width=160,
+            height=45,
             fg_color="#00d4ff",
             text_color="#1a1a2e",
             hover_color="#00a8cc",
+            corner_radius=8,
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(side="left", padx=10)
         

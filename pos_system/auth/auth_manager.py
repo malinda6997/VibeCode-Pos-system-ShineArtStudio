@@ -1,6 +1,7 @@
 import hashlib
 import sqlite3
 from typing import Optional, Dict, Any
+from datetime import datetime
 
 
 class AuthManager:
@@ -31,12 +32,24 @@ class AuthManager:
             ''', (username,))
             
             user = cursor.fetchone()
-            conn.close()
             
             if user and self.verify_password(password, user['password_hash']):
                 self.current_user = dict(user)
+                
+                # Update last_login timestamp
+                current_time = datetime.now().strftime('%Y-%m-%d %H:%M')
+                cursor.execute('''
+                    UPDATE users SET last_login = ? WHERE id = ?
+                ''', (current_time, user['id']))
+                conn.commit()
+                
+                # Store last_login in current_user
+                self.current_user['last_login'] = current_time
+                
+                conn.close()
                 return self.current_user
             
+            conn.close()
             return None
             
         except sqlite3.Error as e:

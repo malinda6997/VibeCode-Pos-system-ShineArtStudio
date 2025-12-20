@@ -42,6 +42,12 @@ class DatabaseSchema:
         except sqlite3.OperationalError:
             pass  # Column already exists
         
+        # Add last_login column if not exists (for existing databases)
+        try:
+            self.cursor.execute('ALTER TABLE users ADD COLUMN last_login TEXT DEFAULT NULL')
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+        
         # Customers table
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS customers (
