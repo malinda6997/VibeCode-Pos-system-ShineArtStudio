@@ -21,6 +21,7 @@ from ui.support_frame import SupportFrame
 from ui.user_guide_frame import UserGuideFrame
 from ui.profile_frame import ProfileFrame
 from ui.category_frame import CategoryManagementFrame
+from ui.permissions_frame import PermissionsFrame
 from services.user_service import UserService
 
 
@@ -196,6 +197,30 @@ class MainApplication(ctk.CTk):
     
     def navigate_to(self, page: str):
         """Navigate to a specific page"""
+        # Permission mapping for each page
+        permission_map = {
+            "dashboard": "can_access_dashboard",
+            "billing": "can_access_billing",
+            "customers": "can_access_customers",
+            "categories": "can_access_categories",
+            "services": "can_access_services",
+            "frames": "can_access_frames",
+            "bookings": "can_access_bookings",
+            "invoices": "can_access_invoices",
+            "users": "can_access_users",
+            "permissions": "can_access_permissions",
+            "settings": "can_access_settings",
+            "profile": "can_access_profile",
+            "support": "can_access_support",
+            "guide": "can_access_user_guide",
+        }
+        
+        # Check permission before navigating
+        required_permission = permission_map.get(page)
+        if required_permission and not self.auth_manager.has_permission(required_permission):
+            Toast.show_toast(self, "Access Denied", "You don't have permission to access this feature.", "error")
+            return
+        
         self.clear_content()
         
         # Update sidebar active state
@@ -212,6 +237,7 @@ class MainApplication(ctk.CTk):
             "bookings": BookingManagementFrame,
             "invoices": InvoiceHistoryFrame,
             "users": UsersManagementFrame,
+            "permissions": PermissionsFrame,
             "settings": SettingsFrame,
             "profile": ProfileFrame,
             "support": SupportFrame,

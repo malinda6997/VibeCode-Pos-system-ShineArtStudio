@@ -46,6 +46,9 @@ class AuthManager:
                 # Store last_login in current_user
                 self.current_user['last_login'] = current_time
                 
+                # Load user permissions
+                self._load_user_permissions(cursor, user['id'], user['role'])
+                
                 conn.close()
                 return self.current_user
             
@@ -55,6 +58,77 @@ class AuthManager:
         except sqlite3.Error as e:
             print(f"Authentication error: {e}")
             return None
+    
+    def _load_user_permissions(self, cursor, user_id: int, role: str):
+        """Load user permissions into current_user dict"""
+        # Admin has all permissions
+        if role == 'Admin':
+            self.current_user['permissions'] = {
+                'can_access_dashboard': True,
+                'can_access_billing': True,
+                'can_access_customers': True,
+                'can_access_categories': True,
+                'can_access_services': True,
+                'can_access_frames': True,
+                'can_access_bookings': True,
+                'can_access_invoices': True,
+                'can_access_support': True,
+                'can_access_user_guide': True,
+                'can_access_users': True,
+                'can_access_settings': True,
+                'can_access_permissions': True,
+                'can_access_profile': True
+            }
+        else:
+            # Load staff permissions from database
+            cursor.execute('''
+                SELECT * FROM user_permissions WHERE user_id = ?
+            ''', (user_id,))
+            perm_row = cursor.fetchone()
+            
+            if perm_row:
+                perm_dict = dict(perm_row)
+                self.current_user['permissions'] = {
+                    'can_access_dashboard': bool(perm_dict.get('can_access_dashboard', 1)),
+                    'can_access_billing': bool(perm_dict.get('can_access_billing', 1)),
+                    'can_access_customers': bool(perm_dict.get('can_access_customers', 1)),
+                    'can_access_categories': bool(perm_dict.get('can_access_categories', 1)),
+                    'can_access_services': bool(perm_dict.get('can_access_services', 1)),
+                    'can_access_frames': bool(perm_dict.get('can_access_frames', 1)),
+                    'can_access_bookings': bool(perm_dict.get('can_access_bookings', 1)),
+                    'can_access_invoices': bool(perm_dict.get('can_access_invoices', 1)),
+                    'can_access_support': bool(perm_dict.get('can_access_support', 1)),
+                    'can_access_user_guide': bool(perm_dict.get('can_access_user_guide', 1)),
+                    'can_access_users': False,
+                    'can_access_settings': False,
+                    'can_access_permissions': False,
+                    'can_access_profile': True
+                }
+            else:
+                # Default permissions for staff (all enabled except admin features)
+                self.current_user['permissions'] = {
+                    'can_access_dashboard': True,
+                    'can_access_billing': True,
+                    'can_access_customers': True,
+                    'can_access_categories': True,
+                    'can_access_services': True,
+                    'can_access_frames': True,
+                    'can_access_bookings': True,
+                    'can_access_invoices': True,
+                    'can_access_support': True,
+                    'can_access_user_guide': True,
+                    'can_access_users': False,
+                    'can_access_settings': False,
+                    'can_access_permissions': False,
+                    'can_access_profile': True
+                }
+    
+    def has_permission(self, permission_name: str) -> bool:
+        """Check if current user has a specific permission"""
+        if not self.current_user:
+            return False
+        permissions = self.current_user.get('permissions', {})
+        return permissions.get(permission_name, False)
     
     def logout(self):
         """Logout current user"""

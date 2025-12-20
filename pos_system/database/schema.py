@@ -155,6 +155,27 @@ class DatabaseSchema:
             )
         ''')
         
+        # User Permissions table
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_permissions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL UNIQUE,
+                can_access_dashboard INTEGER DEFAULT 1,
+                can_access_billing INTEGER DEFAULT 1,
+                can_access_customers INTEGER DEFAULT 1,
+                can_access_categories INTEGER DEFAULT 1,
+                can_access_services INTEGER DEFAULT 1,
+                can_access_frames INTEGER DEFAULT 1,
+                can_access_bookings INTEGER DEFAULT 1,
+                can_access_invoices INTEGER DEFAULT 1,
+                can_access_support INTEGER DEFAULT 1,
+                can_access_user_guide INTEGER DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+        ''')
+        
         self.conn.commit()
         self.close()
         

@@ -402,3 +402,83 @@ class DatabaseManager:
         '''
         search_pattern = f'%{search_term}%'
         return self.execute_query(query, (search_pattern, search_pattern))
+    
+    # ==================== User Permissions Operations ====================
+    
+    def get_user_permissions(self, user_id: int) -> Optional[Dict[str, Any]]:
+        """Get permissions for a user"""
+        query = 'SELECT * FROM user_permissions WHERE user_id = ?'
+        results = self.execute_query(query, (user_id,))
+        return results[0] if results else None
+    
+    def create_default_permissions(self, user_id: int) -> bool:
+        """Create default permissions for a new user (all enabled)"""
+        query = '''
+            INSERT OR IGNORE INTO user_permissions (user_id)
+            VALUES (?)
+        '''
+        return self.execute_update(query, (user_id,))
+    
+    def update_user_permissions(self, user_id: int, permissions: Dict[str, bool]) -> bool:
+        """Update permissions for a user"""
+        # First ensure user has a permissions record
+        self.create_default_permissions(user_id)
+        
+        # Build dynamic update query based on provided permissions
+        valid_permissions = [
+            'can_access_dashboard', 'can_access_billing', 'can_access_customers',
+            'can_access_categories', 'can_access_services', 'can_access_frames',
+            'can_access_bookings', 'can_access_invoices', 'can_access_support',
+            'can_access_user_guide'
+        ]
+        
+        set_clauses = []
+        params = []
+        for perm in valid_permissions:
+            if perm in permissions:
+                set_clauses.append(f"{perm} = ?")
+                params.append(1 if permissions[perm] else 0)
+        
+        if not set_clauses:
+            return True
+        
+        set_clauses.append("updated_at = CURRENT_TIMESTAMP")
+        params.append(user_id)
+        
+        query = f'''
+            UPDATE user_permissions 
+            SET {', '.join(set_clauses)}
+            WHERE user_id = ?
+        '''
+        return self.execute_update(query, tuple(params))
+    
+    def get_all_staff_users(self) -> List[Dict[str, Any]]:
+        """Get all staff users for permission management"""
+        query = '''
+            SELECT id, username, full_name, is_active 
+            FROM users 
+            WHERE role = 'Staff'
+            ORDER BY full_name
+        '''
+        return self.execute_query(query)
+    
+    def get_staff_with_permissions(self) -> List[Dict[str, Any]]:
+        """Get all staff users with their permissions"""
+        query = '''
+            SELECT u.id, u.username, u.full_name, u.is_active,
+                   COALESCE(p.can_access_dashboard, 1) as can_access_dashboard,
+                   COALESCE(p.can_access_billing, 1) as can_access_billing,
+                   COALESCE(p.can_access_customers, 1) as can_access_customers,
+                   COALESCE(p.can_access_categories, 1) as can_access_categories,
+                   COALESCE(p.can_access_services, 1) as can_access_services,
+                   COALESCE(p.can_access_frames, 1) as can_access_frames,
+                   COALESCE(p.can_access_bookings, 1) as can_access_bookings,
+                   COALESCE(p.can_access_invoices, 1) as can_access_invoices,
+                   COALESCE(p.can_access_support, 1) as can_access_support,
+                   COALESCE(p.can_access_user_guide, 1) as can_access_user_guide
+            FROM users u
+            LEFT JOIN user_permissions p ON u.id = p.user_id
+            WHERE u.role = 'Staff'
+            ORDER BY u.full_name
+        '''
+        return self.execute_query(query)

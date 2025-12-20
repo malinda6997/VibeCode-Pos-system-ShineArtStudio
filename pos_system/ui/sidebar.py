@@ -56,34 +56,36 @@ class Sidebar(ctk.CTkFrame):
         )
         self.nav_scroll.pack(fill="both", expand=True, padx=5)
         
-        # Navigation items with emoji icons
+        # Navigation items with emoji icons and permission keys
         nav_items = [
-            ("dashboard", "📊", "Dashboard"),
-            ("billing", "💳", "Billing"),
-            ("customers", "👥", "Customers"),
-            ("categories", "📁", "Categories"),
-            ("services", "🎨", "Services"),
-            ("frames", "🖼", "Photo Frames"),
-            ("bookings", "📅", "Bookings"),
-            ("invoices", "📄", "Invoices"),
+            ("dashboard", "📊", "Dashboard", "can_access_dashboard"),
+            ("billing", "💳", "Billing", "can_access_billing"),
+            ("customers", "👥", "Customers", "can_access_customers"),
+            ("categories", "📁", "Categories", "can_access_categories"),
+            ("services", "🎨", "Services", "can_access_services"),
+            ("frames", "🖼", "Photo Frames", "can_access_frames"),
+            ("bookings", "📅", "Bookings", "can_access_bookings"),
+            ("invoices", "📄", "Invoices", "can_access_invoices"),
         ]
         
         # Admin only items
         admin_items = [
-            ("users", "👤", "Users"),
-            ("settings", "⚙️", "Settings"),
+            ("users", "👤", "Users", "can_access_users"),
+            ("permissions", "🛡️", "Permissions", "can_access_permissions"),
+            ("settings", "⚙️", "Settings", "can_access_settings"),
         ]
         
         # All users items
         bottom_items = [
-            ("profile", "🔒", "My Profile"),
-            ("support", "💬", "Support"),
-            ("guide", "📖", "User Guide"),
+            ("profile", "🔒", "My Profile", "can_access_profile"),
+            ("support", "💬", "Support", "can_access_support"),
+            ("guide", "📖", "User Guide", "can_access_user_guide"),
         ]
         
-        # Main navigation buttons
-        for tab_id, icon, text in nav_items:
-            self.create_nav_button(self.nav_scroll, tab_id, icon, text)
+        # Main navigation buttons (filter by permissions)
+        for tab_id, icon, text, perm_key in nav_items:
+            if self.auth_manager.has_permission(perm_key):
+                self.create_nav_button(self.nav_scroll, tab_id, icon, text)
         
         # Admin section - only show for admin users
         if self.auth_manager.is_admin():
@@ -98,16 +100,18 @@ class Sidebar(ctk.CTkFrame):
             )
             admin_label.pack(anchor="w", padx=15, pady=(5, 5))
             
-            for tab_id, icon, text in admin_items:
-                self.create_nav_button(self.nav_scroll, tab_id, icon, text)
+            for tab_id, icon, text, perm_key in admin_items:
+                if self.auth_manager.has_permission(perm_key):
+                    self.create_nav_button(self.nav_scroll, tab_id, icon, text)
         
         # Separator before bottom items
         bottom_sep = ctk.CTkFrame(self.nav_scroll, fg_color="#333355", height=1)
         bottom_sep.pack(fill="x", padx=10, pady=10)
         
-        # Bottom section items (in scrollable area)
-        for tab_id, icon, text in bottom_items:
-            self.create_nav_button(self.nav_scroll, tab_id, icon, text)
+        # Bottom section items (filter by permissions)
+        for tab_id, icon, text, perm_key in bottom_items:
+            if self.auth_manager.has_permission(perm_key):
+                self.create_nav_button(self.nav_scroll, tab_id, icon, text)
         
         # User info at very bottom (fixed)
         user_frame = ctk.CTkFrame(self, fg_color="#252545", corner_radius=10)
