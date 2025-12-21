@@ -249,8 +249,8 @@ class MainApplication(ctk.CTk):
         
         frame_class = frame_classes.get(page)
         if frame_class:
-            # Pass main_app reference to ProfileFrame for updating display
-            if page == "profile":
+            # Pass main_app reference to ProfileFrame and DashboardFrame
+            if page in ["profile", "dashboard"]:
                 frame = frame_class(self.content_frame, self.auth_manager, self.db_manager, self)
             else:
                 frame = frame_class(self.content_frame, self.auth_manager, self.db_manager)

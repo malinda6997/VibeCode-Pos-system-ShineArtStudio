@@ -339,7 +339,7 @@ class PermissionsFrame(ctk.CTkFrame):
     def enable_all_permissions(self):
         """Enable all permission switches"""
         if not self.selected_user_id:
-            Toast.show_toast(self, "No User Selected", "Please select a staff user first.", "warning")
+            Toast.warning(self, "Please select a staff user first")
             return
         
         for switch in self.permission_switches.values():
@@ -348,7 +348,7 @@ class PermissionsFrame(ctk.CTkFrame):
     def disable_all_permissions(self):
         """Disable all permission switches"""
         if not self.selected_user_id:
-            Toast.show_toast(self, "No User Selected", "Please select a staff user first.", "warning")
+            Toast.warning(self, "Please select a staff user first")
             return
         
         for switch in self.permission_switches.values():
@@ -357,7 +357,7 @@ class PermissionsFrame(ctk.CTkFrame):
     def save_permissions(self):
         """Save permission changes to database"""
         if not self.selected_user_id:
-            Toast.show_toast(self, "No User Selected", "Please select a staff user first.", "warning")
+            Toast.warning(self, "Please select a staff user first")
             return
         
         # Gather permission values
@@ -369,6 +369,6 @@ class PermissionsFrame(ctk.CTkFrame):
         success = self.db_manager.update_user_permissions(self.selected_user_id, permissions)
         
         if success:
-            Toast.show_toast(self, "Success", "Permissions updated successfully!", "success")
+            Toast.success(self, "Permissions saved successfully!")
         else:
-            Toast.show_toast(self, "Error", "Failed to update permissions.", "error")
+            Toast.error(self, "Failed to save permissions")

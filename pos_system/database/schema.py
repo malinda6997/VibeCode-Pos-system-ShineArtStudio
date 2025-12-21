@@ -122,12 +122,13 @@ class DatabaseSchema:
         except sqlite3.OperationalError:
             pass  # Column already exists
         
-        # Invoices table
+        # Invoices table - customer_id is NULL for guest customers
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS invoices (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 invoice_number TEXT UNIQUE NOT NULL,
-                customer_id INTEGER NOT NULL,
+                customer_id INTEGER,
+                guest_name TEXT,
                 subtotal REAL NOT NULL,
                 discount REAL DEFAULT 0,
                 category_service_cost REAL DEFAULT 0,
@@ -141,6 +142,12 @@ class DatabaseSchema:
                 FOREIGN KEY (created_by) REFERENCES users (id)
             )
         ''')
+        
+        # Add guest_name column if not exists (for existing databases)
+        try:
+            self.cursor.execute('ALTER TABLE invoices ADD COLUMN guest_name TEXT')
+        except sqlite3.OperationalError:
+            pass
         
         # Add category_service_cost column if not exists
         try:

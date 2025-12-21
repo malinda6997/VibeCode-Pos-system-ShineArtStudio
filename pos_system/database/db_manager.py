@@ -246,15 +246,17 @@ class DatabaseManager:
     def create_invoice(self, invoice_number: str, customer_id: int, subtotal: float,
                       discount: float, total_amount: float, paid_amount: float,
                       balance_amount: float, created_by: int, 
-                      category_service_cost: float = 0, advance_payment: float = 0) -> Optional[int]:
-        """Create a new invoice with category service cost and advance payment"""
+                      category_service_cost: float = 0, advance_payment: float = 0,
+                      guest_name: str = None) -> Optional[int]:
+        """Create a new invoice with category service cost and advance payment.
+        For guest customers, customer_id is None and guest_name is provided."""
         query = '''
-            INSERT INTO invoices (invoice_number, customer_id, subtotal, discount,
+            INSERT INTO invoices (invoice_number, customer_id, guest_name, subtotal, discount,
                                 category_service_cost, advance_payment, total_amount, 
                                 paid_amount, balance_amount, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         '''
-        return self.execute_insert(query, (invoice_number, customer_id, subtotal, 
+        return self.execute_insert(query, (invoice_number, customer_id, guest_name, subtotal, 
                                           discount, category_service_cost, advance_payment,
                                           total_amount, paid_amount, balance_amount, created_by))
     
@@ -271,11 +273,14 @@ class DatabaseManager:
                                           quantity, unit_price, total_price, buying_price))
     
     def get_invoice_by_id(self, invoice_id: int) -> Optional[Dict[str, Any]]:
-        """Get invoice with customer details"""
+        """Get invoice with customer details (handles both registered and guest customers)"""
         query = '''
-            SELECT i.*, c.full_name, c.mobile_number, u.full_name as created_by_name
+            SELECT i.*, 
+                   COALESCE(c.full_name, i.guest_name) as full_name, 
+                   c.mobile_number,
+                   u.full_name as created_by_name
             FROM invoices i
-            JOIN customers c ON i.customer_id = c.id
+            LEFT JOIN customers c ON i.customer_id = c.id
             JOIN users u ON i.created_by = u.id
             WHERE i.id = ?
         '''

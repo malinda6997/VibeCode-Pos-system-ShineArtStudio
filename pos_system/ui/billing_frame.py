@@ -11,6 +11,8 @@ class BillingFrame(BaseFrame):
         super().__init__(parent, auth_manager, db_manager)
         self.invoice_generator = InvoiceGenerator()
         self.selected_customer = None
+        self.is_guest_customer = False  # Track if guest customer mode
+        self.guest_customer_name = ""  # Guest customer name
         self.cart_items = []
         self.categories_map = {}  # name -> id mapping
         self.categories_data = {}  # name -> full category data including service_cost
@@ -48,19 +50,44 @@ class BillingFrame(BaseFrame):
             text="Customer Information",
             font=ctk.CTkFont(size=16, weight="bold")
         )
-        customer_label.pack(pady=(10, 15))
+        customer_label.pack(pady=(10, 10))
         
-        # Mobile search
-        search_container = ctk.CTkFrame(customer_frame, fg_color="transparent")
-        search_container.pack(fill="x", padx=15, pady=5)
+        # Guest Customer Toggle
+        guest_toggle_container = ctk.CTkFrame(customer_frame, fg_color="transparent")
+        guest_toggle_container.pack(fill="x", padx=15, pady=(0, 10))
         
-        ctk.CTkLabel(search_container, text="Mobile Number:").pack(side="left", padx=5)
-        self.mobile_search = ctk.CTkEntry(search_container, width=150, height=30)
+        self.guest_switch_var = ctk.StringVar(value="off")
+        self.guest_switch = ctk.CTkSwitch(
+            guest_toggle_container,
+            text="Guest Customer (Walk-in)",
+            variable=self.guest_switch_var,
+            onvalue="on",
+            offvalue="off",
+            command=self.toggle_guest_customer,
+            progress_color="#00d4ff",
+            button_color="#00ff88",
+            button_hover_color="#00cc6a"
+        )
+        self.guest_switch.pack(side="left", padx=5)
+        
+        ctk.CTkLabel(
+            guest_toggle_container,
+            text="💡 No registration needed",
+            font=ctk.CTkFont(size=11),
+            text_color="#888888"
+        ).pack(side="left", padx=10)
+        
+        # Mobile search (for registered customers)
+        self.search_container = ctk.CTkFrame(customer_frame, fg_color="transparent")
+        self.search_container.pack(fill="x", padx=15, pady=5)
+        
+        ctk.CTkLabel(self.search_container, text="Mobile Number:").pack(side="left", padx=5)
+        self.mobile_search = ctk.CTkEntry(self.search_container, width=150, height=30)
         self.mobile_search.pack(side="left", padx=5)
         self.mobile_search.bind("<KeyRelease>", self.on_mobile_search_change)
         
         ctk.CTkButton(
-            search_container,
+            self.search_container,
             text="Search",
             command=self.search_customer,
             width=80,
@@ -68,7 +95,7 @@ class BillingFrame(BaseFrame):
         ).pack(side="left", padx=5)
         
         ctk.CTkButton(
-            search_container,
+            self.search_container,
             text="➕ Add New Customer",
             command=self.add_new_customer,
             width=150,
@@ -76,6 +103,25 @@ class BillingFrame(BaseFrame):
             fg_color="#00d4ff",
             text_color="#1a1a2e",
             hover_color="#00a8cc",
+            font=ctk.CTkFont(size=12, weight="bold")
+        ).pack(side="left", padx=5)
+        
+        # Guest customer name entry (hidden by default)
+        self.guest_name_container = ctk.CTkFrame(customer_frame, fg_color="transparent")
+        
+        ctk.CTkLabel(self.guest_name_container, text="Customer Name:").pack(side="left", padx=5)
+        self.guest_name_entry = ctk.CTkEntry(self.guest_name_container, width=250, height=30, placeholder_text="Enter guest customer name")
+        self.guest_name_entry.pack(side="left", padx=5)
+        
+        ctk.CTkButton(
+            self.guest_name_container,
+            text="✓ Confirm",
+            command=self.confirm_guest_customer,
+            width=100,
+            height=30,
+            fg_color="#00ff88",
+            text_color="#1a1a2e",
+            hover_color="#00cc6a",
             font=ctk.CTkFont(size=12, weight="bold")
         ).pack(side="left", padx=5)
         
@@ -474,9 +520,55 @@ class BillingFrame(BaseFrame):
     def clear_selected_customer(self):
         """Clear selected customer"""
         self.selected_customer = None
+        self.is_guest_customer = False
+        self.guest_customer_name = ""
         self.customer_card.pack_forget()
         self.no_customer_label.pack(pady=10)
         self.mobile_search.delete(0, "end")
+        self.guest_name_entry.delete(0, "end")
+    
+    def toggle_guest_customer(self):
+        """Toggle between guest and registered customer mode"""
+        if self.guest_switch_var.get() == "on":
+            # Switch to guest customer mode
+            self.is_guest_customer = True
+            self.search_container.pack_forget()
+            self.guest_name_container.pack(fill="x", padx=15, pady=5)
+            self.clear_selected_customer_display()
+            self.hide_suggestions()
+            # Update label
+            self.no_customer_label.configure(text="🎫 Enter guest customer name above")
+        else:
+            # Switch back to registered customer mode
+            self.is_guest_customer = False
+            self.guest_customer_name = ""
+            self.guest_name_container.pack_forget()
+            self.search_container.pack(fill="x", padx=15, pady=5)
+            self.clear_selected_customer_display()
+            # Restore label
+            self.no_customer_label.configure(text="🔍 Search customer by mobile number or add a new one")
+    
+    def clear_selected_customer_display(self):
+        """Clear customer card display without resetting guest mode"""
+        self.selected_customer = None
+        self.customer_card.pack_forget()
+        self.no_customer_label.pack(pady=10)
+        self.mobile_search.delete(0, "end")
+        self.guest_name_entry.delete(0, "end")
+    
+    def confirm_guest_customer(self):
+        """Confirm guest customer name"""
+        name = self.guest_name_entry.get().strip()
+        if not name:
+            MessageDialog.show_error("Error", "Please enter guest customer name")
+            return
+        
+        self.guest_customer_name = name
+        # Show in customer card with guest indicator
+        self.customer_name_label.configure(text=f"🎫 {name}")
+        self.customer_mobile_label.configure(text="Guest Customer (Walk-in)")
+        self.no_customer_label.pack_forget()
+        self.customer_card.pack(fill="x", padx=15, pady=10)
     
     def on_mobile_search_change(self, event=None):
         """Auto-search when typing 5+ digits"""
@@ -803,9 +895,15 @@ class BillingFrame(BaseFrame):
     
     def generate_invoice(self):
         """Generate and save invoice"""
-        if not self.selected_customer:
-            MessageDialog.show_error("Error", "Please select a customer")
-            return
+        # Check for customer (either registered or guest)
+        if self.is_guest_customer:
+            if not self.guest_customer_name:
+                MessageDialog.show_error("Error", "Please enter guest customer name")
+                return
+        else:
+            if not self.selected_customer:
+                MessageDialog.show_error("Error", "Please select a customer")
+                return
         
         if not self.cart_items:
             MessageDialog.show_error("Error", "Please add items to cart")
@@ -838,10 +936,18 @@ class BillingFrame(BaseFrame):
         # Generate invoice number
         invoice_number = self.db_manager.generate_invoice_number()
         
+        # Determine customer_id and guest_name
+        if self.is_guest_customer:
+            customer_id = None
+            guest_name = self.guest_customer_name
+        else:
+            customer_id = self.selected_customer['id']
+            guest_name = None
+        
         # Create invoice with category service cost and advance payment
         invoice_id = self.db_manager.create_invoice(
             invoice_number,
-            self.selected_customer['id'],
+            customer_id,
             subtotal,
             discount,
             total,
@@ -849,7 +955,8 @@ class BillingFrame(BaseFrame):
             balance,
             self.auth_manager.get_user_id(),
             service_cost,
-            advance
+            advance,
+            guest_name
         )
         
         if not invoice_id:
@@ -897,11 +1004,20 @@ class BillingFrame(BaseFrame):
         invoice_data = self.db_manager.get_invoice_by_id(invoice_id)
         items_data = self.db_manager.get_invoice_items(invoice_id)
         
+        # Prepare customer data for PDF (works for both guest and registered)
+        if self.is_guest_customer:
+            customer_data = {
+                'full_name': self.guest_customer_name,
+                'mobile_number': 'Guest Customer'
+            }
+        else:
+            customer_data = self.selected_customer
+        
         try:
             pdf_path = self.invoice_generator.generate_invoice(
                 invoice_data,
                 items_data,
-                self.selected_customer
+                customer_data
             )
             
             MessageDialog.show_success("Success", f"Invoice {invoice_number} generated successfully!")
@@ -918,11 +1034,19 @@ class BillingFrame(BaseFrame):
     def clear_all(self):
         """Clear all fields"""
         self.selected_customer = None
+        self.is_guest_customer = False
+        self.guest_customer_name = ""
         self.cart_items = []
         self.category_service_cost = 0
         self.selected_category_name = None
         self.mobile_search.delete(0, 'end')
+        self.guest_name_entry.delete(0, 'end')
+        # Reset guest switch
+        self.guest_switch_var.set("off")
+        self.guest_name_container.pack_forget()
+        self.search_container.pack(fill="x", padx=15, pady=5)
         self.clear_selected_customer()
+        self.no_customer_label.configure(text="🔍 Search customer by mobile number or add a new one")
         self.discount_entry.delete(0, 'end')
         self.discount_entry.insert(0, "0")
         self.advance_entry.delete(0, 'end')

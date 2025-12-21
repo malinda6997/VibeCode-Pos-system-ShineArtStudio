@@ -261,6 +261,89 @@ class DashboardService:
                 'net_profit': 0
             }
     
+    # ==================== Staff Dashboard Widgets ====================
+    
+    def get_upcoming_bookings(self, limit: int = 5) -> list:
+        """Get upcoming bookings for staff dashboard"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            today = datetime.now().strftime('%Y-%m-%d')
+            
+            cursor.execute('''
+                SELECT b.id, b.event_date, b.event_time, b.event_location, 
+                       b.event_type, b.status, c.full_name as customer_name
+                FROM bookings b
+                JOIN customers c ON b.customer_id = c.id
+                WHERE b.event_date >= ? AND b.status IN ('Pending', 'Confirmed')
+                ORDER BY b.event_date ASC, b.event_time ASC
+                LIMIT ?
+            ''', (today, limit))
+            
+            bookings = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+            return bookings
+        except sqlite3.Error as e:
+            print(f"Error getting upcoming bookings: {e}")
+            return []
+    
+    def get_recent_customers(self, limit: int = 5) -> list:
+        """Get recently added customers for staff dashboard"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT id, full_name, mobile_number, created_at
+                FROM customers
+                ORDER BY created_at DESC
+                LIMIT ?
+            ''', (limit,))
+            
+            customers = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+            return customers
+        except sqlite3.Error as e:
+            print(f"Error getting recent customers: {e}")
+            return []
+    
+    def get_frame_stock_summary(self, limit: int = 5) -> list:
+        """Get frame stock summary for staff dashboard (no prices)"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            # Get frames sorted by stock level (lowest first for alerts)
+            cursor.execute('''
+                SELECT id, frame_name, size, quantity
+                FROM photo_frames
+                ORDER BY quantity ASC
+                LIMIT ?
+            ''', (limit,))
+            
+            frames = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+            return frames
+        except sqlite3.Error as e:
+            print(f"Error getting frame stock: {e}")
+            return []
+    
+    def get_staff_dashboard_stats(self) -> Dict[str, Any]:
+        """Get dashboard statistics for staff users (no financial data)"""
+        return {
+            'today_invoices': self.get_today_invoices(),
+            'total_invoices': self.get_total_invoices(),
+            'total_customers': self.get_total_customers(),
+            'pending_bookings': self.get_pending_bookings(),
+            'low_stock_frames': self.get_low_stock_frames(),
+            'upcoming_bookings': self.get_upcoming_bookings(),
+            'recent_customers': self.get_recent_customers(),
+            'frame_stock': self.get_frame_stock_summary(),
+        }
+    
     def get_dashboard_stats(self) -> Dict[str, Any]:
         """Get all dashboard statistics"""
         return {

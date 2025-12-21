@@ -357,7 +357,18 @@ class ProfileFrame(ctk.CTkFrame):
         if not user:
             return
         
-        def do_remove():
+        # Show confirmation dialog
+        confirmed = Toast.confirm(
+            self, 
+            "Remove Picture", 
+            "Remove your profile picture?", 
+            "Yes, Remove", 
+            "Cancel", 
+            "🗑️", 
+            "#e74c3c"
+        )
+        
+        if confirmed:
             # Get current picture path
             current_path = self.user_service.get_profile_picture(user['id'])
             
@@ -377,10 +388,9 @@ class ProfileFrame(ctk.CTkFrame):
                 if self.main_app:
                     self.main_app.update_profile_display()
                 
-                Toast.success(self, "Profile picture removed")
-        
-        Toast.confirm(self, "Remove Picture", "Remove your profile picture?", 
-                     "Yes, Remove", "Cancel", "🗑️", "#e74c3c", do_remove)
+                Toast.success(self, "Profile picture removed successfully!")
+            else:
+                Toast.error(self, "Failed to remove profile picture")
     
     def change_password(self):
         """Handle password change"""

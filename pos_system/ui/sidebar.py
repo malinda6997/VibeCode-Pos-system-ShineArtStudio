@@ -71,9 +71,9 @@ class Sidebar(ctk.CTkFrame):
         # Admin only items
         admin_items = [
             ("users", "👤", "Users", "can_access_users"),
-            ("permissions", "🛡️", "Permissions", "can_access_permissions"),
+            ("permissions", "�", "Permissions", "can_access_permissions"),
             ("staff_reports", "📋", "Staff Reports", "can_access_staff_reports"),
-            ("settings", "⚙️", "Settings", "can_access_settings"),
+            ("settings", "⚙", "Settings", "can_access_settings"),
         ]
         
         # All users items
@@ -120,42 +120,13 @@ class Sidebar(ctk.CTkFrame):
         
         user = self.auth_manager.get_current_user()
         if user:
-            # Horizontal layout with avatar
+            # User info layout
             user_content = ctk.CTkFrame(user_frame, fg_color="transparent")
             user_content.pack(fill="x", padx=12, pady=12)
             
-            # Avatar container (circular) - improved styling
-            avatar_size = 44
-            avatar_frame = ctk.CTkFrame(
-                user_content, 
-                fg_color="#1a1a2e", 
-                width=avatar_size, 
-                height=avatar_size, 
-                corner_radius=avatar_size // 2,
-                border_width=2,
-                border_color="#00d4ff"
-            )
-            avatar_frame.pack(side="left")
-            avatar_frame.pack_propagate(False)
-            
-            # Load profile image or show default
-            profile_img = self.load_user_avatar(user.get('id'), (avatar_size - 4, avatar_size - 4))
-            if profile_img:
-                self.avatar_label = ctk.CTkLabel(avatar_frame, image=profile_img, text="")
-            else:
-                # Default avatar with initials or icon
-                initials = self.get_user_initials(user['full_name'])
-                self.avatar_label = ctk.CTkLabel(
-                    avatar_frame,
-                    text=initials if initials else "👤",
-                    font=ctk.CTkFont(size=14, weight="bold"),
-                    text_color="#00d4ff"
-                )
-            self.avatar_label.pack(expand=True)
-            
             # User info (name + role)
             info_frame = ctk.CTkFrame(user_content, fg_color="transparent")
-            info_frame.pack(side="left", padx=(12, 0), fill="x", expand=True)
+            info_frame.pack(side="left", fill="x", expand=True)
             
             user_name = ctk.CTkLabel(
                 info_frame,
@@ -269,12 +240,12 @@ class Sidebar(ctk.CTkFrame):
         """Create navigation button with emoji icon"""
         btn = ctk.CTkButton(
             parent,
-            text=f"{icon}   {text}",
-            font=ctk.CTkFont(size=13),
+            text=f"{icon}  {text}",
+            font=ctk.CTkFont(size=14),
             fg_color="transparent",
             hover_color="#2d2d5a",
             anchor="w",
-            height=40,
+            height=42,
             corner_radius=8,
             command=lambda t=tab_id: self.navigate(t)
         )
