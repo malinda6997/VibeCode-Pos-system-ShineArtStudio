@@ -252,6 +252,9 @@ class LoginWindow(ctk.CTkToplevel):
         
         self.title("Shine Art Studio - Login")
         
+        # Set window icon
+        self._set_window_icon()
+        
         # Set window size
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
@@ -274,6 +277,24 @@ class LoginWindow(ctk.CTkToplevel):
         self.protocol("WM_DELETE_WINDOW", self.on_close)
         
         self.create_widgets()
+    
+    def _set_window_icon(self):
+        """Set the login window icon"""
+        try:
+            icon_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "logos", "App logo.jpg")
+            if os.path.exists(icon_path):
+                from PIL import ImageTk
+                icon_image = Image.open(icon_path)
+                # Create multiple sizes for better display
+                icon_sizes = [(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
+                icon_photos = []
+                for size in icon_sizes:
+                    resized = icon_image.resize(size, Image.Resampling.LANCZOS)
+                    icon_photos.append(ImageTk.PhotoImage(resized))
+                self._icon_photos = icon_photos  # Keep reference to prevent garbage collection
+                self.iconphoto(True, *icon_photos)
+        except Exception as e:
+            print(f"Could not load login window icon: {e}")
         
     def create_widgets(self):
         """Create login form widgets"""
@@ -333,27 +354,26 @@ class LoginWindow(ctk.CTkToplevel):
         form_container = ctk.CTkFrame(right_panel, fg_color="transparent")
         form_container.place(relx=0.5, rely=0.5, anchor="center")
         
-        # Logo
+        # Logo - Match dashboard sidebar proportions
         self.logo_image = None
         try:
-            logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "logo001.png")
+            logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "logos", "studio-logo.png")
             if os.path.exists(logo_path):
                 logo_img = Image.open(logo_path)
-                self.logo_image = ctk.CTkImage(light_image=logo_img, dark_image=logo_img, size=(110, 110))
+                # Use same sizing logic as sidebar dashboard
+                orig_width, orig_height = logo_img.size
+                target_height = 50
+                aspect_ratio = orig_width / orig_height
+                target_width = int(target_height * aspect_ratio)
+                # Constrain width to fit login panel (max 220px like sidebar)
+                target_width = max(min(target_width, 220), 160)
+                self.logo_image = ctk.CTkImage(light_image=logo_img, dark_image=logo_img, size=(target_width, target_height))
                 logo_label = ctk.CTkLabel(form_container, image=self.logo_image, text="")
-                logo_label.pack(pady=(0, 25))
+                logo_label.pack(pady=(0, 30))
         except Exception as e:
             print(f"Could not load logo: {e}")
         
-        # Title with hierarchy
-        title_label = ctk.CTkLabel(
-            form_container,
-            text="Shine Art Studio",
-            font=ctk.CTkFont(size=32, weight="bold"),
-            text_color="#ffffff"
-        )
-        title_label.pack(pady=(0, 8))
-        
+        # Subtitle only (logo already contains brand name)
         subtitle_label = ctk.CTkLabel(
             form_container,
             text="Photography POS System",
