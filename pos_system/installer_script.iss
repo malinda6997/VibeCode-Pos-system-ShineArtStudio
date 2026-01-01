@@ -76,14 +76,13 @@ Name: "custom"; Description: "Custom Installation"; Flags: iscustom
 
 ; Main Application
 Source: "dist\ShineArtStudio_POS.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: main
-Source: "dist\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main
 
 ; Documentation
 Source: "README.md"; DestDir: "{app}\docs"; Flags: ignoreversion; Components: docs
 Source: "LICENSE.txt"; DestDir: "{app}\docs"; Flags: ignoreversion; Components: docs
 Source: "INSTALLATION_GUIDE.md"; DestDir: "{app}\docs"; Flags: ignoreversion isreadme; Components: docs
 
-[Degistry]
+[Registry]
 Root: HKLM; Subkey: "Software\ShineArtStudio"; Flags: uninsdeletekeyifempty
 Root: HKLM; Subkey: "Software\ShineArtStudio\POS"; Flags: uninsdeletekey
 Root: HKLM; Subkey: "Software\ShineArtStudio\POS"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"

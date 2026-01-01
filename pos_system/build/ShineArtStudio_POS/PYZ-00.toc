@@ -85,11 +85,20 @@
   ('PIL.ImageColor',
    'D:\\Install Softwares\\Python\\Lib\\site-packages\\PIL\\ImageColor.py',
    'PYMODULE'),
+  ('PIL.ImageDraw',
+   'D:\\Install Softwares\\Python\\Lib\\site-packages\\PIL\\ImageDraw.py',
+   'PYMODULE'),
+  ('PIL.ImageDraw2',
+   'D:\\Install Softwares\\Python\\Lib\\site-packages\\PIL\\ImageDraw2.py',
+   'PYMODULE'),
   ('PIL.ImageFile',
    'D:\\Install Softwares\\Python\\Lib\\site-packages\\PIL\\ImageFile.py',
    'PYMODULE'),
   ('PIL.ImageFilter',
    'D:\\Install Softwares\\Python\\Lib\\site-packages\\PIL\\ImageFilter.py',
+   'PYMODULE'),
+  ('PIL.ImageFont',
+   'D:\\Install Softwares\\Python\\Lib\\site-packages\\PIL\\ImageFont.py',
    'PYMODULE'),
   ('PIL.ImageMath',
    'D:\\Install Softwares\\Python\\Lib\\site-packages\\PIL\\ImageMath.py',
@@ -102,6 +111,9 @@
    'PYMODULE'),
   ('PIL.ImagePalette',
    'D:\\Install Softwares\\Python\\Lib\\site-packages\\PIL\\ImagePalette.py',
+   'PYMODULE'),
+  ('PIL.ImagePath',
+   'D:\\Install Softwares\\Python\\Lib\\site-packages\\PIL\\ImagePath.py',
    'PYMODULE'),
   ('PIL.ImageQt',
    'D:\\Install Softwares\\Python\\Lib\\site-packages\\PIL\\ImageQt.py',
@@ -1938,9 +1950,25 @@
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
    'Studio\\pos_system\\services\\__init__.py',
    'PYMODULE'),
+  ('services.dashboard_service',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\services\\dashboard_service.py',
+   'PYMODULE'),
   ('services.invoice_generator',
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
    'Studio\\pos_system\\services\\invoice_generator.py',
+   'PYMODULE'),
+  ('services.settings_service',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\services\\settings_service.py',
+   'PYMODULE'),
+  ('services.staff_report_generator',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\services\\staff_report_generator.py',
+   'PYMODULE'),
+  ('services.user_service',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\services\\user_service.py',
    'PYMODULE'),
   ('shlex', 'D:\\Install Softwares\\Python\\Lib\\shlex.py', 'PYMODULE'),
   ('shutil', 'D:\\Install Softwares\\Python\\Lib\\shutil.py', 'PYMODULE'),
@@ -2132,6 +2160,10 @@
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
    'Studio\\pos_system\\ui\\booking_frame.py',
    'PYMODULE'),
+  ('ui.category_frame',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\ui\\category_frame.py',
+   'PYMODULE'),
   ('ui.components',
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
    'Studio\\pos_system\\ui\\components.py',
@@ -2139,6 +2171,10 @@
   ('ui.customer_frame',
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
    'Studio\\pos_system\\ui\\customer_frame.py',
+   'PYMODULE'),
+  ('ui.dashboard_frame',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\ui\\dashboard_frame.py',
    'PYMODULE'),
   ('ui.frame_frame',
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
@@ -2148,9 +2184,41 @@
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
    'Studio\\pos_system\\ui\\invoice_history_frame.py',
    'PYMODULE'),
+  ('ui.permissions_frame',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\ui\\permissions_frame.py',
+   'PYMODULE'),
+  ('ui.profile_frame',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\ui\\profile_frame.py',
+   'PYMODULE'),
   ('ui.service_frame',
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
    'Studio\\pos_system\\ui\\service_frame.py',
+   'PYMODULE'),
+  ('ui.settings_frame',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\ui\\settings_frame.py',
+   'PYMODULE'),
+  ('ui.sidebar',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\ui\\sidebar.py',
+   'PYMODULE'),
+  ('ui.staff_reports_frame',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\ui\\staff_reports_frame.py',
+   'PYMODULE'),
+  ('ui.support_frame',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\ui\\support_frame.py',
+   'PYMODULE'),
+  ('ui.user_guide_frame',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\ui\\user_guide_frame.py',
+   'PYMODULE'),
+  ('ui.users_frame',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\ui\\users_frame.py',
    'PYMODULE'),
   ('unittest',
    'D:\\Install Softwares\\Python\\Lib\\unittest\\__init__.py',

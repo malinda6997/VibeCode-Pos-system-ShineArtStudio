@@ -18,7 +18,10 @@
   <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/main.py" type="text/plain"><tt>main.py</tt></a>
 <span class="moduletype">Script</span>  <div class="import">
 imports:
-    <a href="#_collections_abc">_collections_abc</a>
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#_collections_abc">_collections_abc</a>
  &#8226;   <a href="#_weakrefset">_weakrefset</a>
  &#8226;   <a href="#abc">abc</a>
  &#8226;   <a href="#auth">auth</a>
@@ -216,6 +219,7 @@ imports:
  &#8226;   <a href="#re._parser">re._parser</a>
  &#8226;   <a href="#reportlab">reportlab</a>
  &#8226;   <a href="#reprlib">reprlib</a>
+ &#8226;   <a href="#services.user_service">services.user_service</a>
  &#8226;   <a href="#sre_compile">sre_compile</a>
  &#8226;   <a href="#sre_constants">sre_constants</a>
  &#8226;   <a href="#sre_parse">sre_parse</a>
@@ -225,15 +229,27 @@ imports:
  &#8226;   <a href="#tkcalendar.calendar_">tkcalendar.calendar_</a>
  &#8226;   <a href="#tkcalendar.dateentry">tkcalendar.dateentry</a>
  &#8226;   <a href="#tkcalendar.tooltip">tkcalendar.tooltip</a>
+ &#8226;   <a href="#tkinter">tkinter</a>
+ &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
  &#8226;   <a href="#traceback">traceback</a>
  &#8226;   <a href="#types">types</a>
  &#8226;   <a href="#ui.billing_frame">ui.billing_frame</a>
  &#8226;   <a href="#ui.booking_frame">ui.booking_frame</a>
+ &#8226;   <a href="#ui.category_frame">ui.category_frame</a>
  &#8226;   <a href="#ui.components">ui.components</a>
  &#8226;   <a href="#ui.customer_frame">ui.customer_frame</a>
+ &#8226;   <a href="#ui.dashboard_frame">ui.dashboard_frame</a>
  &#8226;   <a href="#ui.frame_frame">ui.frame_frame</a>
  &#8226;   <a href="#ui.invoice_history_frame">ui.invoice_history_frame</a>
+ &#8226;   <a href="#ui.permissions_frame">ui.permissions_frame</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
  &#8226;   <a href="#ui.service_frame">ui.service_frame</a>
+ &#8226;   <a href="#ui.settings_frame">ui.settings_frame</a>
+ &#8226;   <a href="#ui.sidebar">ui.sidebar</a>
+ &#8226;   <a href="#ui.staff_reports_frame">ui.staff_reports_frame</a>
+ &#8226;   <a href="#ui.support_frame">ui.support_frame</a>
+ &#8226;   <a href="#ui.user_guide_frame">ui.user_guide_frame</a>
+ &#8226;   <a href="#ui.users_frame">ui.users_frame</a>
  &#8226;   <a href="#warnings">warnings</a>
  &#8226;   <a href="#weakref">weakref</a>
 
@@ -319,6 +335,7 @@ imported by:
 <span class="moduletype">MissingModule</span>  <div class="import">
 imported by:
     <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
  &#8226;   <a href="#PIL.ImageFilter">PIL.ImageFilter</a>
  &#8226;   <a href="#PIL.ImageOps">PIL.ImageOps</a>
  &#8226;   <a href="#PIL.ImagePalette">PIL.ImagePalette</a>
@@ -473,12 +490,16 @@ imports:
  &#8226;   <a href="#PIL.ImageChops">PIL.ImageChops</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
  &#8226;   <a href="#PIL.ImageColor">PIL.ImageColor</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#PIL.ImageDraw2">PIL.ImageDraw2</a>
  &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
  &#8226;   <a href="#PIL.ImageFilter">PIL.ImageFilter</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageMath">PIL.ImageMath</a>
  &#8226;   <a href="#PIL.ImageMode">PIL.ImageMode</a>
  &#8226;   <a href="#PIL.ImageOps">PIL.ImageOps</a>
  &#8226;   <a href="#PIL.ImagePalette">PIL.ImagePalette</a>
+ &#8226;   <a href="#PIL.ImagePath">PIL.ImagePath</a>
  &#8226;   <a href="#PIL.ImageQt">PIL.ImageQt</a>
  &#8226;   <a href="#PIL.ImageSequence">PIL.ImageSequence</a>
  &#8226;   <a href="#PIL.ImageShow">PIL.ImageShow</a>
@@ -532,12 +553,16 @@ imported by:
  &#8226;   <a href="#PIL.ImageChops">PIL.ImageChops</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
  &#8226;   <a href="#PIL.ImageColor">PIL.ImageColor</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#PIL.ImageDraw2">PIL.ImageDraw2</a>
  &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
  &#8226;   <a href="#PIL.ImageFilter">PIL.ImageFilter</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageMath">PIL.ImageMath</a>
  &#8226;   <a href="#PIL.ImageMode">PIL.ImageMode</a>
  &#8226;   <a href="#PIL.ImageOps">PIL.ImageOps</a>
  &#8226;   <a href="#PIL.ImagePalette">PIL.ImagePalette</a>
+ &#8226;   <a href="#PIL.ImagePath">PIL.ImagePath</a>
  &#8226;   <a href="#PIL.ImageQt">PIL.ImageQt</a>
  &#8226;   <a href="#PIL.ImageSequence">PIL.ImageSequence</a>
  &#8226;   <a href="#PIL.ImageShow">PIL.ImageShow</a>
@@ -579,6 +604,7 @@ imported by:
  &#8226;   <a href="#PIL._deprecate">PIL._deprecate</a>
  &#8226;   <a href="#PIL._imaging">PIL._imaging</a>
  &#8226;   <a href="#PIL._imagingcms">PIL._imagingcms</a>
+ &#8226;   <a href="#PIL._imagingft">PIL._imagingft</a>
  &#8226;   <a href="#PIL._imagingmath">PIL._imagingmath</a>
  &#8226;   <a href="#PIL._imagingtk">PIL._imagingtk</a>
  &#8226;   <a href="#PIL._typing">PIL._typing</a>
@@ -587,8 +613,12 @@ imported by:
  &#8226;   <a href="#PIL._webp">PIL._webp</a>
  &#8226;   <a href="#PIL.features">PIL.features</a>
  &#8226;   <a href="#customtkinter.windows.widgets.image.ctk_image">customtkinter.windows.widgets.image.ctk_image</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#reportlab.graphics.renderPM">reportlab.graphics.renderPM</a>
  &#8226;   <a href="#reportlab.lib.utils">reportlab.lib.utils</a>
+ &#8226;   <a href="#ui.components">ui.components</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
+ &#8226;   <a href="#ui.sidebar">ui.sidebar</a>
 
   </div>
 
@@ -1232,11 +1262,15 @@ imported by:
  &#8226;   <a href="#PIL.ImageChops">PIL.ImageChops</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
  &#8226;   <a href="#PIL.ImageColor">PIL.ImageColor</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#PIL.ImageDraw2">PIL.ImageDraw2</a>
  &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
  &#8226;   <a href="#PIL.ImageFilter">PIL.ImageFilter</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageMath">PIL.ImageMath</a>
  &#8226;   <a href="#PIL.ImageOps">PIL.ImageOps</a>
  &#8226;   <a href="#PIL.ImagePalette">PIL.ImagePalette</a>
+ &#8226;   <a href="#PIL.ImagePath">PIL.ImagePath</a>
  &#8226;   <a href="#PIL.ImageQt">PIL.ImageQt</a>
  &#8226;   <a href="#PIL.ImageSequence">PIL.ImageSequence</a>
  &#8226;   <a href="#PIL.ImageShow">PIL.ImageShow</a>
@@ -1272,8 +1306,12 @@ imported by:
  &#8226;   <a href="#PIL.XpmImagePlugin">PIL.XpmImagePlugin</a>
  &#8226;   <a href="#PIL.features">PIL.features</a>
  &#8226;   <a href="#customtkinter.windows.widgets.image.ctk_image">customtkinter.windows.widgets.image.ctk_image</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#reportlab.graphics.renderPM">reportlab.graphics.renderPM</a>
  &#8226;   <a href="#reportlab.lib.utils">reportlab.lib.utils</a>
+ &#8226;   <a href="#ui.components">ui.components</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
+ &#8226;   <a href="#ui.sidebar">ui.sidebar</a>
 
   </div>
 
@@ -1346,8 +1384,67 @@ imports:
 imported by:
     <a href="#PIL">PIL</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#PIL.ImageDraw2">PIL.ImageDraw2</a>
  &#8226;   <a href="#PIL.ImageOps">PIL.ImageOps</a>
  &#8226;   <a href="#PIL.ImagePalette">PIL.ImagePalette</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="PIL.ImageDraw"></a>
+  <a target="code" href="///D:/Install%20Softwares/Python/Lib/site-packages/PIL/ImageDraw.py" type="text/plain"><tt>PIL.ImageDraw</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#'collections.abc'">'collections.abc'</a>
+ &#8226;   <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageColor">PIL.ImageColor</a>
+ &#8226;   <a href="#PIL.ImageDraw2">PIL.ImageDraw2</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
+ &#8226;   <a href="#PIL._deprecate">PIL._deprecate</a>
+ &#8226;   <a href="#PIL._typing">PIL._typing</a>
+ &#8226;   <a href="#__future__">__future__</a>
+ &#8226;   <a href="#math">math</a>
+ &#8226;   <a href="#struct">struct</a>
+ &#8226;   <a href="#types">types</a>
+ &#8226;   <a href="#typing">typing</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.ImageDraw2">PIL.ImageDraw2</a>
+ &#8226;   <a href="#main.py">main.py</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
+ &#8226;   <a href="#ui.sidebar">ui.sidebar</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="PIL.ImageDraw2"></a>
+  <a target="code" href="///D:/Install%20Softwares/Python/Lib/site-packages/PIL/ImageDraw2.py" type="text/plain"><tt>PIL.ImageDraw2</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageColor">PIL.ImageColor</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
+ &#8226;   <a href="#PIL.ImagePath">PIL.ImagePath</a>
+ &#8226;   <a href="#PIL._typing">PIL._typing</a>
+ &#8226;   <a href="#__future__">__future__</a>
+ &#8226;   <a href="#typing">typing</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
 
   </div>
 
@@ -1398,6 +1495,7 @@ imported by:
  &#8226;   <a href="#PIL.IcoImagePlugin">PIL.IcoImagePlugin</a>
  &#8226;   <a href="#PIL.ImImagePlugin">PIL.ImImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageQt">PIL.ImageQt</a>
  &#8226;   <a href="#PIL.ImageTk">PIL.ImageTk</a>
  &#8226;   <a href="#PIL.ImtImagePlugin">PIL.ImtImagePlugin</a>
@@ -1453,6 +1551,42 @@ imports:
 imported by:
     <a href="#PIL">PIL</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="PIL.ImageFont"></a>
+  <a target="code" href="///D:/Install%20Softwares/Python/Lib/site-packages/PIL/ImageFont.py" type="text/plain"><tt>PIL.ImageFont</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
+ &#8226;   <a href="#PIL._imaging">PIL._imaging</a>
+ &#8226;   <a href="#PIL._imagingft">PIL._imagingft</a>
+ &#8226;   <a href="#PIL._typing">PIL._typing</a>
+ &#8226;   <a href="#PIL._util">PIL._util</a>
+ &#8226;   <a href="#PIL.features">PIL.features</a>
+ &#8226;   <a href="#__future__">__future__</a>
+ &#8226;   <a href="#base64">base64</a>
+ &#8226;   <a href="#enum">enum</a>
+ &#8226;   <a href="#io">io</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#packaging.version">packaging.version</a>
+ &#8226;   <a href="#sys">sys</a>
+ &#8226;   <a href="#types">types</a>
+ &#8226;   <a href="#typing">typing</a>
+ &#8226;   <a href="#warnings">warnings</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#PIL.ImageDraw2">PIL.ImageDraw2</a>
+ &#8226;   <a href="#PIL._imagingft">PIL._imagingft</a>
 
   </div>
 
@@ -1527,6 +1661,7 @@ imported by:
     <a href="#PIL">PIL</a>
  &#8226;   <a href="#PIL.GifImagePlugin">PIL.GifImagePlugin</a>
  &#8226;   <a href="#PIL.TiffImagePlugin">PIL.TiffImagePlugin</a>
+ &#8226;   <a href="#ui.sidebar">ui.sidebar</a>
 
   </div>
 
@@ -1569,6 +1704,25 @@ imported by:
  &#8226;   <a href="#PIL.TiffImagePlugin">PIL.TiffImagePlugin</a>
  &#8226;   <a href="#PIL.XVThumbImagePlugin">PIL.XVThumbImagePlugin</a>
  &#8226;   <a href="#PIL.XpmImagePlugin">PIL.XpmImagePlugin</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="PIL.ImagePath"></a>
+  <a target="code" href="///D:/Install%20Softwares/Python/Lib/site-packages/PIL/ImagePath.py" type="text/plain"><tt>PIL.ImagePath</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#__future__">__future__</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.ImageDraw2">PIL.ImageDraw2</a>
 
   </div>
 
@@ -2539,6 +2693,7 @@ imported by:
     <a href="#PIL.IcnsImagePlugin">PIL.IcnsImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
  &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
  &#8226;   <a href="#PIL.ImageMath">PIL.ImageMath</a>
  &#8226;   <a href="#PIL.ImageMode">PIL.ImageMode</a>
@@ -2565,7 +2720,9 @@ imported by:
  &#8226;   <a href="#PIL.GifImagePlugin">PIL.GifImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageFilter">PIL.ImageFilter</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.PngImagePlugin">PIL.PngImagePlugin</a>
+ &#8226;   <a href="#PIL._imagingft">PIL._imagingft</a>
 
   </div>
 
@@ -2586,6 +2743,24 @@ imports:
 imported by:
     <a href="#PIL">PIL</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="PIL._imagingft"></a>
+  <tt>PIL._imagingft</tt> <span class="moduletype"><tt>D:\Install Softwares\Python\Lib\site-packages\PIL\_imagingft.cp313-win_amd64.pyd</tt></span>  <div class="import">
+imports:
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
+ &#8226;   <a href="#PIL._imaging">PIL._imaging</a>
+ &#8226;   <a href="#typing">typing</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#PIL.ImageFont">PIL.ImageFont</a>
 
   </div>
 
@@ -2647,8 +2822,11 @@ imported by:
     <a href="#PIL.GifImagePlugin">PIL.GifImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#PIL.ImageDraw2">PIL.ImageDraw2</a>
  &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
  &#8226;   <a href="#PIL.ImageFilter">PIL.ImageFilter</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageTk">PIL.ImageTk</a>
  &#8226;   <a href="#PIL.MpegImagePlugin">PIL.MpegImagePlugin</a>
  &#8226;   <a href="#PIL.TiffImagePlugin">PIL.TiffImagePlugin</a>
@@ -2680,6 +2858,7 @@ imported by:
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
  &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageQt">PIL.ImageQt</a>
  &#8226;   <a href="#PIL.MpoImagePlugin">PIL.MpoImagePlugin</a>
  &#8226;   <a href="#PIL.PngImagePlugin">PIL.PngImagePlugin</a>
@@ -2745,6 +2924,7 @@ imports:
 imported by:
     <a href="#PIL">PIL</a>
  &#8226;   <a href="#PIL.IcnsImagePlugin">PIL.IcnsImagePlugin</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.PdfImagePlugin">PIL.PdfImagePlugin</a>
 
   </div>
@@ -2818,12 +2998,16 @@ imported by:
  &#8226;   <a href="#PIL.ImageChops">PIL.ImageChops</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
  &#8226;   <a href="#PIL.ImageColor">PIL.ImageColor</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#PIL.ImageDraw2">PIL.ImageDraw2</a>
  &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
  &#8226;   <a href="#PIL.ImageFilter">PIL.ImageFilter</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageMath">PIL.ImageMath</a>
  &#8226;   <a href="#PIL.ImageMode">PIL.ImageMode</a>
  &#8226;   <a href="#PIL.ImageOps">PIL.ImageOps</a>
  &#8226;   <a href="#PIL.ImagePalette">PIL.ImagePalette</a>
+ &#8226;   <a href="#PIL.ImagePath">PIL.ImagePath</a>
  &#8226;   <a href="#PIL.ImageQt">PIL.ImageQt</a>
  &#8226;   <a href="#PIL.ImageSequence">PIL.ImageSequence</a>
  &#8226;   <a href="#PIL.ImageShow">PIL.ImageShow</a>
@@ -5142,6 +5326,7 @@ imported by:
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
     <a href="#auth">auth</a>
+ &#8226;   <a href="#datetime">datetime</a>
  &#8226;   <a href="#hashlib">hashlib</a>
  &#8226;   <a href="#sqlite3">sqlite3</a>
  &#8226;   <a href="#typing">typing</a>
@@ -5439,7 +5624,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#email._encoded_words">email._encoded_words</a>
+    <a href="#PIL.ImageFont">PIL.ImageFont</a>
+ &#8226;   <a href="#email._encoded_words">email._encoded_words</a>
  &#8226;   <a href="#email.base64mime">email.base64mime</a>
  &#8226;   <a href="#email.encoders">email.encoders</a>
  &#8226;   <a href="#encodings.base64_codec">encodings.base64_codec</a>
@@ -6677,11 +6863,21 @@ imported by:
  &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#ui.billing_frame">ui.billing_frame</a>
  &#8226;   <a href="#ui.booking_frame">ui.booking_frame</a>
+ &#8226;   <a href="#ui.category_frame">ui.category_frame</a>
  &#8226;   <a href="#ui.components">ui.components</a>
  &#8226;   <a href="#ui.customer_frame">ui.customer_frame</a>
+ &#8226;   <a href="#ui.dashboard_frame">ui.dashboard_frame</a>
  &#8226;   <a href="#ui.frame_frame">ui.frame_frame</a>
  &#8226;   <a href="#ui.invoice_history_frame">ui.invoice_history_frame</a>
+ &#8226;   <a href="#ui.permissions_frame">ui.permissions_frame</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
  &#8226;   <a href="#ui.service_frame">ui.service_frame</a>
+ &#8226;   <a href="#ui.settings_frame">ui.settings_frame</a>
+ &#8226;   <a href="#ui.sidebar">ui.sidebar</a>
+ &#8226;   <a href="#ui.staff_reports_frame">ui.staff_reports_frame</a>
+ &#8226;   <a href="#ui.support_frame">ui.support_frame</a>
+ &#8226;   <a href="#ui.user_guide_frame">ui.user_guide_frame</a>
+ &#8226;   <a href="#ui.users_frame">ui.users_frame</a>
 
   </div>
 
@@ -7991,6 +8187,7 @@ imports:
 imported by:
     <a href="#PIL._imagingcms">PIL._imagingcms</a>
  &#8226;   <a href="#_strptime">_strptime</a>
+ &#8226;   <a href="#auth.auth_manager">auth.auth_manager</a>
  &#8226;   <a href="#babel.dates">babel.dates</a>
  &#8226;   <a href="#babel.localtime">babel.localtime</a>
  &#8226;   <a href="#babel.localtime._fallback">babel.localtime._fallback</a>
@@ -8008,10 +8205,15 @@ imported by:
  &#8226;   <a href="#pytz.tzinfo">pytz.tzinfo</a>
  &#8226;   <a href="#reportlab.lib.normalDate">reportlab.lib.normalDate</a>
  &#8226;   <a href="#reportlab.lib.utils">reportlab.lib.utils</a>
+ &#8226;   <a href="#services.dashboard_service">services.dashboard_service</a>
  &#8226;   <a href="#services.invoice_generator">services.invoice_generator</a>
+ &#8226;   <a href="#services.staff_report_generator">services.staff_report_generator</a>
  &#8226;   <a href="#sqlite3.dbapi2">sqlite3.dbapi2</a>
  &#8226;   <a href="#tkcalendar.__main__">tkcalendar.__main__</a>
  &#8226;   <a href="#ui.booking_frame">ui.booking_frame</a>
+ &#8226;   <a href="#ui.dashboard_frame">ui.dashboard_frame</a>
+ &#8226;   <a href="#ui.settings_frame">ui.settings_frame</a>
+ &#8226;   <a href="#ui.staff_reports_frame">ui.staff_reports_frame</a>
  &#8226;   <a href="#xmlrpc.client">xmlrpc.client</a>
  &#8226;   <a href="#zoneinfo._zoneinfo">zoneinfo._zoneinfo</a>
 
@@ -11135,6 +11337,7 @@ imported by:
  &#8226;   <a href="#PIL.GifImagePlugin">PIL.GifImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.PngImagePlugin">PIL.PngImagePlugin</a>
  &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#asyncio.constants">asyncio.constants</a>
@@ -11620,6 +11823,7 @@ imported by:
  &#8226;   <a href="#reportlab.lib.utils">reportlab.lib.utils</a>
  &#8226;   <a href="#reportlab.pdfbase.pdfdoc">reportlab.pdfbase.pdfdoc</a>
  &#8226;   <a href="#reportlab.pdfgen.canvas">reportlab.pdfgen.canvas</a>
+ &#8226;   <a href="#services.user_service">services.user_service</a>
  &#8226;   <a href="#urllib.request">urllib.request</a>
 
   </div>
@@ -12457,6 +12661,7 @@ imported by:
  &#8226;   <a href="#PIL.IcoImagePlugin">PIL.IcoImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageQt">PIL.ImageQt</a>
  &#8226;   <a href="#PIL.ImageTk">PIL.ImageTk</a>
  &#8226;   <a href="#PIL.IptcImagePlugin">PIL.IptcImagePlugin</a>
@@ -12905,6 +13110,7 @@ imported by:
  &#8226;   <a href="#PIL.GimpGradientFile">PIL.GimpGradientFile</a>
  &#8226;   <a href="#PIL.IcoImagePlugin">PIL.IcoImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
  &#8226;   <a href="#PIL.JpegImagePlugin">PIL.JpegImagePlugin</a>
  &#8226;   <a href="#PIL.PdfImagePlugin">PIL.PdfImagePlugin</a>
  &#8226;   <a href="#PIL.PpmImagePlugin">PIL.PpmImagePlugin</a>
@@ -20643,6 +20849,7 @@ imported by:
  &#8226;   <a href="#PIL.ImImagePlugin">PIL.ImImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageShow">PIL.ImageShow</a>
  &#8226;   <a href="#PIL.Jpeg2KImagePlugin">PIL.Jpeg2KImagePlugin</a>
  &#8226;   <a href="#PIL.JpegImagePlugin">PIL.JpegImagePlugin</a>
@@ -20791,6 +20998,7 @@ imported by:
  &#8226;   <a href="#reportlab.rl_settings">reportlab.rl_settings</a>
  &#8226;   <a href="#runpy">runpy</a>
  &#8226;   <a href="#services.invoice_generator">services.invoice_generator</a>
+ &#8226;   <a href="#services.staff_report_generator">services.staff_report_generator</a>
  &#8226;   <a href="#shlex">shlex</a>
  &#8226;   <a href="#shutil">shutil</a>
  &#8226;   <a href="#socket">socket</a>
@@ -20803,6 +21011,10 @@ imported by:
  &#8226;   <a href="#threading">threading</a>
  &#8226;   <a href="#tkinter">tkinter</a>
  &#8226;   <a href="#tkinter.filedialog">tkinter.filedialog</a>
+ &#8226;   <a href="#ui.components">ui.components</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
+ &#8226;   <a href="#ui.settings_frame">ui.settings_frame</a>
+ &#8226;   <a href="#ui.sidebar">ui.sidebar</a>
  &#8226;   <a href="#unittest.loader">unittest.loader</a>
  &#8226;   <a href="#unittest.main">unittest.main</a>
  &#8226;   <a href="#urllib.request">urllib.request</a>
@@ -20894,7 +21106,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#customtkinter.windows.ctk_tk">customtkinter.windows.ctk_tk</a>
+    <a href="#PIL.ImageFont">PIL.ImageFont</a>
+ &#8226;   <a href="#customtkinter.windows.ctk_tk">customtkinter.windows.ctk_tk</a>
  &#8226;   <a href="#customtkinter.windows.ctk_toplevel">customtkinter.windows.ctk_toplevel</a>
  &#8226;   <a href="#packaging">packaging</a>
 
@@ -21587,6 +21800,7 @@ imported by:
  &#8226;   <a href="#secrets">secrets</a>
  &#8226;   <a href="#statistics">statistics</a>
  &#8226;   <a href="#tempfile">tempfile</a>
+ &#8226;   <a href="#ui.components">ui.components</a>
 
   </div>
 
@@ -22614,6 +22828,7 @@ imported by:
  &#8226;   <a href="#reportlab.platypus.xpreformatted">reportlab.platypus.xpreformatted</a>
  &#8226;   <a href="#reportlab.rl_config">reportlab.rl_config</a>
  &#8226;   <a href="#services.invoice_generator">services.invoice_generator</a>
+ &#8226;   <a href="#services.staff_report_generator">services.staff_report_generator</a>
 
   </div>
 
@@ -22769,6 +22984,7 @@ imported by:
  &#8226;   <a href="#reportlab.platypus.paraparser">reportlab.platypus.paraparser</a>
  &#8226;   <a href="#reportlab.platypus.tables">reportlab.platypus.tables</a>
  &#8226;   <a href="#services.invoice_generator">services.invoice_generator</a>
+ &#8226;   <a href="#services.staff_report_generator">services.staff_report_generator</a>
 
   </div>
 
@@ -22816,6 +23032,7 @@ imported by:
  &#8226;   <a href="#reportlab.platypus.paragraph">reportlab.platypus.paragraph</a>
  &#8226;   <a href="#reportlab.platypus.paraparser">reportlab.platypus.paraparser</a>
  &#8226;   <a href="#services.invoice_generator">services.invoice_generator</a>
+ &#8226;   <a href="#services.staff_report_generator">services.staff_report_generator</a>
 
   </div>
 
@@ -22927,6 +23144,7 @@ imports:
 imported by:
     <a href="#reportlab.rl_config">reportlab.rl_config</a>
  &#8226;   <a href="#services.invoice_generator">services.invoice_generator</a>
+ &#8226;   <a href="#services.staff_report_generator">services.staff_report_generator</a>
 
   </div>
 
@@ -23130,6 +23348,7 @@ imported by:
  &#8226;   <a href="#reportlab.platypus.tables">reportlab.platypus.tables</a>
  &#8226;   <a href="#reportlab.platypus.xpreformatted">reportlab.platypus.xpreformatted</a>
  &#8226;   <a href="#services.invoice_generator">services.invoice_generator</a>
+ &#8226;   <a href="#services.staff_report_generator">services.staff_report_generator</a>
 
   </div>
 
@@ -23177,6 +23396,7 @@ imported by:
  &#8226;   <a href="#reportlab.platypus.paragraph">reportlab.platypus.paragraph</a>
  &#8226;   <a href="#reportlab.platypus.paraparser">reportlab.platypus.paraparser</a>
  &#8226;   <a href="#services.invoice_generator">services.invoice_generator</a>
+ &#8226;   <a href="#services.staff_report_generator">services.staff_report_generator</a>
 
   </div>
 
@@ -24148,6 +24368,7 @@ imported by:
  &#8226;   <a href="#reportlab.platypus.tables">reportlab.platypus.tables</a>
  &#8226;   <a href="#reportlab.platypus.xpreformatted">reportlab.platypus.xpreformatted</a>
  &#8226;   <a href="#services.invoice_generator">services.invoice_generator</a>
+ &#8226;   <a href="#services.staff_report_generator">services.staff_report_generator</a>
 
   </div>
 
@@ -24690,14 +24911,41 @@ imported by:
   <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/services/__init__.py" type="text/plain"><tt>services</tt></a>
 <span class="moduletype">Package</span>  <div class="import">
 imports:
-    <a href="#services.invoice_generator">services.invoice_generator</a>
+    <a href="#services.dashboard_service">services.dashboard_service</a>
+ &#8226;   <a href="#services.invoice_generator">services.invoice_generator</a>
+ &#8226;   <a href="#services.settings_service">services.settings_service</a>
+ &#8226;   <a href="#services.user_service">services.user_service</a>
 
   </div>
   <div class="import">
 imported by:
-    <a href="#services.invoice_generator">services.invoice_generator</a>
+    <a href="#services.dashboard_service">services.dashboard_service</a>
+ &#8226;   <a href="#services.invoice_generator">services.invoice_generator</a>
+ &#8226;   <a href="#services.settings_service">services.settings_service</a>
+ &#8226;   <a href="#services.staff_report_generator">services.staff_report_generator</a>
+ &#8226;   <a href="#services.user_service">services.user_service</a>
  &#8226;   <a href="#ui.billing_frame">ui.billing_frame</a>
  &#8226;   <a href="#ui.invoice_history_frame">ui.invoice_history_frame</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="services.dashboard_service"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/services/dashboard_service.py" type="text/plain"><tt>services.dashboard_service</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#datetime">datetime</a>
+ &#8226;   <a href="#services">services</a>
+ &#8226;   <a href="#sqlite3">sqlite3</a>
+ &#8226;   <a href="#typing">typing</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#services">services</a>
+ &#8226;   <a href="#ui.dashboard_frame">ui.dashboard_frame</a>
 
   </div>
 
@@ -24723,6 +24971,73 @@ imports:
   <div class="import">
 imported by:
     <a href="#services">services</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="services.settings_service"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/services/settings_service.py" type="text/plain"><tt>services.settings_service</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#services">services</a>
+ &#8226;   <a href="#sqlite3">sqlite3</a>
+ &#8226;   <a href="#typing">typing</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#services">services</a>
+ &#8226;   <a href="#ui.settings_frame">ui.settings_frame</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="services.staff_report_generator"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/services/staff_report_generator.py" type="text/plain"><tt>services.staff_report_generator</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#datetime">datetime</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#reportlab.lib">reportlab.lib</a>
+ &#8226;   <a href="#reportlab.lib.colors">reportlab.lib.colors</a>
+ &#8226;   <a href="#reportlab.lib.enums">reportlab.lib.enums</a>
+ &#8226;   <a href="#reportlab.lib.pagesizes">reportlab.lib.pagesizes</a>
+ &#8226;   <a href="#reportlab.lib.styles">reportlab.lib.styles</a>
+ &#8226;   <a href="#reportlab.lib.units">reportlab.lib.units</a>
+ &#8226;   <a href="#reportlab.platypus">reportlab.platypus</a>
+ &#8226;   <a href="#services">services</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#ui.staff_reports_frame">ui.staff_reports_frame</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="services.user_service"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/services/user_service.py" type="text/plain"><tt>services.user_service</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#hashlib">hashlib</a>
+ &#8226;   <a href="#services">services</a>
+ &#8226;   <a href="#sqlite3">sqlite3</a>
+ &#8226;   <a href="#typing">typing</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+ &#8226;   <a href="#services">services</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
+ &#8226;   <a href="#ui.sidebar">ui.sidebar</a>
+ &#8226;   <a href="#ui.users_frame">ui.users_frame</a>
 
   </div>
 
@@ -24800,6 +25115,7 @@ imported by:
  &#8226;   <a href="#numpy.testing._private.utils">numpy.testing._private.utils</a>
  &#8226;   <a href="#tarfile">tarfile</a>
  &#8226;   <a href="#tempfile">tempfile</a>
+ &#8226;   <a href="#ui.settings_frame">ui.settings_frame</a>
  &#8226;   <a href="#webbrowser">webbrowser</a>
  &#8226;   <a href="#zipfile">zipfile</a>
 
@@ -24923,6 +25239,9 @@ imported by:
     <a href="#auth.auth_manager">auth.auth_manager</a>
  &#8226;   <a href="#database.db_manager">database.db_manager</a>
  &#8226;   <a href="#database.schema">database.schema</a>
+ &#8226;   <a href="#services.dashboard_service">services.dashboard_service</a>
+ &#8226;   <a href="#services.settings_service">services.settings_service</a>
+ &#8226;   <a href="#services.user_service">services.user_service</a>
  &#8226;   <a href="#sqlite3">sqlite3</a>
  &#8226;   <a href="#sqlite3.__main__">sqlite3.__main__</a>
  &#8226;   <a href="#sqlite3.dbapi2">sqlite3.dbapi2</a>
@@ -25190,6 +25509,7 @@ imported by:
  &#8226;   <a href="#PIL.FtexImagePlugin">PIL.FtexImagePlugin</a>
  &#8226;   <a href="#PIL.IcnsImagePlugin">PIL.IcnsImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
  &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
  &#8226;   <a href="#PIL.Jpeg2KImagePlugin">PIL.Jpeg2KImagePlugin</a>
  &#8226;   <a href="#PIL.JpegImagePlugin">PIL.JpegImagePlugin</a>
@@ -25299,6 +25619,7 @@ imported by:
  &#8226;   <a href="#PIL.IcnsImagePlugin">PIL.IcnsImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageMode">PIL.ImageMode</a>
  &#8226;   <a href="#PIL.ImageQt">PIL.ImageQt</a>
  &#8226;   <a href="#PIL.ImageShow">PIL.ImageShow</a>
@@ -25850,6 +26171,7 @@ imported by:
  &#8226;   <a href="#tkcalendar.dateentry">tkcalendar.dateentry</a>
  &#8226;   <a href="#tkcalendar.tooltip">tkcalendar.tooltip</a>
  &#8226;   <a href="#ui.booking_frame">ui.booking_frame</a>
+ &#8226;   <a href="#ui.staff_reports_frame">ui.staff_reports_frame</a>
 
   </div>
 
@@ -25992,6 +26314,7 @@ imported by:
  &#8226;   <a href="#customtkinter.windows.widgets.ctk_tabview">customtkinter.windows.widgets.ctk_tabview</a>
  &#8226;   <a href="#customtkinter.windows.widgets.ctk_textbox">customtkinter.windows.widgets.ctk_textbox</a>
  &#8226;   <a href="#customtkinter.windows.widgets.scaling.scaling_tracker">customtkinter.windows.widgets.scaling.scaling_tracker</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#tkcalendar.__main__">tkcalendar.__main__</a>
  &#8226;   <a href="#tkcalendar.calendar_">tkcalendar.calendar_</a>
  &#8226;   <a href="#tkcalendar.dateentry">tkcalendar.dateentry</a>
@@ -26006,11 +26329,15 @@ imported by:
  &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
  &#8226;   <a href="#ui.billing_frame">ui.billing_frame</a>
  &#8226;   <a href="#ui.booking_frame">ui.booking_frame</a>
- &#8226;   <a href="#ui.components">ui.components</a>
+ &#8226;   <a href="#ui.category_frame">ui.category_frame</a>
  &#8226;   <a href="#ui.customer_frame">ui.customer_frame</a>
  &#8226;   <a href="#ui.frame_frame">ui.frame_frame</a>
  &#8226;   <a href="#ui.invoice_history_frame">ui.invoice_history_frame</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
  &#8226;   <a href="#ui.service_frame">ui.service_frame</a>
+ &#8226;   <a href="#ui.settings_frame">ui.settings_frame</a>
+ &#8226;   <a href="#ui.staff_reports_frame">ui.staff_reports_frame</a>
+ &#8226;   <a href="#ui.users_frame">ui.users_frame</a>
 
   </div>
 
@@ -26084,6 +26411,8 @@ imports:
   <div class="import">
 imported by:
     <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
+ &#8226;   <a href="#ui.settings_frame">ui.settings_frame</a>
 
   </div>
 
@@ -26120,7 +26449,6 @@ imports:
 imported by:
     <a href="#tkinter">tkinter</a>
  &#8226;   <a href="#tkinter.simpledialog">tkinter.simpledialog</a>
- &#8226;   <a href="#ui.components">ui.components</a>
 
   </div>
 
@@ -26154,16 +26482,20 @@ imports:
   <div class="import">
 imported by:
     <a href="#customtkinter.windows.widgets.core_widget_classes.ctk_base_class">customtkinter.windows.widgets.core_widget_classes.ctk_base_class</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#tkcalendar.__main__">tkcalendar.__main__</a>
  &#8226;   <a href="#tkcalendar.calendar_">tkcalendar.calendar_</a>
  &#8226;   <a href="#tkcalendar.dateentry">tkcalendar.dateentry</a>
  &#8226;   <a href="#tkcalendar.tooltip">tkcalendar.tooltip</a>
  &#8226;   <a href="#ui.billing_frame">ui.billing_frame</a>
  &#8226;   <a href="#ui.booking_frame">ui.booking_frame</a>
+ &#8226;   <a href="#ui.category_frame">ui.category_frame</a>
  &#8226;   <a href="#ui.customer_frame">ui.customer_frame</a>
  &#8226;   <a href="#ui.frame_frame">ui.frame_frame</a>
  &#8226;   <a href="#ui.invoice_history_frame">ui.invoice_history_frame</a>
  &#8226;   <a href="#ui.service_frame">ui.service_frame</a>
+ &#8226;   <a href="#ui.staff_reports_frame">ui.staff_reports_frame</a>
+ &#8226;   <a href="#ui.users_frame">ui.users_frame</a>
 
   </div>
 
@@ -26331,7 +26663,9 @@ imports:
   <div class="import">
 imported by:
     <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
  &#8226;   <a href="#PIL.ImageFilter">PIL.ImageFilter</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageMath">PIL.ImageMath</a>
  &#8226;   <a href="#PIL._typing">PIL._typing</a>
  &#8226;   <a href="#_weakrefset">_weakrefset</a>
@@ -26431,8 +26765,11 @@ imported by:
  &#8226;   <a href="#PIL.ImImagePlugin">PIL.ImImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
  &#8226;   <a href="#PIL.ImageCms">PIL.ImageCms</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#PIL.ImageDraw2">PIL.ImageDraw2</a>
  &#8226;   <a href="#PIL.ImageFile">PIL.ImageFile</a>
  &#8226;   <a href="#PIL.ImageFilter">PIL.ImageFilter</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.ImageMath">PIL.ImageMath</a>
  &#8226;   <a href="#PIL.ImageMode">PIL.ImageMode</a>
  &#8226;   <a href="#PIL.ImageOps">PIL.ImageOps</a>
@@ -26464,6 +26801,7 @@ imported by:
  &#8226;   <a href="#PIL.XbmImagePlugin">PIL.XbmImagePlugin</a>
  &#8226;   <a href="#PIL._imaging">PIL._imaging</a>
  &#8226;   <a href="#PIL._imagingcms">PIL._imagingcms</a>
+ &#8226;   <a href="#PIL._imagingft">PIL._imagingft</a>
  &#8226;   <a href="#PIL._imagingmath">PIL._imagingmath</a>
  &#8226;   <a href="#PIL._imagingtk">PIL._imagingtk</a>
  &#8226;   <a href="#PIL._typing">PIL._typing</a>
@@ -26543,8 +26881,12 @@ imported by:
  &#8226;   <a href="#numpy.random.bit_generator">numpy.random.bit_generator</a>
  &#8226;   <a href="#numpy.random.mtrand">numpy.random.mtrand</a>
  &#8226;   <a href="#packaging.version">packaging.version</a>
+ &#8226;   <a href="#services.dashboard_service">services.dashboard_service</a>
+ &#8226;   <a href="#services.settings_service">services.settings_service</a>
+ &#8226;   <a href="#services.user_service">services.user_service</a>
  &#8226;   <a href="#typing_extensions">typing_extensions</a>
  &#8226;   <a href="#ui.components">ui.components</a>
+ &#8226;   <a href="#ui.sidebar">ui.sidebar</a>
 
   </div>
 
@@ -27001,20 +27343,37 @@ imports:
  &#8226;   <a href="#ui.booking_frame">ui.booking_frame</a>
  &#8226;   <a href="#ui.components">ui.components</a>
  &#8226;   <a href="#ui.customer_frame">ui.customer_frame</a>
+ &#8226;   <a href="#ui.dashboard_frame">ui.dashboard_frame</a>
  &#8226;   <a href="#ui.frame_frame">ui.frame_frame</a>
  &#8226;   <a href="#ui.invoice_history_frame">ui.invoice_history_frame</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
  &#8226;   <a href="#ui.service_frame">ui.service_frame</a>
+ &#8226;   <a href="#ui.settings_frame">ui.settings_frame</a>
+ &#8226;   <a href="#ui.sidebar">ui.sidebar</a>
+ &#8226;   <a href="#ui.support_frame">ui.support_frame</a>
+ &#8226;   <a href="#ui.user_guide_frame">ui.user_guide_frame</a>
+ &#8226;   <a href="#ui.users_frame">ui.users_frame</a>
 
   </div>
   <div class="import">
 imported by:
     <a href="#ui.billing_frame">ui.billing_frame</a>
  &#8226;   <a href="#ui.booking_frame">ui.booking_frame</a>
+ &#8226;   <a href="#ui.category_frame">ui.category_frame</a>
  &#8226;   <a href="#ui.components">ui.components</a>
  &#8226;   <a href="#ui.customer_frame">ui.customer_frame</a>
+ &#8226;   <a href="#ui.dashboard_frame">ui.dashboard_frame</a>
  &#8226;   <a href="#ui.frame_frame">ui.frame_frame</a>
  &#8226;   <a href="#ui.invoice_history_frame">ui.invoice_history_frame</a>
+ &#8226;   <a href="#ui.permissions_frame">ui.permissions_frame</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
  &#8226;   <a href="#ui.service_frame">ui.service_frame</a>
+ &#8226;   <a href="#ui.settings_frame">ui.settings_frame</a>
+ &#8226;   <a href="#ui.sidebar">ui.sidebar</a>
+ &#8226;   <a href="#ui.staff_reports_frame">ui.staff_reports_frame</a>
+ &#8226;   <a href="#ui.support_frame">ui.support_frame</a>
+ &#8226;   <a href="#ui.user_guide_frame">ui.user_guide_frame</a>
+ &#8226;   <a href="#ui.users_frame">ui.users_frame</a>
 
   </div>
 
@@ -27066,13 +27425,35 @@ imported by:
 </div>
 
 <div class="node">
-  <a name="ui.components"></a>
-  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/components.py" type="text/plain"><tt>ui.components</tt></a>
+  <a name="ui.category_frame"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/category_frame.py" type="text/plain"><tt>ui.category_frame</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
     <a href="#customtkinter">customtkinter</a>
  &#8226;   <a href="#tkinter">tkinter</a>
- &#8226;   <a href="#tkinter.messagebox">tkinter.messagebox</a>
+ &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
+ &#8226;   <a href="#ui">ui</a>
+ &#8226;   <a href="#ui.components">ui.components</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="ui.components"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/components.py" type="text/plain"><tt>ui.components</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#random">random</a>
  &#8226;   <a href="#typing">typing</a>
  &#8226;   <a href="#ui">ui</a>
 
@@ -27083,10 +27464,17 @@ imported by:
  &#8226;   <a href="#ui">ui</a>
  &#8226;   <a href="#ui.billing_frame">ui.billing_frame</a>
  &#8226;   <a href="#ui.booking_frame">ui.booking_frame</a>
+ &#8226;   <a href="#ui.category_frame">ui.category_frame</a>
  &#8226;   <a href="#ui.customer_frame">ui.customer_frame</a>
  &#8226;   <a href="#ui.frame_frame">ui.frame_frame</a>
  &#8226;   <a href="#ui.invoice_history_frame">ui.invoice_history_frame</a>
+ &#8226;   <a href="#ui.permissions_frame">ui.permissions_frame</a>
+ &#8226;   <a href="#ui.profile_frame">ui.profile_frame</a>
  &#8226;   <a href="#ui.service_frame">ui.service_frame</a>
+ &#8226;   <a href="#ui.settings_frame">ui.settings_frame</a>
+ &#8226;   <a href="#ui.staff_reports_frame">ui.staff_reports_frame</a>
+ &#8226;   <a href="#ui.support_frame">ui.support_frame</a>
+ &#8226;   <a href="#ui.users_frame">ui.users_frame</a>
 
   </div>
 
@@ -27102,6 +27490,26 @@ imports:
  &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
  &#8226;   <a href="#ui">ui</a>
  &#8226;   <a href="#ui.components">ui.components</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+ &#8226;   <a href="#ui">ui</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="ui.dashboard_frame"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/dashboard_frame.py" type="text/plain"><tt>ui.dashboard_frame</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#datetime">datetime</a>
+ &#8226;   <a href="#services.dashboard_service">services.dashboard_service</a>
+ &#8226;   <a href="#ui">ui</a>
 
   </div>
   <div class="import">
@@ -27157,11 +27565,188 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="ui.permissions_frame"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/permissions_frame.py" type="text/plain"><tt>ui.permissions_frame</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#ui">ui</a>
+ &#8226;   <a href="#ui.components">ui.components</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="ui.profile_frame"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/profile_frame.py" type="text/plain"><tt>ui.profile_frame</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#services.user_service">services.user_service</a>
+ &#8226;   <a href="#tkinter">tkinter</a>
+ &#8226;   <a href="#tkinter.filedialog">tkinter.filedialog</a>
+ &#8226;   <a href="#ui">ui</a>
+ &#8226;   <a href="#ui.components">ui.components</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+ &#8226;   <a href="#ui">ui</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="ui.service_frame"></a>
   <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/service_frame.py" type="text/plain"><tt>ui.service_frame</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
     <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#tkinter">tkinter</a>
+ &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
+ &#8226;   <a href="#ui">ui</a>
+ &#8226;   <a href="#ui.components">ui.components</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+ &#8226;   <a href="#ui">ui</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="ui.settings_frame"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/settings_frame.py" type="text/plain"><tt>ui.settings_frame</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#datetime">datetime</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#services.settings_service">services.settings_service</a>
+ &#8226;   <a href="#shutil">shutil</a>
+ &#8226;   <a href="#tkinter">tkinter</a>
+ &#8226;   <a href="#tkinter.filedialog">tkinter.filedialog</a>
+ &#8226;   <a href="#ui">ui</a>
+ &#8226;   <a href="#ui.components">ui.components</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+ &#8226;   <a href="#ui">ui</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="ui.sidebar"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/sidebar.py" type="text/plain"><tt>ui.sidebar</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#PIL">PIL</a>
+ &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageDraw">PIL.ImageDraw</a>
+ &#8226;   <a href="#PIL.ImageOps">PIL.ImageOps</a>
+ &#8226;   <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#services.user_service">services.user_service</a>
+ &#8226;   <a href="#typing">typing</a>
+ &#8226;   <a href="#ui">ui</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+ &#8226;   <a href="#ui">ui</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="ui.staff_reports_frame"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/staff_reports_frame.py" type="text/plain"><tt>ui.staff_reports_frame</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#datetime">datetime</a>
+ &#8226;   <a href="#services.staff_report_generator">services.staff_report_generator</a>
+ &#8226;   <a href="#tkcalendar">tkcalendar</a>
+ &#8226;   <a href="#tkinter">tkinter</a>
+ &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
+ &#8226;   <a href="#ui">ui</a>
+ &#8226;   <a href="#ui.components">ui.components</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="ui.support_frame"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/support_frame.py" type="text/plain"><tt>ui.support_frame</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#ui">ui</a>
+ &#8226;   <a href="#ui.components">ui.components</a>
+ &#8226;   <a href="#webbrowser">webbrowser</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+ &#8226;   <a href="#ui">ui</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="ui.user_guide_frame"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/user_guide_frame.py" type="text/plain"><tt>ui.user_guide_frame</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#ui">ui</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+ &#8226;   <a href="#ui">ui</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="ui.users_frame"></a>
+  <a target="code" href="///F:/2025%20NEW%20PROJECTS/Pasindu/Shine%20Art%20Studio/pos_system/ui/users_frame.py" type="text/plain"><tt>ui.users_frame</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#customtkinter">customtkinter</a>
+ &#8226;   <a href="#services.user_service">services.user_service</a>
  &#8226;   <a href="#tkinter">tkinter</a>
  &#8226;   <a href="#tkinter.ttk">tkinter.ttk</a>
  &#8226;   <a href="#ui">ui</a>
@@ -27639,6 +28224,7 @@ imports:
 imported by:
     <a href="#PIL.IcoImagePlugin">PIL.IcoImagePlugin</a>
  &#8226;   <a href="#PIL.Image">PIL.Image</a>
+ &#8226;   <a href="#PIL.ImageFont">PIL.ImageFont</a>
  &#8226;   <a href="#PIL.JpegImagePlugin">PIL.JpegImagePlugin</a>
  &#8226;   <a href="#PIL.PngImagePlugin">PIL.PngImagePlugin</a>
  &#8226;   <a href="#PIL.TgaImagePlugin">PIL.TgaImagePlugin</a>
@@ -27838,6 +28424,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#pydoc">pydoc</a>
+ &#8226;   <a href="#ui.support_frame">ui.support_frame</a>
 
   </div>
 
