@@ -36,6 +36,9 @@ class MainApplication(ctk.CTk):
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
         
+        # Set application window icon
+        self._set_window_icon()
+        
         # Configure ttk styles for tables with larger font
         style = ttk.Style()
         style.theme_use("clam")
@@ -80,6 +83,24 @@ class MainApplication(ctk.CTk):
         
         # Show login
         self.show_login()
+    
+    def _set_window_icon(self):
+        """Set the application window icon"""
+        try:
+            icon_path = os.path.join(os.path.dirname(__file__), "assets", "logos", "App logo.jpg")
+            if os.path.exists(icon_path):
+                icon_image = Image.open(icon_path)
+                from PIL import ImageTk
+                # Create multiple sizes for better display
+                icon_sizes = [(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
+                icon_photos = []
+                for size in icon_sizes:
+                    resized = icon_image.resize(size, Image.Resampling.LANCZOS)
+                    icon_photos.append(ImageTk.PhotoImage(resized))
+                self._icon_photos = icon_photos  # Keep reference to prevent garbage collection
+                self.iconphoto(True, *icon_photos)
+        except Exception as e:
+            print(f"Could not load application icon: {e}")
     
     def show_login(self):
         """Show login window"""
@@ -140,29 +161,9 @@ class MainApplication(ctk.CTk):
         top_bar.pack(fill="x", side="top")
         top_bar.pack_propagate(False)
         
-        # Logo/Title container
-        logo_title_frame = ctk.CTkFrame(top_bar, fg_color="transparent")
-        logo_title_frame.pack(side="left", padx=20, pady=10)
-        
-        # Logo
-        try:
-            logo_path = os.path.join(os.path.dirname(__file__), "assets", "logo001.png")
-            if os.path.exists(logo_path):
-                logo_image = Image.open(logo_path)
-                logo_photo = ctk.CTkImage(light_image=logo_image, dark_image=logo_image, size=(40, 40))
-                logo_label = ctk.CTkLabel(logo_title_frame, image=logo_photo, text="")
-                logo_label.pack(side="left", padx=(0, 10))
-        except Exception as e:
-            print(f"Could not load logo: {e}")
-        
-        # Title
-        title_label = ctk.CTkLabel(
-            logo_title_frame,
-            text="Shine Art Studio",
-            font=ctk.CTkFont(size=18, weight="bold"),
-            text_color="white"
-        )
-        title_label.pack(side="left")
+        # Top bar left spacer (logo is in sidebar, no duplicate here)
+        left_spacer = ctk.CTkFrame(top_bar, fg_color="transparent")
+        left_spacer.pack(side="left", padx=20, pady=10)
         
         # Right side of top bar - Logout only
         right_frame = ctk.CTkFrame(top_bar, fg_color="transparent")
@@ -273,6 +274,13 @@ class MainApplication(ctk.CTk):
             if self.main_container:
                 self.main_container.destroy()
                 self.main_container = None
+            
+            # Reset references
+            self.content_frame = None
+            self.sidebar = None
+            
+            # Hide the main window before showing login
+            self.withdraw()
             
             # Show login
             self.show_login()

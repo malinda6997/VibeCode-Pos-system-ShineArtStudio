@@ -24,24 +24,35 @@ class Sidebar(ctk.CTkFrame):
         
         # Logo section (fixed at top)
         logo_frame = ctk.CTkFrame(self, fg_color="transparent", height=80)
-        logo_frame.pack(fill="x", pady=(20, 10))
+        logo_frame.pack(fill="x", pady=(15, 10))
         logo_frame.pack_propagate(False)
         
-        logo_label = ctk.CTkLabel(
-            logo_frame,
-            text="✨ Shine Art",
-            font=ctk.CTkFont(size=22, weight="bold"),
-            text_color="#00d4ff"
-        )
-        logo_label.pack(pady=10)
-        
-        studio_label = ctk.CTkLabel(
-            logo_frame,
-            text="Photography Studio",
-            font=ctk.CTkFont(size=11),
-            text_color="#888888"
-        )
-        studio_label.pack()
+        # Load and display studio logo image - text-based logo needs wider width
+        self.sidebar_logo_image = None
+        try:
+            logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "logos", "studio-logo.png")
+            if os.path.exists(logo_path):
+                logo_img = Image.open(logo_path)
+                # Calculate proportional width for text-based logo
+                orig_width, orig_height = logo_img.size
+                target_height = 50
+                aspect_ratio = orig_width / orig_height
+                target_width = int(target_height * aspect_ratio)
+                # Ensure minimum width for text logos, max to fit sidebar
+                target_width = max(min(target_width, 220), 160)
+                self.sidebar_logo_image = ctk.CTkImage(light_image=logo_img, dark_image=logo_img, size=(target_width, target_height))
+                logo_img_label = ctk.CTkLabel(logo_frame, image=self.sidebar_logo_image, text="")
+                logo_img_label.pack(pady=(15, 5))
+        except Exception as e:
+            print(f"Could not load sidebar logo: {e}")
+            # Fallback text only if logo fails to load
+            logo_label = ctk.CTkLabel(
+                logo_frame,
+                text="✨ Shine Art Studio",
+                font=ctk.CTkFont(size=16, weight="bold"),
+                text_color="#00d4ff"
+            )
+            logo_label.pack(pady=(15, 5))
         
         # Separator
         sep = ctk.CTkFrame(self, fg_color="#333355", height=2)
