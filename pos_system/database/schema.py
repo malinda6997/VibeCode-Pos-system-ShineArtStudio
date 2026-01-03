@@ -161,6 +161,9 @@ class DatabaseSchema:
         except sqlite3.OperationalError:
             pass
         
+        # Fix customer_id NOT NULL constraint for guest customers (migrate existing table)
+        self._migrate_invoices_table()
+        
         # Invoice items table
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS invoice_items (
@@ -290,6 +293,55 @@ class DatabaseSchema:
         
         self.conn.commit()
         self.close()
+    
+    def _migrate_invoices_table(self):
+        """Migrate invoices table to allow NULL customer_id for guest customers"""
+        try:
+            # Check if customer_id column has NOT NULL constraint
+            self.cursor.execute("PRAGMA table_info(invoices)")
+            columns = self.cursor.fetchall()
+            
+            for col in columns:
+                # col format: (cid, name, type, notnull, dflt_value, pk)
+                if col[1] == 'customer_id' and col[3] == 1:  # notnull = 1 means NOT NULL
+                    # Need to recreate table without NOT NULL on customer_id
+                    self.cursor.execute('''
+                        CREATE TABLE IF NOT EXISTS invoices_new (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            invoice_number TEXT UNIQUE NOT NULL,
+                            customer_id INTEGER,
+                            guest_name TEXT,
+                            subtotal REAL NOT NULL,
+                            discount REAL DEFAULT 0,
+                            category_service_cost REAL DEFAULT 0,
+                            advance_payment REAL DEFAULT 0,
+                            total_amount REAL NOT NULL,
+                            paid_amount REAL NOT NULL,
+                            balance_amount REAL NOT NULL,
+                            created_by INTEGER NOT NULL,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            FOREIGN KEY (customer_id) REFERENCES customers (id),
+                            FOREIGN KEY (created_by) REFERENCES users (id)
+                        )
+                    ''')
+                    
+                    # Copy existing data
+                    self.cursor.execute('''
+                        INSERT INTO invoices_new 
+                        SELECT id, invoice_number, customer_id, guest_name, subtotal, 
+                               discount, category_service_cost, advance_payment, 
+                               total_amount, paid_amount, balance_amount, created_by, created_at
+                        FROM invoices
+                    ''')
+                    
+                    # Drop old table and rename new one
+                    self.cursor.execute('DROP TABLE invoices')
+                    self.cursor.execute('ALTER TABLE invoices_new RENAME TO invoices')
+                    self.conn.commit()
+                    print("Migrated invoices table to allow guest customers")
+                    break
+        except sqlite3.Error as e:
+            print(f"Migration check: {e}")
         
     def reset_database(self):
         """Drop all tables and recreate (use with caution)"""

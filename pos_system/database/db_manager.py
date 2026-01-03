@@ -1,59 +1,77 @@
 import sqlite3
 from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
+import threading
 
 
 class DatabaseManager:
     """Central database manager for all CRUD operations"""
     
+    _lock = threading.Lock()
+    
     def __init__(self, db_path='pos_database.db'):
         self.db_path = db_path
         
     def get_connection(self):
-        """Get database connection"""
-        conn = sqlite3.connect(self.db_path)
+        """Get database connection with timeout and WAL mode"""
+        conn = sqlite3.connect(self.db_path, timeout=30.0)
         conn.row_factory = sqlite3.Row
+        # Enable WAL mode for better concurrent access
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA busy_timeout=30000")
         return conn
     
     def execute_query(self, query: str, params: Tuple = ()) -> List[Dict[str, Any]]:
         """Execute a SELECT query and return results as list of dicts"""
+        conn = None
         try:
-            conn = self.get_connection()
-            cursor = conn.cursor()
-            cursor.execute(query, params)
-            rows = cursor.fetchall()
-            conn.close()
-            return [dict(row) for row in rows]
+            with self._lock:
+                conn = self.get_connection()
+                cursor = conn.cursor()
+                cursor.execute(query, params)
+                rows = cursor.fetchall()
+                return [dict(row) for row in rows]
         except sqlite3.Error as e:
             print(f"Database error: {e}")
             return []
+        finally:
+            if conn:
+                conn.close()
     
     def execute_update(self, query: str, params: Tuple = ()) -> bool:
         """Execute INSERT, UPDATE, or DELETE query"""
+        conn = None
         try:
-            conn = self.get_connection()
-            cursor = conn.cursor()
-            cursor.execute(query, params)
-            conn.commit()
-            conn.close()
-            return True
+            with self._lock:
+                conn = self.get_connection()
+                cursor = conn.cursor()
+                cursor.execute(query, params)
+                conn.commit()
+                return True
         except sqlite3.Error as e:
             print(f"Database error: {e}")
             return False
+        finally:
+            if conn:
+                conn.close()
     
     def execute_insert(self, query: str, params: Tuple = ()) -> Optional[int]:
         """Execute INSERT query and return last inserted id"""
+        conn = None
         try:
-            conn = self.get_connection()
-            cursor = conn.cursor()
-            cursor.execute(query, params)
-            last_id = cursor.lastrowid
-            conn.commit()
-            conn.close()
-            return last_id
+            with self._lock:
+                conn = self.get_connection()
+                cursor = conn.cursor()
+                cursor.execute(query, params)
+                last_id = cursor.lastrowid
+                conn.commit()
+                return last_id
         except sqlite3.Error as e:
             print(f"Database error: {e}")
             return None
+        finally:
+            if conn:
+                conn.close()
     
     # Customer operations
     def add_customer(self, full_name: str, mobile_number: str) -> Optional[int]:

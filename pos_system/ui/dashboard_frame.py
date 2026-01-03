@@ -49,16 +49,16 @@ class DashboardFrame(ctk.CTkFrame):
         date_label.pack(side="right")
         
         # Refresh button
-        refresh_btn = ctk.CTkButton(
+        self.refresh_btn = ctk.CTkButton(
             header_frame,
             text="🔄 Refresh",
             width=100,
             height=35,
-            command=self.load_stats,
+            command=self.refresh_with_animation,
             fg_color="#2d2d5a",
             hover_color="#3d3d7a"
         )
-        refresh_btn.pack(side="right", padx=20)
+        self.refresh_btn.pack(side="right", padx=20)
         
         # Welcome message
         user = self.auth_manager.get_current_user()
@@ -407,6 +407,63 @@ class DashboardFrame(ctk.CTkFrame):
         card.value_label = value_label
         
         return card
+    
+    def refresh_with_animation(self):
+        """Refresh dashboard with loading animation"""
+        # Disable refresh button during animation
+        self.refresh_btn.configure(state="disabled", text="⏳ Loading...")
+        
+        # Create loading overlay
+        self.loading_overlay = ctk.CTkFrame(self, fg_color="#0d0d1a")
+        self.loading_overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
+        
+        # Loading content
+        loading_content = ctk.CTkFrame(self.loading_overlay, fg_color="transparent")
+        loading_content.place(relx=0.5, rely=0.5, anchor="center")
+        
+        # Spinning animation label
+        self.loading_label = ctk.CTkLabel(
+            loading_content,
+            text="🔄",
+            font=ctk.CTkFont(size=50)
+        )
+        self.loading_label.pack(pady=(0, 20))
+        
+        loading_text = ctk.CTkLabel(
+            loading_content,
+            text="Refreshing Dashboard...",
+            font=ctk.CTkFont(size=18, weight="bold"),
+            text_color="#00d4ff"
+        )
+        loading_text.pack()
+        
+        # Animation variables
+        self.animation_step = 0
+        self.animation_symbols = ["🔄", "⏳", "✨", "📊"]
+        
+        def animate():
+            if hasattr(self, 'loading_label') and self.loading_label.winfo_exists():
+                self.animation_step = (self.animation_step + 1) % len(self.animation_symbols)
+                self.loading_label.configure(text=self.animation_symbols[self.animation_step])
+                self.after(200, animate)
+        
+        animate()
+        
+        # Perform refresh after short delay
+        self.after(800, self.complete_refresh)
+    
+    def complete_refresh(self):
+        """Complete the refresh process"""
+        try:
+            # Reload stats
+            self.load_stats()
+        finally:
+            # Remove loading overlay
+            if hasattr(self, 'loading_overlay') and self.loading_overlay.winfo_exists():
+                self.loading_overlay.destroy()
+            
+            # Re-enable refresh button
+            self.refresh_btn.configure(state="normal", text="🔄 Refresh")
     
     def load_stats(self):
         """Load dashboard statistics"""

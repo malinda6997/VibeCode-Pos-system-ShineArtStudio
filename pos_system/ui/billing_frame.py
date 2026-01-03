@@ -22,6 +22,7 @@ class BillingFrame(BaseFrame):
         self.selected_category_name = None
         self.selected_category_id = None
         self.free_service_name = None
+        self.payment_type = "full"  # 'full' or 'advance'
         self.create_widgets()
         self.load_categories()
 
@@ -309,16 +310,43 @@ class BillingFrame(BaseFrame):
 
         self.cart_tree.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
-        # Remove button
+        # Bind double-click to remove item
+        self.cart_tree.bind("<Double-1>", self.on_cart_item_double_click)
+
+        # Cart action buttons
+        cart_btn_frame = ctk.CTkFrame(cart_frame, fg_color="transparent")
+        cart_btn_frame.pack(fill="x", padx=10, pady=(0, 10))
+
         ctk.CTkButton(
-            cart_frame,
-            text="Remove Selected",
+            cart_btn_frame,
+            text="✏️ Edit Qty",
+            command=self.edit_cart_item,
+            width=120,
+            height=30,
+            fg_color="#ffa500",
+            hover_color="#cc8400",
+            text_color="#1a1a2e"
+        ).pack(side="left", padx=5)
+
+        ctk.CTkButton(
+            cart_btn_frame,
+            text="🗑️ Remove",
             command=self.remove_from_cart,
-            width=150,
+            width=120,
             height=30,
             fg_color="#ff4757",
             hover_color="#ff3344"
-        ).pack(pady=(0, 10))
+        ).pack(side="left", padx=5)
+
+        ctk.CTkButton(
+            cart_btn_frame,
+            text="🗑️ Clear Cart",
+            command=self.clear_cart,
+            width=120,
+            height=30,
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a"
+        ).pack(side="right", padx=5)
 
         # Right panel - Payment
         right_panel = ctk.CTkFrame(main_container, width=350, fg_color="#1e1e3f", corner_radius=15)
@@ -380,22 +408,60 @@ class BillingFrame(BaseFrame):
         )
         self.total_label.pack(side="right", padx=10, pady=10)
 
-        # Advance Payment (optional)
-        advance_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
-        advance_frame.pack(fill="x", padx=20, pady=10)
-        ctk.CTkLabel(advance_frame, text="Advance Payment:", font=ctk.CTkFont(size=13)).pack(side="left")
-        self.advance_entry = ctk.CTkEntry(advance_frame, width=120, height=35)
+        # Payment Type Selector
+        payment_type_frame = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=8)
+        payment_type_frame.pack(fill="x", padx=20, pady=10)
+
+        ctk.CTkLabel(
+            payment_type_frame,
+            text="Payment Type:",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(anchor="w", padx=10, pady=(10, 5))
+
+        self.payment_type_var = ctk.StringVar(value="full")
+
+        payment_radio_frame = ctk.CTkFrame(payment_type_frame, fg_color="transparent")
+        payment_radio_frame.pack(fill="x", padx=10, pady=(0, 10))
+
+        self.full_payment_radio = ctk.CTkRadioButton(
+            payment_radio_frame,
+            text="Full Payment",
+            variable=self.payment_type_var,
+            value="full",
+            command=self.on_payment_type_change,
+            fg_color="#00ff88",
+            hover_color="#00cc6a"
+        )
+        self.full_payment_radio.pack(side="left", padx=10)
+
+        self.advance_payment_radio = ctk.CTkRadioButton(
+            payment_radio_frame,
+            text="Advance Payment",
+            variable=self.payment_type_var,
+            value="advance",
+            command=self.on_payment_type_change,
+            fg_color="#ffa500",
+            hover_color="#cc8400"
+        )
+        self.advance_payment_radio.pack(side="left", padx=10)
+
+        # Advance Payment (only for advance payment type)
+        self.advance_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
+        self.advance_frame.pack(fill="x", padx=20, pady=10)
+        ctk.CTkLabel(self.advance_frame, text="Advance Amount:", font=ctk.CTkFont(size=13)).pack(side="left")
+        self.advance_entry = ctk.CTkEntry(self.advance_frame, width=120, height=35, state="disabled")
         self.advance_entry.insert(0, "0")
         self.advance_entry.pack(side="right")
         self.advance_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
 
-        # Paid amount
+        # Cash Received (for receipt display only)
         paid_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
         paid_frame.pack(fill="x", padx=20, pady=10)
-        ctk.CTkLabel(paid_frame, text="Paid Amount:", font=ctk.CTkFont(size=13)).pack(side="left")
-        self.paid_entry = ctk.CTkEntry(paid_frame, width=120, height=35)
+        self.paid_label_widget = ctk.CTkLabel(paid_frame, text="Cash Received:", font=ctk.CTkFont(size=13))
+        self.paid_label_widget.pack(side="left")
+        self.paid_entry = ctk.CTkEntry(paid_frame, width=120, height=35, placeholder_text="For receipt")
         self.paid_entry.pack(side="right")
-        self.paid_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
+        # Cash received does not affect calculations, only for receipt printing
 
         # Remaining Balance
         balance_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
@@ -413,28 +479,33 @@ class BillingFrame(BaseFrame):
         )
         self.balance_label.pack(side="right")
 
-        # Generate invoice button
+        # Action buttons container
+        action_btn_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
+        action_btn_frame.pack(fill="x", padx=20, pady=30)
+
+        # Generate Bill button
         ctk.CTkButton(
-            right_panel,
-            text="Generate Invoice",
+            action_btn_frame,
+            text="💵 Generate Bill",
             command=self.generate_invoice,
-            width=200,
+            width=150,
             height=45,
-            font=ctk.CTkFont(size=16, weight="bold"),
+            font=ctk.CTkFont(size=14, weight="bold"),
             fg_color="#1f538d",
             hover_color="#14375e"
-        ).pack(pady=30)
+        ).pack(side="left", padx=(0, 10))
 
-        # Clear all button
+        # Clear All button
         ctk.CTkButton(
-            right_panel,
-            text="Clear All",
+            action_btn_frame,
+            text="🔄 Clear All",
             command=self.clear_all,
-            width=200,
-            height=35,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
-        ).pack(pady=10)
+            width=130,
+            height=45,
+            fg_color="#ff4757",
+            hover_color="#ff3344",
+            font=ctk.CTkFont(size=14, weight="bold")
+        ).pack(side="left")
 
     def load_categories(self):
         """Load categories data"""
@@ -791,28 +862,47 @@ class BillingFrame(BaseFrame):
         ).pack(pady=15)
 
     def add_item_to_cart(self, item, item_type, qty):
-        """Add selected item to cart"""
+        """Add selected item to cart - handles duplicates by updating qty"""
         if item_type == "Service":
-            cart_item = {
-                'type': 'Service',
-                'id': item['id'],
-                'name': item['service_name'],
-                'quantity': qty,
-                'unit_price': item.get('price', 0),
-                'total': item.get('price', 0) * qty
-            }
+            item_id = item['id']
+            item_name = item['service_name']
+            unit_price = item.get('price', 0)
+            cart_type = 'Service'
         else:
+            # Check stock for frames
             if item.get('quantity', 0) < qty:
                 MessageDialog.show_error("Error", f"Insufficient stock. Available: {item.get('quantity', 0)}")
                 return
-            cart_item = {
-                'type': 'Frame',
-                'id': item['id'],
-                'name': f"{item['frame_name']} - {item['size']}",
-                'quantity': qty,
-                'unit_price': item.get('price', 0),
-                'total': item.get('price', 0) * qty
-            }
+            item_id = item['id']
+            item_name = f"{item['frame_name']} - {item['size']}"
+            unit_price = item.get('price', 0)
+            cart_type = 'Frame'
+
+        # Check for existing item in cart (prevent duplicates)
+        for existing_item in self.cart_items:
+            if existing_item['id'] == item_id and existing_item['type'] == cart_type:
+                # Check stock if adding more frames
+                if cart_type == 'Frame':
+                    new_qty = existing_item['quantity'] + qty
+                    if item.get('quantity', 0) < new_qty:
+                        MessageDialog.show_error("Error", f"Insufficient stock. Available: {item.get('quantity', 0)}")
+                        return
+                # Update existing item quantity
+                existing_item['quantity'] += qty
+                existing_item['total'] = existing_item['unit_price'] * existing_item['quantity']
+                self.refresh_cart()
+                self.calculate_totals()
+                return
+
+        # Add new item to cart
+        cart_item = {
+            'type': cart_type,
+            'id': item_id,
+            'name': item_name,
+            'quantity': qty,
+            'unit_price': unit_price,
+            'total': unit_price * qty
+        }
 
         self.cart_items.append(cart_item)
         self.refresh_cart()
@@ -1095,6 +1185,205 @@ class BillingFrame(BaseFrame):
         self.refresh_cart()
         self.calculate_totals()
 
+    def edit_cart_item(self):
+        """Edit quantity of selected cart item"""
+        selection = self.cart_tree.selection()
+        if not selection:
+            MessageDialog.show_error("Error", "Please select an item to edit")
+            return
+
+        index = self.cart_tree.index(selection[0])
+        item = self.cart_items[index]
+
+        # Create edit dialog
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("Edit Quantity")
+        dialog.geometry("350x200")
+        dialog.transient(self.winfo_toplevel())
+        dialog.grab_set()
+        dialog.configure(fg_color="#1a1a2e")
+        dialog.resizable(False, False)
+
+        def close_dialog():
+            try:
+                dialog.grab_release()
+            except:
+                pass
+            dialog.destroy()
+            self.winfo_toplevel().focus_force()
+
+        dialog.protocol("WM_DELETE_WINDOW", close_dialog)
+
+        dialog.update_idletasks()
+        x = (dialog.winfo_screenwidth() // 2) - 175
+        y = (dialog.winfo_screenheight() // 2) - 100
+        dialog.geometry(f"350x200+{x}+{y}")
+
+        ctk.CTkLabel(
+            dialog,
+            text=f"Edit: {item['name']}",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color="#00d4ff"
+        ).pack(pady=(20, 15))
+
+        qty_frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        qty_frame.pack(pady=10)
+
+        ctk.CTkLabel(qty_frame, text="New Quantity:", font=ctk.CTkFont(size=13)).pack(side="left", padx=10)
+        qty_entry = ctk.CTkEntry(qty_frame, width=100, height=35)
+        qty_entry.insert(0, str(item['quantity']))
+        qty_entry.pack(side="left", padx=10)
+
+        def save_qty():
+            qty_str = qty_entry.get().strip()
+            if not qty_str or not qty_str.isdigit() or int(qty_str) <= 0:
+                MessageDialog.show_error("Error", "Please enter a valid quantity (positive integer)")
+                return
+            new_qty = int(qty_str)
+
+            # Check stock for frames
+            if item['type'] == 'Frame':
+                frame_data = self.db_manager.get_photo_frame_by_id(item['id'])
+                if frame_data and frame_data.get('quantity', 0) < new_qty:
+                    MessageDialog.show_error("Error", f"Insufficient stock. Available: {frame_data.get('quantity', 0)}")
+                    return
+
+            # Update quantity and total
+            item['quantity'] = new_qty
+            item['total'] = item['unit_price'] * new_qty
+            self.refresh_cart()
+            self.calculate_totals()
+            close_dialog()
+
+        btn_frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        btn_frame.pack(pady=20)
+
+        ctk.CTkButton(
+            btn_frame,
+            text="Cancel",
+            command=close_dialog,
+            width=100,
+            height=35,
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a"
+        ).pack(side="left", padx=10)
+
+        ctk.CTkButton(
+            btn_frame,
+            text="Save",
+            command=save_qty,
+            width=100,
+            height=35,
+            fg_color="#00ff88",
+            text_color="#1a1a2e",
+            hover_color="#00cc6a"
+        ).pack(side="left", padx=10)
+
+        qty_entry.focus()
+        qty_entry.select_range(0, "end")
+
+    def clear_cart(self):
+        """Clear all items from cart"""
+        if not self.cart_items:
+            return
+        self.cart_items = []
+        self.refresh_cart()
+        self.calculate_totals()
+
+    def on_cart_item_double_click(self, event):
+        """Handle double-click on cart item to remove it"""
+        selection = self.cart_tree.selection()
+        if not selection:
+            return
+
+        item_id = selection[0]
+        item_values = self.cart_tree.item(item_id, 'values')
+        if not item_values:
+            return
+
+        item_name = item_values[0]
+
+        # Show confirmation dialog
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("Remove Item")
+        dialog.geometry("350x150")
+        dialog.transient(self.winfo_toplevel())
+        dialog.grab_set()
+        dialog.configure(fg_color="#1a1a2e")
+        dialog.resizable(False, False)
+
+        def close_dialog():
+            try:
+                dialog.grab_release()
+            except:
+                pass
+            dialog.destroy()
+            self.winfo_toplevel().focus_force()
+
+        dialog.protocol("WM_DELETE_WINDOW", close_dialog)
+
+        dialog.update_idletasks()
+        x = (dialog.winfo_screenwidth() // 2) - 175
+        y = (dialog.winfo_screenheight() // 2) - 75
+        dialog.geometry(f"350x150+{x}+{y}")
+
+        ctk.CTkLabel(
+            dialog,
+            text=f"Remove '{item_name}' from cart?",
+            font=ctk.CTkFont(size=14),
+            wraplength=300
+        ).pack(pady=(25, 20))
+
+        btn_frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        btn_frame.pack(pady=10)
+
+        def confirm_remove():
+            index = self.cart_tree.index(item_id)
+            if 0 <= index < len(self.cart_items):
+                self.cart_items.pop(index)
+                self.refresh_cart()
+                self.calculate_totals()
+            close_dialog()
+
+        ctk.CTkButton(
+            btn_frame,
+            text="Cancel",
+            command=close_dialog,
+            width=100,
+            height=35,
+            fg_color="#2d2d5a",
+            hover_color="#3d3d7a"
+        ).pack(side="left", padx=10)
+
+        ctk.CTkButton(
+            btn_frame,
+            text="Remove",
+            command=confirm_remove,
+            width=100,
+            height=35,
+            fg_color="#ff4757",
+            hover_color="#ff3344"
+        ).pack(side="left", padx=10)
+
+    def on_payment_type_change(self):
+        """Handle payment type change"""
+        self.payment_type = self.payment_type_var.get()
+
+        if self.payment_type == "full":
+            # Full payment - disable advance entry and set to 0
+            self.advance_entry.configure(state="normal")
+            self.advance_entry.delete(0, "end")
+            self.advance_entry.insert(0, "0")
+            self.advance_entry.configure(state="disabled")
+        else:
+            # Advance payment - enable advance entry
+            self.advance_entry.configure(state="normal")
+            self.advance_entry.delete(0, "end")
+            self.advance_entry.insert(0, "")
+            self.advance_entry.focus()
+
+        self.calculate_balance()
+
     def refresh_cart(self):
         """Refresh cart display"""
         for item in self.cart_tree.get_children():
@@ -1129,18 +1418,29 @@ class BillingFrame(BaseFrame):
         self.calculate_balance()
 
     def calculate_balance(self):
-        """Calculate remaining balance"""
+        """Calculate remaining balance based on payment type"""
         total_str = self.total_label.cget("text").replace("LKR ", "").replace(",", "")
         total = float(total_str) if total_str else 0
 
-        advance_str = self.advance_entry.get().strip()
-        advance = float(advance_str) if advance_str and self.validate_number(advance_str, True) else 0
+        if self.payment_type == "full":
+            # Full payment - no balance remaining
+            remaining = 0.0
+            paid_amount = total
+        else:
+            # Advance payment - deduct advance from total
+            advance_str = self.advance_entry.get().strip()
+            advance = 0.0
+            if advance_str and self.validate_number(advance_str, True):
+                advance = float(advance_str)
 
-        paid_str = self.paid_entry.get().strip()
-        paid = float(paid_str) if paid_str and self.validate_number(paid_str, True) else 0
+            # Validate advance doesn't exceed total
+            if advance > total:
+                self.advance_entry.delete(0, "end")
+                self.advance_entry.insert(0, str(total))
+                advance = total
 
-        total_paid = advance + paid
-        remaining = max(0, total - total_paid)
+            remaining = max(0, total - advance)
+            paid_amount = advance
 
         self.balance_label.configure(text=f"LKR {remaining:.2f}")
 
@@ -1151,6 +1451,7 @@ class BillingFrame(BaseFrame):
 
     def generate_invoice(self):
         """Generate and save invoice"""
+        # Validate customer selection
         if self.is_guest_customer:
             if not self.guest_customer_name:
                 MessageDialog.show_error("Error", "Please enter guest customer name")
@@ -1160,21 +1461,24 @@ class BillingFrame(BaseFrame):
                 MessageDialog.show_error("Error", "Please select a customer")
                 return
 
+        # Validate cart has items
         if not self.cart_items:
             MessageDialog.show_error("Error", "Please add items to cart")
             return
 
-        paid_str = self.paid_entry.get().strip()
-        advance_str = self.advance_entry.get().strip()
+        # Validate cash received (only for display, optional)
+        cash_received_str = self.paid_entry.get().strip()
+        cash_received = 0.0
+        if cash_received_str:
+            if not self.validate_number(cash_received_str, True):
+                MessageDialog.show_error("Error", "Please enter valid cash received amount")
+                return
+            cash_received = float(cash_received_str)
+            if cash_received < 0:
+                MessageDialog.show_error("Error", "Cash received cannot be negative")
+                return
 
-        if paid_str and not self.validate_number(paid_str, True):
-            MessageDialog.show_error("Error", "Please enter valid paid amount")
-            return
-
-        if advance_str and not self.validate_number(advance_str, True):
-            MessageDialog.show_error("Error", "Please enter valid advance amount")
-            return
-
+        # Calculate totals
         subtotal = sum(item['total'] for item in self.cart_items)
         discount = float(self.discount_entry.get() or 0)
 
@@ -1183,10 +1487,31 @@ class BillingFrame(BaseFrame):
             service_cost = self.category_service_cost
 
         total = max(0, subtotal + service_cost - discount)
-        advance = float(advance_str) if advance_str else 0
-        paid = float(paid_str) if paid_str else 0
-        total_paid = advance + paid
-        balance = max(0, total - total_paid)
+
+        # Payment type logic
+        if self.payment_type == "full":
+            # Full payment - customer pays everything
+            advance = 0.0
+            paid_amount = total
+            balance = 0.0
+        else:
+            # Advance payment
+            advance_str = self.advance_entry.get().strip()
+            if not advance_str or not self.validate_number(advance_str, True):
+                MessageDialog.show_error("Error", "Please enter valid advance amount")
+                return
+            advance = float(advance_str)
+
+            # Validate advance amount
+            if advance < 0:
+                MessageDialog.show_error("Error", "Advance amount cannot be negative")
+                return
+            if advance > total:
+                MessageDialog.show_error("Error", "Advance amount cannot exceed total amount")
+                return
+
+            paid_amount = advance
+            balance = max(0, total - advance)
 
         invoice_number = self.db_manager.generate_invoice_number()
 
@@ -1203,7 +1528,7 @@ class BillingFrame(BaseFrame):
             subtotal,
             discount,
             total,
-            total_paid,
+            paid_amount,
             balance,
             self.auth_manager.get_user_id(),
             service_cost,
@@ -1283,6 +1608,7 @@ class BillingFrame(BaseFrame):
         self.selected_category_name = None
         self.selected_category_id = None
         self.free_service_name = None
+        self.payment_type = "full"
         self.mobile_search.delete(0, 'end')
         self.guest_name_entry.delete(0, 'end')
 
@@ -1294,8 +1620,14 @@ class BillingFrame(BaseFrame):
 
         self.discount_entry.delete(0, 'end')
         self.discount_entry.insert(0, "0")
+
+        # Reset payment type to full
+        self.payment_type_var.set("full")
+        self.advance_entry.configure(state="normal")
         self.advance_entry.delete(0, 'end')
         self.advance_entry.insert(0, "0")
+        self.advance_entry.configure(state="disabled")
+
         self.paid_entry.delete(0, 'end')
 
         self.item_type.set("Service")
