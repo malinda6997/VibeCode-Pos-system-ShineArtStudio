@@ -135,27 +135,20 @@ class MainApplication(ctk.CTk):
     def _set_window_icon(self):
         """Set the application window icon"""
         try:
-            icon_path = os.path.join(os.path.dirname(__file__), "assets", "logos", "App logo.jpg")
-            if os.path.exists(icon_path):
-                icon_image = Image.open(icon_path)
-                
-                # Convert CMYK or other modes to RGBA for compatibility
-                if icon_image.mode in ('CMYK', 'P', 'L', 'LA'):
-                    icon_image = icon_image.convert('RGBA')
-                elif icon_image.mode != 'RGBA':
-                    icon_image = icon_image.convert('RGBA')
-                
-                from PIL import ImageTk
-                
-                # For Windows taskbar icon, we need to set iconbitmap with .ico file
-                ico_path = os.path.join(os.path.dirname(__file__), "assets", "logos", "app_icon.ico")
-                if not os.path.exists(ico_path):
-                    # Create .ico file from the image for Windows compatibility
-                    icon_sizes = [(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
-                    icon_image.save(ico_path, format='ICO', sizes=icon_sizes)
-                
+            # Use the uploaded appLogo.ico directly
+            ico_path = os.path.join(os.path.dirname(__file__), "assets", "logos", "appLogo.ico")
+            
+            if os.path.exists(ico_path):
                 # Set the window icon using iconbitmap for Windows taskbar
                 self.iconbitmap(ico_path)
+                
+                # Also load as image for iconphoto
+                from PIL import ImageTk
+                icon_image = Image.open(ico_path)
+                
+                # Convert to RGBA if needed
+                if icon_image.mode != 'RGBA':
+                    icon_image = icon_image.convert('RGBA')
                 
                 # Also set iconphoto for other platforms/contexts
                 icon_sizes = [(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]

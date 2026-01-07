@@ -94,16 +94,30 @@ class BillGenerator:
         
         separator = "─" * 32
         
-        # === HEADER SECTION ===
-        story.append(Paragraph("STUDIO SHINE ART", header_style))
+        # === HEADER SECTION WITH LOGO ===
+        logo_path = os.path.join('assets', 'logos', 'billLogo.png')
+        if os.path.exists(logo_path):
+            try:
+                # Logo width optimized for 80mm thermal receipt
+                logo = Image(logo_path, width=55*mm, height=20*mm)
+                logo.hAlign = 'CENTER'
+                story.append(logo)
+                story.append(Spacer(1, 1*mm))
+            except:
+                # Fallback to text if logo fails
+                story.append(Paragraph("STUDIO SHINE ART", header_style))
+        else:
+            # Fallback to text if logo not found
+            story.append(Paragraph("STUDIO SHINE ART", header_style))
+        
         story.append(Paragraph("No:52/1/1, Maravila Road", subheader_style))
         story.append(Paragraph("Nattandiya", subheader_style))
         story.append(Paragraph("Tel: 0767898604", subheader_style))
-        story.append(Spacer(1, 2*mm))
+        story.append(Spacer(1, 1.5*mm))
         story.append(Paragraph(separator, center_style))
+        story.append(Spacer(1, 2*mm))
         
         # === BILL INFO SECTION ===
-        story.append(Spacer(1, 1*mm))
         bill_info = f"Bill No: {bill_data['bill_number']}"
         story.append(Paragraph(bill_info, normal_style))
         
@@ -112,27 +126,22 @@ class BillGenerator:
         
         cashier = bill_data.get('created_by_name', 'Staff')
         story.append(Paragraph(f"Cashier: {cashier}", normal_style))
-        story.append(Spacer(1, 1*mm))
-        story.append(Paragraph(separator, center_style))
+        story.append(Spacer(1, 2*mm))
         
         # === CUSTOMER INFO ===
-        story.append(Spacer(1, 1*mm))
         customer_name = customer_data.get('full_name', 'Guest')
         story.append(Paragraph(f"Customer: {customer_name}", normal_style))
         
         mobile = customer_data.get('mobile_number', '')
         if mobile and mobile != 'Guest Customer':
             story.append(Paragraph(f"Mobile: {mobile}", normal_style))
-        story.append(Spacer(1, 1*mm))
-        story.append(Paragraph(separator, center_style))
+        story.append(Spacer(1, 3*mm))
         
         # === ITEMIZED LIST (Monospace for alignment) ===
-        story.append(Spacer(1, 1*mm))
-        
         # Column headers
         header_line = f"{'Item':<18}{'Amt':>8}"
         story.append(Paragraph(header_line, mono_style))
-        story.append(Paragraph("─" * 26, mono_style))
+        story.append(Spacer(1, 1*mm))
         
         # Items
         for item in items:
@@ -147,8 +156,7 @@ class BillGenerator:
             detail_line = f"  {qty} x Rs.{price:<7.2f} Rs.{total:>7.2f}"
             story.append(Paragraph(detail_line, mono_style))
         
-        story.append(Paragraph("─" * 26, mono_style))
-        story.append(Spacer(1, 1*mm))
+        story.append(Spacer(1, 3*mm))
         
         # === TOTALS SECTION ===
         subtotal = bill_data['subtotal']
@@ -164,7 +172,7 @@ class BillGenerator:
         if service_charge > 0:
             story.append(Paragraph(f"{'Service Charge:':<16} Rs.{service_charge:>8.2f}", mono_style))
         
-        story.append(Paragraph("─" * 26, mono_style))
+        story.append(Spacer(1, 1*mm))
         
         # TOTAL - Bold style
         total_style = ParagraphStyle(
@@ -187,13 +195,11 @@ class BillGenerator:
             if balance >= 0:
                 story.append(Paragraph(f"{'Change:':<16} Rs.{balance:>8.2f}", mono_style))
         
-        story.append(Spacer(1, 2*mm))
-        story.append(Paragraph(separator, center_style))
+        story.append(Spacer(1, 5*mm))
         
         # === FOOTER ===
-        story.append(Spacer(1, 2*mm))
         story.append(Paragraph(f"Issued by: {cashier}", center_style))
-        story.append(Spacer(1, 1*mm))
+        story.append(Spacer(1, 2*mm))
         story.append(Paragraph("Thank you! Come again.", center_style))
         story.append(Spacer(1, 1*mm))
         

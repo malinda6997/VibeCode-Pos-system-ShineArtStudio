@@ -19,7 +19,7 @@ class InvoiceHistoryFrame(BaseFrame):
         # Title
         title_label = ctk.CTkLabel(
             self,
-            text="Invoice History",
+            text="Booking Invoices",
             font=ctk.CTkFont(size=24, weight="bold")
         )
         title_label.pack(pady=(10, 20))
@@ -78,7 +78,7 @@ class InvoiceHistoryFrame(BaseFrame):
         
         ctk.CTkLabel(
             table_header,
-            text="🧾 Invoice Records",
+            text="📸 Booking Invoice Records",
             font=ctk.CTkFont(size=14, weight="bold"),
             text_color="#00d4ff"
         ).pack(side="left", padx=15, pady=10)
@@ -129,11 +129,13 @@ class InvoiceHistoryFrame(BaseFrame):
         self.tree.bind("<Double-Button-1>", lambda e: self.view_invoice_details())
     
     def load_invoices(self):
-        """Load all invoices"""
+        """Load only booking invoices (not bills)"""
         for item in self.tree.get_children():
             self.tree.delete(item)
         
-        invoices = self.db_manager.get_all_invoices(limit=200)
+        # Get only booking invoices (invoice_number starts with 'BK-' or has booking_id)
+        all_invoices = self.db_manager.get_all_invoices(limit=200)
+        invoices = [inv for inv in all_invoices if inv['invoice_number'].startswith('BK-') or inv.get('booking_id')]
         
         for i, invoice in enumerate(invoices):
             balance = invoice['balance_amount']
@@ -157,7 +159,7 @@ class InvoiceHistoryFrame(BaseFrame):
         self.record_count_label.configure(text=f"{len(invoices)} records")
     
     def search_invoices(self):
-        """Search invoices"""
+        """Search booking invoices only"""
         search_term = self.search_entry.get().strip()
         
         for item in self.tree.get_children():
@@ -167,7 +169,9 @@ class InvoiceHistoryFrame(BaseFrame):
             self.load_invoices()
             return
         
-        invoices = self.db_manager.search_invoices(search_term)
+        all_invoices = self.db_manager.search_invoices(search_term)
+        # Filter to only booking invoices
+        invoices = [inv for inv in all_invoices if inv['invoice_number'].startswith('BK-') or inv.get('booking_id')]
         
         for i, invoice in enumerate(invoices):
             balance = invoice['balance_amount']

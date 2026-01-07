@@ -37,11 +37,11 @@ class InvoiceGenerator:
         # === HEADER SECTION: Logo Left, INVOICE Title Right ===
         header_data = []
         
-        # Logo cell
+        # Logo cell - optimized width for A4
         logo_path = os.path.join('assets', 'logos', 'invoiceLogo.png')
         if os.path.exists(logo_path):
             try:
-                logo = Image(logo_path, width=45*mm, height=45*mm)
+                logo = Image(logo_path, width=55*mm, height=55*mm)
                 logo_cell = logo
             except:
                 logo_cell = Paragraph("STUDIO SHINE ART", ParagraphStyle('Logo', fontSize=18, fontName='Helvetica-Bold'))
@@ -341,7 +341,7 @@ class InvoiceGenerator:
         logo_path = os.path.join('assets', 'logos', 'invoiceLogo.png')
         if os.path.exists(logo_path):
             try:
-                logo = Image(logo_path, width=45*mm, height=45*mm)
+                logo = Image(logo_path, width=55*mm, height=55*mm)
                 logo_cell = logo
             except:
                 logo_cell = Paragraph("STUDIO SHINE ART", ParagraphStyle('Logo', fontSize=18, fontName='Helvetica-Bold'))
