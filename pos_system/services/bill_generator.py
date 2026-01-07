@@ -4,6 +4,8 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib import colors
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from datetime import datetime
 import os
 
@@ -16,161 +18,184 @@ class BillGenerator:
         os.makedirs(bills_folder, exist_ok=True)
     
     def generate_bill(self, bill_data, items, customer_data):
-        """Generate thermal style receipt bill - black & white only"""
+        """Generate compact thermal style receipt bill - black & white only"""
         
         filename = f"BILL_{bill_data['bill_number']}.pdf"
         filepath = os.path.join(self.bills_folder, filename)
         
         # Thermal receipt size: narrow width (80mm)
         page_width = 80 * mm
-        page_height = 297 * mm
+        page_height = 200 * mm  # Dynamic, will expand as needed
         
         doc = SimpleDocTemplate(
             filepath, 
             pagesize=(page_width, page_height),
-            leftMargin=5*mm,
-            rightMargin=5*mm,
-            topMargin=5*mm,
-            bottomMargin=5*mm
+            leftMargin=3*mm,
+            rightMargin=3*mm,
+            topMargin=3*mm,
+            bottomMargin=3*mm
         )
         
         story = []
-        
-        # Styles
         styles = getSampleStyleSheet()
         
-        # Header style - black text only
+        # Compact styles - minimal spacing
         header_style = ParagraphStyle(
             'BillHeader',
-            parent=styles['Heading1'],
-            fontSize=14,
+            fontSize=11,
             textColor=colors.black,
             alignment=TA_CENTER,
-            spaceAfter=2,
-            fontName='Helvetica-Bold'
+            fontName='Helvetica-Bold',
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=13
         )
         
         subheader_style = ParagraphStyle(
             'BillSubheader',
-            parent=styles['Normal'],
             fontSize=8,
             textColor=colors.black,
             alignment=TA_CENTER,
-            spaceAfter=1
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=10
         )
         
         normal_style = ParagraphStyle(
             'BillNormal',
-            parent=styles['Normal'],
             fontSize=8,
             textColor=colors.black,
+            alignment=TA_LEFT,
+            spaceAfter=0,
+            spaceBefore=0,
             leading=10
         )
         
-        bold_style = ParagraphStyle(
-            'BillBold',
-            parent=styles['Normal'],
+        mono_style = ParagraphStyle(
+            'BillMono',
+            fontSize=7,
+            textColor=colors.black,
+            alignment=TA_LEFT,
+            fontName='Courier',
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=9
+        )
+        
+        center_style = ParagraphStyle(
+            'BillCenter',
             fontSize=8,
             textColor=colors.black,
-            fontName='Helvetica-Bold',
+            alignment=TA_CENTER,
+            spaceAfter=0,
+            spaceBefore=0,
             leading=10
         )
         
-        # Logo - Black & White version
-        logo_path = os.path.join('assets', 'logos', 'App logo.jpg')
-        if os.path.exists(logo_path):
-            try:
-                logo = Image(logo_path, width=30*mm, height=30*mm)
-                logo.hAlign = 'CENTER'
-                story.append(logo)
-                story.append(Spacer(1, 2*mm))
-            except:
-                pass
+        separator = "─" * 32
         
-        # Studio name
-        story.append(Paragraph("<b>SHINE ART STUDIO</b>", header_style))
-        story.append(Paragraph("Photography Services", subheader_style))
-        
-        # Address and phone (replace with actual values)
-        story.append(Paragraph("Address: [Your Address Here]", subheader_style))
-        story.append(Paragraph("Phone: [Your Phone]", subheader_style))
-        story.append(Spacer(1, 3*mm))
-        
-        # Separator
-        story.append(Paragraph("=" * 40, subheader_style))
+        # === HEADER SECTION ===
+        story.append(Paragraph("STUDIO SHINE ART", header_style))
+        story.append(Paragraph("No:52/1/1, Maravila Road", subheader_style))
+        story.append(Paragraph("Nattandiya", subheader_style))
+        story.append(Paragraph("Tel: 0767898604", subheader_style))
         story.append(Spacer(1, 2*mm))
+        story.append(Paragraph(separator, center_style))
         
-        # Bill info
-        story.append(Paragraph(f"<b>Bill No: {bill_data['bill_number']}</b>", bold_style))
-        story.append(Paragraph(f"Date: {bill_data['created_at']}", normal_style))
-        story.append(Paragraph(f"Customer: {customer_data['full_name']}", normal_style))
+        # === BILL INFO SECTION ===
+        story.append(Spacer(1, 1*mm))
+        bill_info = f"Bill No: {bill_data['bill_number']}"
+        story.append(Paragraph(bill_info, normal_style))
         
-        if customer_data.get('mobile_number') and customer_data['mobile_number'] != 'Guest Customer':
-            story.append(Paragraph(f"Mobile: {customer_data['mobile_number']}", normal_style))
+        date_str = bill_data['created_at']
+        story.append(Paragraph(f"Date: {date_str}", normal_style))
         
-        story.append(Spacer(1, 2*mm))
-        story.append(Paragraph("-" * 40, subheader_style))
-        story.append(Spacer(1, 2*mm))
+        cashier = bill_data.get('created_by_name', 'Staff')
+        story.append(Paragraph(f"Cashier: {cashier}", normal_style))
+        story.append(Spacer(1, 1*mm))
+        story.append(Paragraph(separator, center_style))
+        
+        # === CUSTOMER INFO ===
+        story.append(Spacer(1, 1*mm))
+        customer_name = customer_data.get('full_name', 'Guest')
+        story.append(Paragraph(f"Customer: {customer_name}", normal_style))
+        
+        mobile = customer_data.get('mobile_number', '')
+        if mobile and mobile != 'Guest Customer':
+            story.append(Paragraph(f"Mobile: {mobile}", normal_style))
+        story.append(Spacer(1, 1*mm))
+        story.append(Paragraph(separator, center_style))
+        
+        # === ITEMIZED LIST (Monospace for alignment) ===
+        story.append(Spacer(1, 1*mm))
+        
+        # Column headers
+        header_line = f"{'Item':<18}{'Amt':>8}"
+        story.append(Paragraph(header_line, mono_style))
+        story.append(Paragraph("─" * 26, mono_style))
         
         # Items
-        for idx, item in enumerate(items, 1):
-            item_name = item['item_name']
+        for item in items:
+            item_name = item['item_name'][:17]  # Truncate long names
             qty = item['quantity']
             price = item['unit_price']
             total = item['total_price']
             
-            story.append(Paragraph(f"<b>{item_name}</b>", bold_style))
-            story.append(Paragraph(f"  {qty} x Rs.{price:.2f} = Rs.{total:.2f}", normal_style))
+            # Item name line
+            story.append(Paragraph(item_name, mono_style))
+            # Qty x Price = Amount line
+            detail_line = f"  {qty} x Rs.{price:<7.2f} Rs.{total:>7.2f}"
+            story.append(Paragraph(detail_line, mono_style))
         
-        story.append(Spacer(1, 2*mm))
-        story.append(Paragraph("-" * 40, subheader_style))
-        story.append(Spacer(1, 2*mm))
+        story.append(Paragraph("─" * 26, mono_style))
+        story.append(Spacer(1, 1*mm))
         
-        # Totals
+        # === TOTALS SECTION ===
         subtotal = bill_data['subtotal']
+        discount = bill_data.get('discount', 0) or 0
         service_charge = bill_data.get('service_charge', 0) or 0
-        discount = bill_data['discount']
         total = bill_data['total_amount']
         
-        story.append(Paragraph(f"Subtotal: Rs.{subtotal:.2f}", normal_style))
-        
-        if service_charge > 0:
-            story.append(Paragraph(f"Service Charge: Rs.{service_charge:.2f}", normal_style))
+        story.append(Paragraph(f"{'Subtotal:':<16} Rs.{subtotal:>8.2f}", mono_style))
         
         if discount > 0:
-            story.append(Paragraph(f"Discount: Rs.{discount:.2f}", normal_style))
+            story.append(Paragraph(f"{'Discount:':<16} Rs.{discount:>8.2f}", mono_style))
         
-        story.append(Paragraph(f"<b>Total: Rs.{total:.2f}</b>", bold_style))
+        if service_charge > 0:
+            story.append(Paragraph(f"{'Service Charge:':<16} Rs.{service_charge:>8.2f}", mono_style))
         
-        # Cash handling (display only)
+        story.append(Paragraph("─" * 26, mono_style))
+        
+        # TOTAL - Bold style
+        total_style = ParagraphStyle(
+            'TotalBold',
+            fontSize=9,
+            textColor=colors.black,
+            fontName='Courier-Bold',
+            alignment=TA_LEFT,
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=11
+        )
+        story.append(Paragraph(f"{'TOTAL:':<16} Rs.{total:>8.2f}", total_style))
+        
+        # Cash handling
         cash_given = bill_data.get('cash_given', 0) or 0
         if cash_given > 0:
-            story.append(Spacer(1, 2*mm))
-            story.append(Paragraph(f"Cash Given: Rs.{cash_given:.2f}", normal_style))
-            
+            story.append(Paragraph(f"{'Paid:':<16} Rs.{cash_given:>8.2f}", mono_style))
             balance = cash_given - total
-            if balance > 0:
-                story.append(Paragraph(f"Balance: Rs.{balance:.2f}", normal_style))
-            elif balance < 0:
-                story.append(Paragraph(f"Balance Due: Rs.{abs(balance):.2f}", normal_style))
+            if balance >= 0:
+                story.append(Paragraph(f"{'Change:':<16} Rs.{balance:>8.2f}", mono_style))
         
-        story.append(Spacer(1, 3*mm))
-        story.append(Paragraph("=" * 40, subheader_style))
         story.append(Spacer(1, 2*mm))
+        story.append(Paragraph(separator, center_style))
         
-        # Footer
-        footer_style = ParagraphStyle(
-            'BillFooter',
-            parent=styles['Normal'],
-            fontSize=8,
-            textColor=colors.black,
-            alignment=TA_CENTER,
-            fontName='Helvetica-Bold'
-        )
-        
-        story.append(Paragraph("Thank you! Come again.", footer_style))
+        # === FOOTER ===
         story.append(Spacer(1, 2*mm))
-        story.append(Paragraph(f"Served by: {bill_data.get('created_by_name', 'Staff')}", subheader_style))
+        story.append(Paragraph(f"Issued by: {cashier}", center_style))
+        story.append(Spacer(1, 1*mm))
+        story.append(Paragraph("Thank you! Come again.", center_style))
+        story.append(Spacer(1, 1*mm))
         
         # Build PDF
         doc.build(story)

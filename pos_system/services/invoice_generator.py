@@ -33,75 +33,55 @@ class InvoiceGenerator:
         story = []
         styles = getSampleStyleSheet()
         
-        # Logo - COLOR version
+        # Logo - COLOR version (LARGE)
         logo_path = os.path.join('assets', 'logos', 'invoiceLogo.png')
         if os.path.exists(logo_path):
             try:
-                logo = Image(logo_path, width=50*mm, height=50*mm)
-                logo.hAlign = 'LEFT'
+                logo = Image(logo_path, width=70*mm, height=70*mm)
+                logo.hAlign = 'CENTER'
                 story.append(logo)
-                story.append(Spacer(1, 5*mm))
+                story.append(Spacer(1, 8*mm))
             except:
                 pass
         
-        # Studio Header
-        header_style = ParagraphStyle(
-            'InvoiceHeader',
-            parent=styles['Heading1'],
-            fontSize=24,
-            textColor=colors.HexColor('#1a1a2e'),
-            spaceAfter=3,
-            alignment=TA_LEFT,
-            fontName='Helvetica-Bold'
-        )
-        
-        subheader_style = ParagraphStyle(
-            'InvoiceSubheader',
-            parent=styles['Normal'],
-            fontSize=11,
-            textColor=colors.HexColor('#666666'),
-            spaceAfter=2,
-            alignment=TA_LEFT
-        )
-        
-        story.append(Paragraph("SHINE ART STUDIO", header_style))
-        story.append(Paragraph("Address: [Your Studio Address]", subheader_style))
-        story.append(Paragraph("Phone: [Your Phone Number]", subheader_style))
-        story.append(Spacer(1, 10*mm))
-        
-        # Invoice title
+        # Invoice title - LARGE
         invoice_title_style = ParagraphStyle(
             'InvoiceTitle',
             parent=styles['Heading1'],
-            fontSize=20,
+            fontSize=28,
             textColor=colors.HexColor('#1a1a2e'),
             alignment=TA_CENTER,
-            spaceAfter=10,
-            fontName='Helvetica-Bold'
+            fontName='Helvetica-Bold',
+            spaceAfter=5
         )
         story.append(Paragraph("INVOICE", invoice_title_style))
-        story.append(Spacer(1, 5*mm))
         
-        # Invoice metadata table
-        meta_data = [
-            ['Invoice Number:', invoice_data['invoice_number'], 'Invoice Date:', invoice_data['created_at']],
-        ]
+        # Company name - smaller than INVOICE
+        company_style = ParagraphStyle(
+            'CompanyName',
+            parent=styles['Normal'],
+            fontSize=16,
+            textColor=colors.HexColor('#1a1a2e'),
+            alignment=TA_CENTER,
+            fontName='Helvetica-Bold',
+            spaceAfter=3
+        )
+        story.append(Paragraph("SHINE ART STUDIO", company_style))
         
-        if booking_ref:
-            meta_data.append(['Booking Reference:', booking_ref, '', ''])
+        # Address - clean
+        address_style = ParagraphStyle(
+            'Address',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor=colors.HexColor('#666666'),
+            alignment=TA_CENTER,
+            spaceAfter=1
+        )
+        story.append(Paragraph("No:52/1/1, Maravila Road, Nattandiya", address_style))
+        story.append(Paragraph("Tel: 0767898604", address_style))
+        story.append(Spacer(1, 10*mm))
         
-        meta_table = Table(meta_data, colWidths=[35*mm, 55*mm, 35*mm, 45*mm])
-        meta_table.setStyle(TableStyle([
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ]))
-        story.append(meta_table)
-        story.append(Spacer(1, 8*mm))
-        
-        # Customer details
+        # Invoice metadata
         normal_style = ParagraphStyle(
             'InvoiceNormal',
             parent=styles['Normal'],
@@ -109,29 +89,41 @@ class InvoiceGenerator:
             leading=14
         )
         
-        heading_style = ParagraphStyle(
-            'InvoiceHeading',
-            parent=styles['Heading2'],
-            fontSize=12,
-            textColor=colors.HexColor('#1a1a2e'),
-            spaceAfter=5,
+        info_bold = ParagraphStyle(
+            'InfoBold',
+            parent=styles['Normal'],
+            fontSize=10,
             fontName='Helvetica-Bold'
         )
         
-        story.append(Paragraph("Customer Details:", heading_style))
-        story.append(Paragraph(f"<b>Name:</b> {customer_data['full_name']}", normal_style))
+        meta_data = [
+            ['Invoice No:', invoice_data['invoice_number']],
+            ['Date:', invoice_data['created_at']],
+        ]
+        
+        if booking_ref:
+            meta_data.append(['Booking Ref:', booking_ref])
+        
+        meta_data.append(['Customer:', customer_data['full_name']])
         
         if customer_data.get('mobile_number') and customer_data['mobile_number'] != 'Guest Customer':
-            story.append(Paragraph(f"<b>Mobile:</b> {customer_data['mobile_number']}", normal_style))
+            meta_data.append(['Mobile:', customer_data['mobile_number']])
         
+        meta_table = Table(meta_data, colWidths=[40*mm, 130*mm])
+        meta_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ]))
+        story.append(meta_table)
         story.append(Spacer(1, 8*mm))
         
         story.append(Spacer(1, 8*mm))
         
         # Items table
-        story.append(Paragraph("Items / Services:", heading_style))
-        
-        table_data = [['Description', 'Quantity', 'Unit Price', 'Amount']]
+        table_data = [['Description', 'Qty', 'Unit Price', 'Amount']]
         
         for item in items:
             item_name = item['item_name']
@@ -145,24 +137,26 @@ class InvoiceGenerator:
                 f"Rs. {item['total_price']:.2f}"
             ])
         
-        items_table = Table(table_data, colWidths=[80*mm, 25*mm, 35*mm, 30*mm])
+        items_table = Table(table_data, colWidths=[85*mm, 20*mm, 35*mm, 30*mm])
         items_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a1a2e')),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#333333')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 11),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('TOPPADDING', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('TOPPADDING', (0, 0), (-1, 0), 8),
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
             ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
             ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('FONTSIZE', (0, 1), (-1, -1), 9),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 5),
+            ('TOPPADDING', (0, 1), (-1, -1), 5),
         ]))
         
         story.append(items_table)
-        story.append(Spacer(1, 8*mm))
+        story.append(Spacer(1, 6*mm))
         
         # Totals section
         subtotal = invoice_data['subtotal']
@@ -176,50 +170,54 @@ class InvoiceGenerator:
             ['Subtotal:', f"Rs. {subtotal:.2f}"],
         ]
         
-        if service_charge > 0:
-            totals_data.append(['Service Charge:', f"Rs. {service_charge:.2f}"])
-        
         if discount > 0:
             totals_data.append(['Discount:', f"Rs. {discount:.2f}"])
         
-        totals_data.append(['<b>Total Amount:</b>', f"<b>Rs. {total:.2f}</b>"])
+        if service_charge > 0:
+            totals_data.append(['Service Charge:', f"Rs. {service_charge:.2f}"])
         
-        if advance > 0:
-            totals_data.append(['Advance Paid:', f"Rs. {advance:.2f}"])
-        
-        totals_data.append(['<b>Balance Due:</b>', f"<b>Rs. {balance:.2f}</b>"])
-        
-        totals_table = Table(totals_data, colWidths=[110*mm, 60*mm])
+        totals_table = Table(totals_data, colWidths=[120*mm, 50*mm])
         totals_table.setStyle(TableStyle([
             ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
             ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-            ('FONTSIZE', (0, 0), (-1, -1), 11),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('LINEABOVE', (0, -2), (-1, -2), 1, colors.black),
-            ('LINEABOVE', (0, -1), (-1, -1), 1.5, colors.black),
-            ('TEXTCOLOR', (0, -1), (-1, -1), colors.HexColor('#1a1a2e')),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
         ]))
         
         story.append(totals_table)
-        story.append(Spacer(1, 15*mm))
         
-        # Footer with owner details
-        story.append(Paragraph("_" * 60, subheader_style))
-        story.append(Spacer(1, 5*mm))
+        # Total line - BOLD
+        total_data = [['TOTAL:', f"Rs. {total:.2f}"]]
+        total_table = Table(total_data, colWidths=[120*mm, 50*mm])
+        total_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('FONTSIZE', (0, 0), (-1, -1), 12),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('LINEABOVE', (0, 0), (-1, 0), 1.5, colors.black),
+        ]))
         
+        story.append(total_table)
+        story.append(Spacer(1, 10*mm))
+        
+        # Footer
         footer_style = ParagraphStyle(
             'InvoiceFooter',
             parent=styles['Normal'],
-            fontSize=9,
-            textColor=colors.HexColor('#1a1a2e'),
+            fontSize=8,
+            textColor=colors.HexColor('#555555'),
             alignment=TA_CENTER,
-            leading=12
+            leading=11
         )
         
-        story.append(Paragraph("<b>Malinda Prabath</b>", footer_style))
-        story.append(Paragraph("0762206157", footer_style))
-        story.append(Paragraph("malindaprabath876@gmail.com", footer_style))
+        footer_text = ("Thank you for your business. Shine Art Studio - Nattandiya invoice system "
+                      "was developed by Malinda Prabath. For inquiries or support, please contact "
+                      "076 220 6157 or email malindaprabath876@gmail.com")
+        
+        story.append(Paragraph(footer_text, footer_style))
         
         # Build PDF
         doc.build(story)
