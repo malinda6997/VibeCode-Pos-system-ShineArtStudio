@@ -112,7 +112,8 @@ class BillGenerator:
         
         story.append(Paragraph("No:52/1/1, Maravila Road", subheader_style))
         story.append(Paragraph("Nattandiya", subheader_style))
-        story.append(Paragraph("Tel: 0767898604", subheader_style))
+        story.append(Paragraph("<b>Reg No:</b> 26/3610", subheader_style))
+        story.append(Paragraph("Tel: 0767898604 / 0322051680", subheader_style))
         story.append(Spacer(1, 1.5*mm))
         story.append(Paragraph(separator, center_style))
         story.append(Spacer(1, 2*mm))
@@ -195,11 +196,13 @@ class BillGenerator:
             if balance >= 0:
                 story.append(Paragraph(f"{'Change:':<16} Rs.{balance:>8.2f}", mono_style))
         
-        story.append(Spacer(1, 5*mm))
+        story.append(Spacer(1, 4*mm))
         
         # === FOOTER ===
-        story.append(Paragraph(f"Issued by: {cashier}", center_style))
-        story.append(Spacer(1, 2*mm))
+        # story.append(Paragraph(f"Issued by: {cashier}", center_style))
+        # story.append(Spacer(1, 3*mm))
+        # story.append(Paragraph("Signature: .........................", center_style))
+        # story.append(Spacer(1, 3*mm))
         story.append(Paragraph("Thank you! Come again.", center_style))
         story.append(Spacer(1, 1*mm))
         

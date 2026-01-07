@@ -80,7 +80,8 @@ class InvoiceGenerator:
         company_info = Table([
             [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=12, fontName='Helvetica-Bold'))],
             [Paragraph("No:52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=9, textColor=colors.HexColor('#555555')))],
-            [Paragraph("Tel: 0767898604", ParagraphStyle('Tel', fontSize=9, textColor=colors.HexColor('#555555')))],
+            [Paragraph("<b>Reg No:</b> 26/3610", ParagraphStyle('Reg', fontSize=9, textColor=colors.HexColor('#555555')))],
+            [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=9, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
         company_info.setStyle(TableStyle([
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
@@ -200,7 +201,26 @@ class InvoiceGenerator:
         summary_container = Table([[Spacer(1, 1), summary_table]], colWidths=[page_width - 90*mm, 90*mm])
         summary_container.setStyle(TableStyle([('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
         story.append(summary_container)
-        story.append(Spacer(1, 20*mm))
+        story.append(Spacer(1, 15*mm))
+        
+        # === SIGNATURE AREA (Right-aligned) ===
+        sig_style = ParagraphStyle('Sig', fontSize=9, alignment=TA_CENTER, textColor=colors.HexColor('#333333'))
+        
+        # Create signature line with label
+        sig_line = Table([
+            [Paragraph("_" * 30, sig_style)],
+            [Paragraph("Authorized Signature", sig_style)]
+        ], colWidths=[60*mm])
+        sig_line.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('TOPPADDING', (0, 1), (0, 1), 2),
+        ]))
+        
+        # Right-align the signature area
+        sig_container = Table([[Spacer(1, 1), sig_line]], colWidths=[page_width - 60*mm, 60*mm])
+        sig_container.setStyle(TableStyle([('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
+        story.append(sig_container)
+        story.append(Spacer(1, 10*mm))
         
         # === FOOTER SECTION ===
         footer_style = ParagraphStyle('Footer', fontSize=10, alignment=TA_CENTER, textColor=colors.HexColor('#333333'))
@@ -272,7 +292,8 @@ class InvoiceGenerator:
         company_info = Table([
             [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=12, fontName='Helvetica-Bold'))],
             [Paragraph("No:52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=9, textColor=colors.HexColor('#555555')))],
-            [Paragraph("Tel: 0767898604", ParagraphStyle('Tel', fontSize=9, textColor=colors.HexColor('#555555')))],
+            [Paragraph("<b>Reg No:</b> 26/3610", ParagraphStyle('Reg', fontSize=9, textColor=colors.HexColor('#555555')))],
+            [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=9, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
         company_info.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'), ('BOTTOMPADDING', (0, 0), (-1, -1), 2)]))
         
@@ -353,7 +374,24 @@ class InvoiceGenerator:
         summary_container = Table([[Spacer(1, 1), summary_table]], colWidths=[page_width - 90*mm, 90*mm])
         summary_container.setStyle(TableStyle([('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
         story.append(summary_container)
-        story.append(Spacer(1, 20*mm))
+        story.append(Spacer(1, 15*mm))
+        
+        # === SIGNATURE AREA (Right-aligned) ===
+        sig_style = ParagraphStyle('Sig', fontSize=9, alignment=TA_CENTER, textColor=colors.HexColor('#333333'))
+        
+        sig_line = Table([
+            [Paragraph("_" * 30, sig_style)],
+            [Paragraph("Authorized Signature", sig_style)]
+        ], colWidths=[60*mm])
+        sig_line.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('TOPPADDING', (0, 1), (0, 1), 2),
+        ]))
+        
+        sig_container = Table([[Spacer(1, 1), sig_line]], colWidths=[page_width - 60*mm, 60*mm])
+        sig_container.setStyle(TableStyle([('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
+        story.append(sig_container)
+        story.append(Spacer(1, 10*mm))
         
         # === FOOTER ===
         footer_style = ParagraphStyle('Footer', fontSize=10, alignment=TA_CENTER, textColor=colors.HexColor('#333333'))
@@ -411,7 +449,8 @@ class InvoiceGenerator:
         company_info = Table([
             [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=12, fontName='Helvetica-Bold'))],
             [Paragraph("No:52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=9, textColor=colors.HexColor('#555555')))],
-            [Paragraph("Tel: 0767898604", ParagraphStyle('Tel', fontSize=9, textColor=colors.HexColor('#555555')))],
+            [Paragraph("<b>Reg No:</b> 26/3610", ParagraphStyle('Reg', fontSize=9, textColor=colors.HexColor('#555555')))],
+            [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=9, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
         company_info.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'), ('BOTTOMPADDING', (0, 0), (-1, -1), 2)]))
         
@@ -484,7 +523,24 @@ class InvoiceGenerator:
         summary_container = Table([[Spacer(1, 1), summary_table]], colWidths=[page_width - 90*mm, 90*mm])
         summary_container.setStyle(TableStyle([('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
         story.append(summary_container)
-        story.append(Spacer(1, 20*mm))
+        story.append(Spacer(1, 15*mm))
+        
+        # === SIGNATURE AREA (Right-aligned) ===
+        sig_style = ParagraphStyle('Sig', fontSize=9, alignment=TA_CENTER, textColor=colors.HexColor('#333333'))
+        
+        sig_line = Table([
+            [Paragraph("_" * 30, sig_style)],
+            [Paragraph("Authorized Signature", sig_style)]
+        ], colWidths=[60*mm])
+        sig_line.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('TOPPADDING', (0, 1), (0, 1), 2),
+        ]))
+        
+        sig_container = Table([[Spacer(1, 1), sig_line]], colWidths=[page_width - 60*mm, 60*mm])
+        sig_container.setStyle(TableStyle([('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
+        story.append(sig_container)
+        story.append(Spacer(1, 10*mm))
         
         # === FOOTER ===
         footer_style = ParagraphStyle('Footer', fontSize=10, alignment=TA_CENTER, textColor=colors.HexColor('#333333'))
