@@ -346,12 +346,33 @@ Balance: LKR {invoice['balance_amount']:.2f}
         
         items = self.db_manager.get_invoice_items(invoice['id'])
         customer = {
-            'full_name': invoice['full_name'],
-            'mobile_number': invoice['mobile_number']
+            'full_name': invoice['full_name'] or 'Guest',
+            'mobile_number': invoice['mobile_number'] or 'N/A'
         }
         
         try:
-            pdf_path = self.invoice_generator.generate_invoice(invoice, items, customer)
+            # Check if this is a booking invoice (starts with 'BK-')
+            if invoice_number.startswith('BK-'):
+                # Get booking data for booking invoice
+                booking_data = {
+                    'customer_name': invoice['full_name'] or invoice.get('guest_name', 'Guest'),
+                    'mobile_number': invoice['mobile_number'] or 'N/A',
+                    'photoshoot_category': items[0]['item_name'] if items else 'Photography Service',
+                    'full_amount': invoice['total_amount'],
+                    'advance_payment': invoice.get('advance_payment', 0) or invoice['paid_amount'],
+                    'booking_date': invoice['created_at'].split(' ')[0] if invoice['created_at'] else '',
+                    'location': '',
+                    'description': ''
+                }
+                # Use existing invoice number instead of generating new one
+                pdf_path = self.invoice_generator.generate_booking_invoice_reprint(
+                    booking_data, 
+                    invoice.get('created_by_name', 'Staff'),
+                    invoice_number
+                )
+            else:
+                pdf_path = self.invoice_generator.generate_invoice(invoice, items, customer)
+            
             MessageDialog.show_success("Success", f"Invoice {invoice_number} reprinted successfully!")
             self.invoice_generator.open_invoice(pdf_path)
         except Exception as e:

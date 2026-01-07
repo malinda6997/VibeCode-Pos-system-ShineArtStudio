@@ -572,10 +572,49 @@ class BookingManagementFrame(BaseFrame):
                 # Get current user's name
                 current_user = self.auth_manager.get_current_user()
                 created_by_name = current_user.get('full_name', 'Staff') if current_user else 'Staff'
+                user_id = self.auth_manager.get_user_id()
                 
-                # Generate the invoice
+                # Generate the invoice PDF
                 filepath = self.invoice_generator.generate_booking_invoice(booking_data, created_by_name)
                 self.generated_invoice_path = filepath
+                
+                # Extract invoice number from filename (Booking_BK-YYYYMMDDHHMMSS.pdf)
+                import os
+                filename = os.path.basename(filepath)
+                invoice_number = filename.replace('Booking_', '').replace('.pdf', '')
+                
+                # Save invoice to database
+                full_amount = float(booking_data['full_amount'])
+                advance_payment = float(booking_data['advance_payment'])
+                balance = full_amount - advance_payment
+                
+                invoice_id = self.db_manager.create_invoice(
+                    invoice_number=invoice_number,
+                    customer_id=None,  # Guest booking
+                    subtotal=full_amount,
+                    discount=0,
+                    total_amount=full_amount,
+                    paid_amount=advance_payment,
+                    balance_amount=balance,
+                    created_by=user_id,
+                    category_service_cost=0,
+                    advance_payment=advance_payment,
+                    guest_name=booking_data['customer_name'],
+                    booking_id=booking_data.get('id')
+                )
+                
+                # Add invoice item (the service)
+                if invoice_id:
+                    self.db_manager.add_invoice_item(
+                        invoice_id=invoice_id,
+                        item_type='BookingService',
+                        item_id=booking_data.get('id', 0),
+                        item_name=booking_data['photoshoot_category'],
+                        quantity=1,
+                        unit_price=full_amount,
+                        total_price=full_amount,
+                        buying_price=0
+                    )
                 
                 # Show invoice preview popup
                 popup.destroy()

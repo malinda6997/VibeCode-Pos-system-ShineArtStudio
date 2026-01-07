@@ -307,11 +307,14 @@ class DatabaseManager:
         return results[0] if results else None
     
     def get_invoice_by_number(self, invoice_number: str) -> Optional[Dict[str, Any]]:
-        """Get invoice by invoice number"""
+        """Get invoice by invoice number (handles both registered and guest customers)"""
         query = '''
-            SELECT i.*, c.full_name, c.mobile_number, u.full_name as created_by_name
+            SELECT i.*, 
+                   COALESCE(c.full_name, i.guest_name) as full_name, 
+                   c.mobile_number,
+                   u.full_name as created_by_name
             FROM invoices i
-            JOIN customers c ON i.customer_id = c.id
+            LEFT JOIN customers c ON i.customer_id = c.id
             JOIN users u ON i.created_by = u.id
             WHERE i.invoice_number = ?
         '''
@@ -324,29 +327,34 @@ class DatabaseManager:
         return self.execute_query(query, (invoice_id,))
     
     def get_all_invoices(self, limit: int = 100) -> List[Dict[str, Any]]:
-        """Get all invoices with customer info"""
+        """Get all invoices with customer info (handles both registered and guest customers)"""
         query = '''
-            SELECT i.*, c.full_name, c.mobile_number
+            SELECT i.*, 
+                   COALESCE(c.full_name, i.guest_name) as full_name, 
+                   c.mobile_number
             FROM invoices i
-            JOIN customers c ON i.customer_id = c.id
+            LEFT JOIN customers c ON i.customer_id = c.id
             ORDER BY i.created_at DESC
             LIMIT ?
         '''
         return self.execute_query(query, (limit,))
     
     def search_invoices(self, search_term: str) -> List[Dict[str, Any]]:
-        """Search invoices by invoice number or customer name/mobile"""
+        """Search invoices by invoice number or customer name/mobile (handles guest customers)"""
         query = '''
-            SELECT i.*, c.full_name, c.mobile_number
+            SELECT i.*, 
+                   COALESCE(c.full_name, i.guest_name) as full_name, 
+                   c.mobile_number
             FROM invoices i
-            JOIN customers c ON i.customer_id = c.id
+            LEFT JOIN customers c ON i.customer_id = c.id
             WHERE i.invoice_number LIKE ? 
                OR c.full_name LIKE ? 
                OR c.mobile_number LIKE ?
+               OR i.guest_name LIKE ?
             ORDER BY i.created_at DESC
         '''
         search_pattern = f'%{search_term}%'
-        return self.execute_query(query, (search_pattern, search_pattern, search_pattern))
+        return self.execute_query(query, (search_pattern, search_pattern, search_pattern, search_pattern))
     
     def generate_invoice_number(self) -> str:
         """Generate a unique invoice number"""
