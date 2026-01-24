@@ -1950,6 +1950,10 @@
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
    'Studio\\pos_system\\services\\__init__.py',
    'PYMODULE'),
+  ('services.bill_generator',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\services\\bill_generator.py',
+   'PYMODULE'),
   ('services.dashboard_service',
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
    'Studio\\pos_system\\services\\dashboard_service.py',
@@ -2151,6 +2155,10 @@
   ('ui',
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
    'Studio\\pos_system\\ui\\__init__.py',
+   'PYMODULE'),
+  ('ui.bill_history_frame',
+   'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
+   'Studio\\pos_system\\ui\\bill_history_frame.py',
    'PYMODULE'),
   ('ui.billing_frame',
    'F:\\2025 NEW PROJECTS\\Pasindu\\Shine Art '
