@@ -2,7 +2,6 @@ import customtkinter as ctk
 from typing import Callable, Optional
 from PIL import Image
 import os
-import random
 
 
 class ModernToast(ctk.CTkToplevel):
@@ -308,30 +307,28 @@ class LoginWindow(ctk.CTkToplevel):
         """Create login form widgets"""
         
         # Set window background
-        self.configure(fg_color="#1a1a2e")
+        self.configure(fg_color="#060606")
         
         # Main container
-        main_container = ctk.CTkFrame(self, fg_color="#1a1a2e")
+        main_container = ctk.CTkFrame(self, fg_color="#060606")
         main_container.pack(fill="both", expand=True)
         
         # Left side - Image panel
-        left_panel = ctk.CTkFrame(main_container, fg_color="#1a1a2e", corner_radius=0)
+        left_panel = ctk.CTkFrame(main_container, fg_color="#060606", corner_radius=0)
         left_panel.pack(side="left", fill="both", expand=True)
         
-        # Random image selection
+        # Display login image
         self.display_image = None
         try:
-            assets_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets")
-            image_files = ["Image1.jpg", "image2.jpg", "image3.jpg"]
-            available_images = [os.path.join(assets_path, img) for img in image_files if os.path.exists(os.path.join(assets_path, img))]
+            assets_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "login_images")
+            image_path = os.path.join(assets_path, "loginimage01.jpg")
             
-            if available_images:
-                selected_image_path = random.choice(available_images)
-                login_img = Image.open(selected_image_path)
+            if os.path.exists(image_path):
+                login_img = Image.open(image_path)
                 
-                # Calculate image size
+                # Calculate image size to fill left panel while maintaining aspect ratio
                 window_height = int(self.winfo_screenheight() * 0.8)
-                target_height = window_height - 100
+                target_height = window_height
                 aspect_ratio = login_img.width / login_img.height
                 target_width = int(target_height * aspect_ratio)
                 
@@ -341,7 +338,7 @@ class LoginWindow(ctk.CTkToplevel):
                     size=(target_width, target_height)
                 )
                 
-                img_label = ctk.CTkLabel(left_panel, image=self.display_image, text="")
+                img_label = ctk.CTkLabel(left_panel, image=self.display_image, text="", fg_color="#060606")
                 img_label.place(relx=0.5, rely=0.5, anchor="center")
         except Exception as e:
             print(f"Could not load login image: {e}")
@@ -354,7 +351,7 @@ class LoginWindow(ctk.CTkToplevel):
             fallback.place(relx=0.5, rely=0.5, anchor="center")
         
         # Right side - Login form panel
-        right_panel = ctk.CTkFrame(main_container, fg_color="#1a1a2e", width=520, corner_radius=0)
+        right_panel = ctk.CTkFrame(main_container, fg_color="#060606", width=520, corner_radius=0)
         right_panel.pack(side="right", fill="y")
         right_panel.pack_propagate(False)
         
@@ -381,10 +378,10 @@ class LoginWindow(ctk.CTkToplevel):
         except Exception as e:
             print(f"Could not load logo: {e}")
         
-        # Subtitle only (logo already contains brand name)
+        # Welcoming subtitle message
         subtitle_label = ctk.CTkLabel(
             form_container,
-            text="Photography POS System",
+            text="Welcome! Please login to your account",
             font=ctk.CTkFont(size=15),
             text_color="#888888"
         )
@@ -407,13 +404,16 @@ class LoginWindow(ctk.CTkToplevel):
             width=420,
             font=ctk.CTkFont(size=15),
             border_width=2,
-            corner_radius=8
+            corner_radius=20
         )
         self.username_entry.pack(pady=(0, 25))
         
-        # Password field
+        # Password field with visibility toggle
+        password_container = ctk.CTkFrame(form_container, fg_color="transparent")
+        password_container.pack(pady=(0, 35))
+        
         password_label = ctk.CTkLabel(
-            form_container,
+            password_container,
             text="Password",
             font=ctk.CTkFont(size=14, weight="bold"),
             text_color="#cccccc",
@@ -421,17 +421,36 @@ class LoginWindow(ctk.CTkToplevel):
         )
         password_label.pack(pady=(0, 10), anchor="w", padx=5)
         
+        # Password entry and toggle button container
+        password_input_frame = ctk.CTkFrame(password_container, fg_color="transparent")
+        password_input_frame.pack()
+        
         self.password_entry = ctk.CTkEntry(
-            form_container,
+            password_input_frame,
             placeholder_text="Enter your password",
             show="●",
             height=48,
-            width=420,
+            width=360,
             font=ctk.CTkFont(size=15),
             border_width=2,
-            corner_radius=8
+            corner_radius=20
         )
-        self.password_entry.pack(pady=(0, 35))
+        self.password_entry.pack(side="left", padx=(0, 10))
+        
+        # Password visibility toggle
+        self.password_visible = False
+        self.toggle_password_btn = ctk.CTkButton(
+            password_input_frame,
+            text="👁",
+            command=self.toggle_password_visibility,
+            width=50,
+            height=48,
+            font=ctk.CTkFont(size=18),
+            fg_color="#2b2b2b",
+            hover_color="#3d3d3d",
+            corner_radius=20
+        )
+        self.toggle_password_btn.pack(side="left")
         
         # Login button with enhanced styling
         login_btn = ctk.CTkButton(
@@ -441,9 +460,9 @@ class LoginWindow(ctk.CTkToplevel):
             height=52,
             width=420,
             font=ctk.CTkFont(size=17, weight="bold"),
-            fg_color="#1f538d",
-            hover_color="#163d6b",
-            corner_radius=8,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=25,
             border_width=0
         )
         login_btn.pack(pady=(0, 20))
@@ -453,7 +472,7 @@ class LoginWindow(ctk.CTkToplevel):
             right_panel,
             text="Developed by Malinda Prabath\n© 2025 Photography Studio Management System. All rights reserved.",
             font=ctk.CTkFont(size=11),
-            text_color="#555555",
+            text_color="#888888",
             justify="center"
         )
         footer_label.pack(side="bottom", pady=25)
@@ -464,6 +483,15 @@ class LoginWindow(ctk.CTkToplevel):
         
         # Set focus
         self.after(100, lambda: self.username_entry.focus())
+    
+    def toggle_password_visibility(self):
+        """Toggle password visibility"""
+        if self.password_visible:
+            self.password_entry.configure(show="●")
+            self.password_visible = False
+        else:
+            self.password_entry.configure(show="")
+            self.password_visible = True
     
     def handle_login(self):
         """Handle login button click"""
