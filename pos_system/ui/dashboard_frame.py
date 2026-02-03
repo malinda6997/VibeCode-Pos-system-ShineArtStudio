@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from services.dashboard_service import DashboardService
-from services.industrial_report_generator import (
+from services.executive_report_generator import (
     generate_daily_report,
     generate_weekly_report,
     generate_monthly_report
@@ -568,7 +568,7 @@ class DashboardFrame(ctk.CTkFrame):
             messagebox.showerror("Error", "Failed to add expense")
     
     def generate_report(self, report_type: str):
-        """Generate Industrial PDF report"""
+        """Generate Executive PDF report with cover page and TOC"""
         try:
             if report_type == "daily":
                 result = generate_daily_report()
@@ -596,7 +596,7 @@ class DashboardFrame(ctk.CTkFrame):
                     )
                 
                 message = (
-                    f"✅ {report_type.capitalize()} Industrial Report Generated!\n\n"
+                    f"✅ {report_type.capitalize()} Executive Report Generated!\n\n"
                     f"📊 Financial Summary:\n"
                     f"Opening Balance: LKR {summary['opening_balance']:,.2f}\n"
                     f"Total Income: LKR {summary['total_income']:,.2f}\n"
@@ -604,6 +604,8 @@ class DashboardFrame(ctk.CTkFrame):
                     f"Net Profit/Loss: LKR {summary['net_balance']:,.2f}\n"
                     f"Closing Balance: LKR {summary['closing_balance']:,.2f}"
                     f"{analytics_info}\n"
+                    f"📄 Features: Cover Page, Table of Contents, Dynamic Insights\n"
+                    f"👨‍💻 Developer: Malinda Prabath\n\n"
                     f"📁 Saved as: {result['filename']}"
                 )
                 

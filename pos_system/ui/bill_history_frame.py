@@ -5,11 +5,12 @@ from services.bill_generator import BillGenerator
 
 
 class BillHistoryFrame(BaseFrame):
-    """Bill history viewing and reprinting interface (non-booking invoices)"""
+    """Bill history viewing and reprinting interface (thermal bills)"""
     
     def __init__(self, parent, auth_manager, db_manager):
         super().__init__(parent, auth_manager, db_manager)
         self.bill_generator = BillGenerator()
+        self.filter_type = "all"  # 'all', 'registered', 'guest'
         self.create_widgets()
         self.load_bills()
     
@@ -48,6 +49,48 @@ class BillHistoryFrame(BaseFrame):
             hover_color="#7300D6",
             corner_radius=20
         ).pack(side="left", padx=10)
+        
+        # Filter frame
+        filter_frame = ctk.CTkFrame(controls_frame, fg_color="transparent")
+        filter_frame.pack(side="left", padx=15)
+        
+        ctk.CTkLabel(
+            filter_frame,
+            text="Filter:",
+            font=ctk.CTkFont(size=12, weight="bold")
+        ).pack(side="left", padx=5)
+        
+        self.filter_var = ctk.StringVar(value="all")
+        
+        ctk.CTkRadioButton(
+            filter_frame,
+            text="All",
+            variable=self.filter_var,
+            value="all",
+            command=self.apply_filter,
+            fg_color="#8C00FF",
+            hover_color="#7300D6"
+        ).pack(side="left", padx=3)
+        
+        ctk.CTkRadioButton(
+            filter_frame,
+            text="Registered",
+            variable=self.filter_var,
+            value="registered",
+            command=self.apply_filter,
+            fg_color="#8C00FF",
+            hover_color="#7300D6"
+        ).pack(side="left", padx=3)
+        
+        ctk.CTkRadioButton(
+            filter_frame,
+            text="Guest",
+            variable=self.filter_var,
+            value="guest",
+            command=self.apply_filter,
+            fg_color="#8C00FF",
+            hover_color="#7300D6"
+        ).pack(side="left", padx=3)
         
         ctk.CTkButton(
             controls_frame,
@@ -149,16 +192,27 @@ class BillHistoryFrame(BaseFrame):
         self.tree.bind("<Double-Button-1>", lambda e: self.view_bill_details())
     
     def load_bills(self):
-        """Load only regular bills (not booking invoices)"""
+        """Load bills from bills table with filter support"""
         for item in self.tree.get_children():
             self.tree.delete(item)
         
-        # Get all invoices and filter out booking invoices
-        all_invoices = self.db_manager.get_all_invoices(limit=200)
-        bills = [inv for inv in all_invoices if not inv['invoice_number'].startswith('BK-') and not inv.get('booking_id')]
+        # Get all bills
+        all_bills = self.db_manager.get_all_bills(limit=500)
+        
+        # Apply filter
+        self.filter_type = self.filter_var.get()
+        if self.filter_type == "registered":
+            bills = [b for b in all_bills if b['customer_id'] is not None]
+        elif self.filter_type == "guest":
+            bills = [b for b in all_bills if b['customer_id'] is None and b['guest_name']]
+        else:  # all
+            bills = all_bills
         
         for i, bill in enumerate(bills):
-            balance = bill['balance_amount']
+            # Calculate balance
+            balance = bill.get('balance_due', 0) or 0
+            advance = bill.get('advance_amount', 0) or 0
+            
             # Highlight bills with pending balance
             if balance > 0:
                 tag = 'hasbalance'
@@ -166,25 +220,32 @@ class BillHistoryFrame(BaseFrame):
                 tag = 'evenrow' if i % 2 == 0 else 'oddrow'
             
             # Count items for this bill
-            items = self.db_manager.get_invoice_items(bill['id'])
+            items = self.db_manager.get_bill_items(bill['id'])
             item_count = len(items)
             
+            # Display mobile or "Guest Customer"
+            mobile_display = bill['mobile_number'] if bill['mobile_number'] else 'Guest Customer'
+            
             self.tree.insert("", "end", values=(
-                bill['invoice_number'],
+                bill['bill_number'],
                 bill['created_at'],
-                bill['full_name'],
-                bill['mobile_number'] or 'N/A',
+                bill['full_name'] or 'Unknown',
+                mobile_display,
                 item_count,
                 f"{bill['total_amount']:.2f}",
-                f"{bill['paid_amount']:.2f}",
-                f"{bill['balance_amount']:.2f}"
+                f"{advance:.2f}",
+                f"{balance:.2f}"
             ), tags=(tag,))
         
         # Update record count
         self.record_count_label.configure(text=f"{len(bills)} records")
     
+    def apply_filter(self):
+        """Apply the selected filter and reload bills"""
+        self.load_bills()
+    
     def search_bills(self):
-        """Search regular bills only"""
+        """Search bills with filter support"""
         search_term = self.search_entry.get().strip()
         
         for item in self.tree.get_children():
@@ -194,30 +255,44 @@ class BillHistoryFrame(BaseFrame):
             self.load_bills()
             return
         
-        all_invoices = self.db_manager.search_invoices(search_term)
-        # Filter to only regular bills (not booking invoices)
-        bills = [inv for inv in all_invoices if not inv['invoice_number'].startswith('BK-') and not inv.get('booking_id')]
+        # Search in bills table
+        all_bills = self.db_manager.search_bills(search_term)
+        
+        # Apply filter
+        self.filter_type = self.filter_var.get()
+        if self.filter_type == "registered":
+            bills = [b for b in all_bills if b['customer_id'] is not None]
+        elif self.filter_type == "guest":
+            bills = [b for b in all_bills if b['customer_id'] is None and b['guest_name']]
+        else:  # all
+            bills = all_bills
         
         for i, bill in enumerate(bills):
-            balance = bill['balance_amount']
+            # Calculate balance
+            balance = bill.get('balance_due', 0) or 0
+            advance = bill.get('advance_amount', 0) or 0
+            
             if balance > 0:
                 tag = 'hasbalance'
             else:
                 tag = 'evenrow' if i % 2 == 0 else 'oddrow'
             
             # Count items for this bill
-            items = self.db_manager.get_invoice_items(bill['id'])
+            items = self.db_manager.get_bill_items(bill['id'])
             item_count = len(items)
             
+            # Display mobile or "Guest Customer"
+            mobile_display = bill['mobile_number'] if bill['mobile_number'] else 'Guest Customer'
+            
             self.tree.insert("", "end", values=(
-                bill['invoice_number'],
+                bill['bill_number'],
                 bill['created_at'],
-                bill['full_name'],
-                bill['mobile_number'] or 'N/A',
+                bill['full_name'] or 'Unknown',
+                mobile_display,
                 item_count,
                 f"{bill['total_amount']:.2f}",
-                f"{bill['paid_amount']:.2f}",
-                f"{bill['balance_amount']:.2f}"
+                f"{advance:.2f}",
+                f"{balance:.2f}"
             ), tags=(tag,))
         
         # Update record count
@@ -233,12 +308,12 @@ class BillHistoryFrame(BaseFrame):
         item = self.tree.item(selection[0])
         bill_number = item['values'][0]
         
-        bill = self.db_manager.get_invoice_by_number(bill_number)
+        bill = self.db_manager.get_bill_by_number(bill_number)
         if not bill:
             MessageDialog.show_error("Error", "Bill not found")
             return
         
-        items = self.db_manager.get_invoice_items(bill['id'])
+        items = self.db_manager.get_bill_items(bill['id'])
         
         # Create details dialog
         dialog = ctk.CTkToplevel(self)
@@ -265,11 +340,15 @@ class BillHistoryFrame(BaseFrame):
         details_frame.pack(fill="both", expand=True, padx=20, pady=20)
         
         # Bill info
+        customer_type = "👤 Guest Customer" if bill.get('guest_name') else "👤 Registered Customer"
+        mobile_display = bill['mobile_number'] if bill['mobile_number'] else 'Guest Customer'
+        
         info_text = f"""
-📄 Bill Number: {bill['invoice_number']}
+📄 Bill Number: {bill['bill_number']}
 📅 Date: {bill['created_at']}
-👤 Customer: {bill['full_name']}
-📱 Mobile: {bill['mobile_number'] or 'N/A'}
+{customer_type}
+👤 Customer: {bill['full_name'] or 'Unknown'}
+📱 Mobile: {mobile_display}
         """
         
         info_label = ctk.CTkLabel(
@@ -308,13 +387,18 @@ class BillHistoryFrame(BaseFrame):
         items_tree.pack(fill="both", expand=True)
         
         # Payment details
+        service_charge = bill.get('service_charge', 0) or 0
+        advance = bill.get('advance_amount', 0) or 0
+        balance = bill.get('balance_due', 0) or 0
+        
         payment_text = f"""
 -----------------------------------
 Subtotal: LKR {bill['subtotal']:.2f}
-Discount: LKR {bill['discount']:.2f}
+Discount: LKR {bill.get('discount', 0):.2f}
+Service Charge: LKR {service_charge:.2f}
 Total Amount: LKR {bill['total_amount']:.2f}
-Paid Amount: LKR {bill['paid_amount']:.2f}
-Balance: LKR {bill['balance_amount']:.2f}
+Advance Paid: LKR {advance:.2f}
+Balance Due: LKR {balance:.2f}
         """
         
         payment_label = ctk.CTkLabel(
@@ -347,27 +431,38 @@ Balance: LKR {bill['balance_amount']:.2f}
         item = self.tree.item(selection[0])
         bill_number = item['values'][0]
         
-        bill = self.db_manager.get_invoice_by_number(bill_number)
+        bill = self.db_manager.get_bill_by_number(bill_number)
         if not bill:
             MessageDialog.show_error("Error", "Bill not found")
             return
         
-        items = self.db_manager.get_invoice_items(bill['id'])
-        customer = {
-            'full_name': bill['full_name'] or 'Guest',
-            'mobile_number': bill['mobile_number'] or 'N/A'
-        }
+        items = self.db_manager.get_bill_items(bill['id'])
+        
+        # Handle guest vs registered customer
+        if bill.get('guest_name'):
+            customer = {
+                'full_name': bill['guest_name'],
+                'mobile_number': 'Guest Customer'
+            }
+        else:
+            customer = {
+                'full_name': bill['full_name'] or 'Unknown',
+                'mobile_number': bill['mobile_number'] or 'N/A'
+            }
         
         try:
-            # Prepare bill data
+            # Prepare bill data with correct field names
             bill_data = {
-                'bill_number': bill['invoice_number'],
+                'bill_number': bill['bill_number'],
                 'created_at': bill['created_at'],
                 'subtotal': bill['subtotal'],
-                'discount': bill['discount'],
+                'discount': bill.get('discount', 0),
+                'service_charge': bill.get('service_charge', 0),
                 'total_amount': bill['total_amount'],
-                'paid_amount': bill['paid_amount'],
-                'balance_amount': bill['balance_amount']
+                'cash_given': bill.get('cash_given', 0),
+                'advance_amount': bill.get('advance_amount', 0),
+                'balance_due': bill.get('balance_due', 0),
+                'created_by_name': bill.get('created_by_name', 'Staff')
             }
             pdf_path = self.bill_generator.generate_bill(bill_data, items, customer)
             MessageDialog.show_success("Success", f"Bill {bill_number} reprinted successfully!")
@@ -399,16 +494,21 @@ Balance: LKR {bill['balance_amount']:.2f}
         if not confirm:
             return
         
-        bill = self.db_manager.get_invoice_by_number(bill_number)
+        bill = self.db_manager.get_bill_by_number(bill_number)
         if not bill:
             MessageDialog.show_error("Error", "Bill not found")
             return
         
-        if self.db_manager.delete_invoice(bill['id']):
+        # Delete bill and its items
+        try:
+            # Delete bill items first
+            self.db_manager.execute_query('DELETE FROM bill_items WHERE bill_id = ?', (bill['id'],))
+            # Delete bill
+            self.db_manager.execute_query('DELETE FROM bills WHERE id = ?', (bill['id'],))
             MessageDialog.show_success("Success", f"Bill {bill_number} deleted successfully")
             self.load_bills()
-        else:
-            MessageDialog.show_error("Error", "Failed to delete bill")
+        except Exception as e:
+            MessageDialog.show_error("Error", f"Failed to delete bill: {str(e)}")
         
         # Restore focus to main window
         self.restore_focus()

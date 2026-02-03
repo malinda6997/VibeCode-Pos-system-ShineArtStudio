@@ -188,13 +188,35 @@ class BillGenerator:
         )
         story.append(Paragraph(f"{'TOTAL:':<16} Rs.{total:>8.2f}", total_style))
         
-        # Cash handling
-        cash_given = bill_data.get('cash_given', 0) or 0
-        if cash_given > 0:
-            story.append(Paragraph(f"{'Paid:':<16} Rs.{cash_given:>8.2f}", mono_style))
-            balance = cash_given - total
-            if balance >= 0:
-                story.append(Paragraph(f"{'Change:':<16} Rs.{balance:>8.2f}", mono_style))
+        # Payment handling - check for advance payment
+        advance_amount = bill_data.get('advance_amount', 0) or 0
+        balance_due = bill_data.get('balance_due', 0) or 0
+        
+        if advance_amount > 0 and balance_due > 0:
+            # Advance payment bill
+            story.append(Spacer(1, 1*mm))
+            story.append(Paragraph(f"{'Advance Paid:':<16} Rs.{advance_amount:>8.2f}", mono_style))
+            
+            # Balance due in bold
+            balance_style = ParagraphStyle(
+                'BalanceBold',
+                fontSize=9,
+                textColor=colors.black,
+                fontName='Courier-Bold',
+                alignment=TA_LEFT,
+                spaceAfter=0,
+                spaceBefore=0,
+                leading=11
+            )
+            story.append(Paragraph(f"{'BALANCE DUE:':<16} Rs.{balance_due:>8.2f}", balance_style))
+        else:
+            # Full payment or cash given handling
+            cash_given = bill_data.get('cash_given', 0) or 0
+            if cash_given > 0:
+                story.append(Paragraph(f"{'Paid:':<16} Rs.{cash_given:>8.2f}", mono_style))
+                change = cash_given - total
+                if change >= 0:
+                    story.append(Paragraph(f"{'Change:':<16} Rs.{change:>8.2f}", mono_style))
         
         story.append(Spacer(1, 4*mm))
         

@@ -1511,11 +1511,32 @@ class BillingFrame(BaseFrame):
                 return
             cash_given = float(cash_given_str)
 
-        # For bills, payment must be full (no advance payment)
-        # Bills are for normal sales, not bookings
+        # Calculate advance amount and balance due based on payment type
+        advance_amount = 0.0
+        balance_due = 0.0
+        
         if self.payment_type == "advance":
-            MessageDialog.show_error("Error", "Bills do not support advance payment. Use full payment or create a booking for advance payments.")
-            return
+            # Advance payment - validate advance amount
+            advance_str = self.advance_entry.get().strip()
+            if not advance_str or not self.validate_number(advance_str, True):
+                MessageDialog.show_error("Error", "Please enter valid advance payment amount")
+                return
+            
+            advance_amount = float(advance_str)
+            
+            if advance_amount <= 0:
+                MessageDialog.show_error("Error", "Advance payment must be greater than 0")
+                return
+            
+            if advance_amount > total:
+                MessageDialog.show_error("Error", "Advance payment cannot exceed total amount")
+                return
+            
+            balance_due = total - advance_amount
+        else:
+            # Full payment - no advance or balance
+            advance_amount = total
+            balance_due = 0.0
 
         bill_number = self.db_manager.generate_bill_number()
 
@@ -1536,7 +1557,9 @@ class BillingFrame(BaseFrame):
             self.auth_manager.get_user_id(),
             service_charge,
             cash_given,
-            guest_name
+            guest_name,
+            advance_amount,
+            balance_due
         )
 
         if not bill_id:

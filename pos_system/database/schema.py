@@ -206,12 +206,24 @@ class DatabaseSchema:
                 service_charge REAL DEFAULT 0,
                 total_amount REAL NOT NULL,
                 cash_given REAL DEFAULT 0,
+                advance_amount REAL DEFAULT 0,
+                balance_due REAL DEFAULT 0,
                 created_by INTEGER NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (customer_id) REFERENCES customers (id),
                 FOREIGN KEY (created_by) REFERENCES users (id)
             )
         ''')
+        
+        # Add advance_amount and balance_due columns if they don't exist (migration)
+        try:
+            self.cursor.execute('ALTER TABLE bills ADD COLUMN advance_amount REAL DEFAULT 0')
+        except:
+            pass
+        try:
+            self.cursor.execute('ALTER TABLE bills ADD COLUMN balance_due REAL DEFAULT 0')
+        except:
+            pass
         
         # Bill items table
         self.cursor.execute('''

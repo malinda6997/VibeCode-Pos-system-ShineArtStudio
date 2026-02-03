@@ -1,6 +1,6 @@
 """
 Industrial-Grade Financial Analytics Report Generator
-High-End Professional PDF Reports with Advanced Analytics & Visualizations
+Multi-Page Executive Document with Cover Page, TOC, and Dynamic Insights
 """
 
 import os
@@ -13,12 +13,13 @@ from typing import Dict, List, Tuple, Any
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm, inch
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT, TA_JUSTIFY
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, 
-    Image, HRFlowable, KeepTogether, PageBreak
+    Image, HRFlowable, KeepTogether, PageBreak, TableOfContents
 )
 from reportlab.lib import colors
+from reportlab.pdfgen import canvas
 
 # Matplotlib imports for charts
 import matplotlib
@@ -28,9 +29,9 @@ import matplotlib.patches as mpatches
 
 
 class IndustrialReportGenerator:
-    """Generate high-end industrial financial analytics PDF reports"""
+    """Generate multi-page executive financial analytics PDF reports"""
     
-    # MINIMALIST COLOR PALETTE - Black & White with subtle grays
+    # MINIMALIST COLOR PALETTE - Black & White with purple accent
     COLOR_BLACK = colors.HexColor('#000000')
     COLOR_DARKGRAY = colors.HexColor('#333333')
     COLOR_MEDIUMGRAY = colors.HexColor('#666666')
@@ -38,25 +39,166 @@ class IndustrialReportGenerator:
     COLOR_VERYLIGHTGRAY = colors.HexColor('#CCCCCC')
     COLOR_ULTRALIGHTGRAY = colors.HexColor('#F5F5F5')
     COLOR_WHITE = colors.HexColor('#FFFFFF')
+    COLOR_PURPLE_ACCENT = colors.HexColor('#8C00FF')  # Premium accent color
     
     # Thin elegant line thickness
     LINE_THIN = 0.5
     LINE_MEDIUM = 1.0
+    LINE_ACCENT = 2.0  # For purple accent lines
     
     # Professional font sizes
+    FONT_TITLE = 18
     FONT_HEADER = 11
     FONT_SUBHEADER = 10
     FONT_BODY = 9
     FONT_SMALL = 8
     FONT_TINY = 7
     
+    # Company Information
+    COMPANY_NAME = "Studio Shine Art"
+    COMPANY_REG = "Reg No: 26/3610"
+    COMPANY_ADDRESS = "No: 52/1/1, Maravila Road, Nattandiya"
+    COMPANY_CONTACT = "0767898604 / 0322051680"
+    DEVELOPER_CREDIT = "System developed by Malinda Prabath | malindaprabath876@gmail.com | 076 220 6157"
+    
     def __init__(self, db_path='pos_database.db'):
         self.db_path = db_path
         self.reports_dir = 'reports'
         os.makedirs(self.reports_dir, exist_ok=True)
+        self.current_page = 1
+        self.total_pages = 0
+    
+    def _add_page_footer(self, canvas_obj, doc):
+        """Add footer with developer credit and page numbers to every page"""
+        canvas_obj.saveState()
+        page_width = A4[0]
+        page_height = A4[1]
+        
+        # Developer credit on left
+        canvas_obj.setFont('Helvetica', 7)
+        canvas_obj.setFillColor(self.COLOR_LIGHTGRAY)
+        canvas_obj.drawString(15*mm, 10*mm, self.DEVELOPER_CREDIT)
+        
+        # Page number on right
+        page_num_text = f"Page {doc.page} of {self.total_pages}"
+        canvas_obj.drawRightString(page_width - 15*mm, 10*mm, page_num_text)
+        
+        canvas_obj.restoreState()
+    
+    def _clean_html_tags(self, text: str) -> str:
+        """Remove all HTML tags from text"""
+        if not isinstance(text, str):
+            return str(text)
+        
+        # Remove common HTML tags
+        cleaned = text.replace('<b>', '').replace('</b>', '')
+        cleaned = cleaned.replace('<i>', '').replace('</i>', '')
+        cleaned = cleaned.replace('<u>', '').replace('</u>', '')
+        
+        # Remove font color tags
+        import re
+        cleaned = re.sub(r'<font[^>]*>', '', cleaned)
+        cleaned = cleaned.replace('</font>', '')
+        
+        return cleaned
+    
+    def get_report_summary(self, analytics: Dict, summary: Dict) -> Dict[str, str]:
+        """
+        Generate dynamic contextual descriptions for each section
+        Smart analysis of data to provide executive insights
+        """
+        insights = {}
+        
+        # Revenue Insight
+        top_service = None
+        top_revenue = 0
+        if analytics['service_revenue']:
+            for category, data in analytics['service_revenue'].items():
+                if data['revenue'] > top_revenue:
+                    top_revenue = data['revenue']
+                    top_service = category
+        
+        if summary['net_balance'] < 0:
+            insights['revenue'] = (
+                f"Revenue Analysis: The reporting period shows a net loss of LKR {abs(summary['net_balance']):,.2f}. "
+                f"{'The highest revenue generator was ' + top_service + ' category.' if top_service else 'Immediate corrective action is recommended.'} "
+                f"Management should review expense optimization strategies and revenue enhancement opportunities."
+            )
+        else:
+            insights['revenue'] = (
+                f"Revenue Analysis: The period generated a net profit of LKR {summary['net_balance']:,.2f}. "
+                f"{'The ' + top_service + ' category emerged as the top revenue contributor.' if top_service else 'Performance metrics indicate positive operational efficiency.'} "
+                f"Total income reached LKR {summary['total_income']:,.2f} with controlled expenses of LKR {summary['total_expenses']:,.2f}."
+            )
+        
+        # Customer Insight
+        new_customers = analytics['user_insights'].get('new_customers', 0)
+        total_customers = analytics['user_insights'].get('total_customers', 0)
+        returning_customers = total_customers - new_customers
+        
+        insights['customers'] = (
+            f"Customer Acquisition: During this period, {new_customers} new customers were acquired, "
+            f"bringing the total active customer base to {total_customers}. "
+            f"Returning customers account for {returning_customers} of the total base, indicating "
+            f"{'strong' if returning_customers > new_customers else 'developing'} customer retention and loyalty metrics."
+        )
+        
+        # Booking Insight
+        total_bookings = 0
+        completed_bookings = 0
+        cancelled_bookings = 0
+        
+        for status, data in analytics['booking_status'].items():
+            total_bookings += data['count']
+            if status == 'Completed':
+                completed_bookings = data['count']
+            elif status == 'Cancelled':
+                cancelled_bookings = data['count']
+        
+        if total_bookings > 0:
+            completion_rate = (completed_bookings / total_bookings) * 100
+            cancellation_rate = (cancelled_bookings / total_bookings) * 100
+            
+            insights['bookings'] = (
+                f"Booking Performance: A total of {total_bookings} bookings were processed during this period, "
+                f"achieving a {completion_rate:.1f}% completion rate with {cancelled_bookings} cancellations ({cancellation_rate:.1f}%). "
+                f"{'This completion rate exceeds industry benchmarks.' if completion_rate >= 80 else 'Completion rate requires attention to improve operational efficiency.'}"
+            )
+        else:
+            insights['bookings'] = (
+                f"Booking Performance: No bookings were recorded during this reporting period. "
+                f"This may indicate seasonal variations or requires investigation into market conditions and promotional strategies."
+            )
+        
+        # Payment Insight
+        advance_received = analytics['payment_metrics'].get('advance_received', 0)
+        balance_due = analytics['payment_metrics'].get('balance_due', 0)
+        
+        if advance_received + balance_due > 0:
+            advance_percentage = (advance_received / (advance_received + balance_due)) * 100
+            insights['payments'] = (
+                f"Payment Collection: Advance payments of LKR {advance_received:,.2f} were collected, "
+                f"representing {advance_percentage:.1f}% of total booking values. "
+                f"Outstanding balances amount to LKR {balance_due:,.2f}, requiring follow-up and collection procedures."
+            )
+        else:
+            insights['payments'] = (
+                f"Payment Collection: No payment transactions were recorded during this period. "
+                f"Financial operations appear dormant and require management attention."
+            )
+        
+        # Expense Insight
+        expense_count = len(analytics['expense_details'])
+        insights['expenses'] = (
+            f"Expense Management: {expense_count} manual expense transactions totaling LKR {summary['total_expenses']:,.2f} "
+            f"were recorded. Expense tracking and categorization are functioning as designed. "
+            f"{'Expense levels are within acceptable operational parameters.' if summary['net_balance'] >= 0 else 'Expense optimization is recommended to improve profitability.'}"
+        )
+        
+        return insights
     
     def _create_chart(self, chart_type: str, data: Dict, title: str) -> BytesIO:
-        """Generate matplotlib chart and return as BytesIO"""
+        """Generate matplotlib chart with purple accents and return as BytesIO"""
         fig, ax = plt.subplots(figsize=(6, 3), facecolor='white')
         
         if chart_type == 'pie':
@@ -72,8 +214,8 @@ class IndustrialReportGenerator:
             
             labels, sizes = zip(*filtered_data)
             
-            # Black and white color scheme with grays
-            colors_list = ['#333333', '#666666', '#999999', '#CCCCCC', '#E5E5E5']
+            # Black, white, and gray color scheme with purple accent for top slice
+            colors_list = ['#8C00FF', '#333333', '#666666', '#999999', '#CCCCCC']
             
             wedges, texts, autotexts = ax.pie(
                 sizes, labels=labels, autopct='%1.1f%%',
@@ -83,7 +225,7 @@ class IndustrialReportGenerator:
             
             # Make percentage text bold and white on dark slices
             for i, autotext in enumerate(autotexts):
-                autotext.set_color('white' if i < 2 else 'black')
+                autotext.set_color('white' if i == 0 else 'black')
                 autotext.set_fontsize(7)
                 autotext.set_weight('bold')
             
@@ -94,7 +236,9 @@ class IndustrialReportGenerator:
             categories = list(data.keys())
             values = list(data.values())
             
-            bars = ax.barh(categories, values, color=['#333333', '#666666'])
+            # Purple for income, dark gray for expenses
+            bar_colors = ['#8C00FF' if cat == 'Income' else '#333333' for cat in categories]
+            bars = ax.barh(categories, values, color=bar_colors)
             
             # Add value labels on bars
             for i, (bar, value) in enumerate(zip(bars, values)):
@@ -109,7 +253,6 @@ class IndustrialReportGenerator:
             ax.spines['bottom'].set_color('#CCCCCC')
             ax.grid(axis='x', alpha=0.2, linestyle='--', color='#CCCCCC')
         
-        # Remove title (minimalist design)
         plt.tight_layout()
         
         # Save to BytesIO

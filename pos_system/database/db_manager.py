@@ -641,17 +641,20 @@ class DatabaseManager:
     def create_bill(self, bill_number: str, customer_id: int, subtotal: float,
                    discount: float, total_amount: float, created_by: int,
                    service_charge: float = 0, cash_given: float = 0,
-                   guest_name: str = None) -> Optional[int]:
+                   guest_name: str = None, advance_amount: float = 0,
+                   balance_due: float = 0) -> Optional[int]:
         """Create a new bill (thermal receipt) for normal sales.
-        For guest customers, customer_id is None and guest_name is provided."""
+        For guest customers, customer_id is None and guest_name is provided.
+        Supports both full and advance payment."""
         query = '''
             INSERT INTO bills (bill_number, customer_id, guest_name, subtotal, discount,
-                             service_charge, total_amount, cash_given, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             service_charge, total_amount, cash_given, advance_amount, 
+                             balance_due, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         '''
         return self.execute_insert(query, (bill_number, customer_id, guest_name, subtotal,
                                           discount, service_charge, total_amount, 
-                                          cash_given, created_by))
+                                          cash_given, advance_amount, balance_due, created_by))
     
     def add_bill_item(self, bill_id: int, item_type: str, item_id: int,
                      item_name: str, quantity: int, unit_price: float,
@@ -697,11 +700,46 @@ class DatabaseManager:
         query = '''
             SELECT b.*, 
                    COALESCE(c.full_name, b.guest_name) as full_name,
-                   c.mobile_number
+                   c.mobile_number,
+                   u.full_name as created_by_name
             FROM bills b
             LEFT JOIN customers c ON b.customer_id = c.id
+            LEFT JOIN users u ON b.created_by = u.id
             ORDER BY b.created_at DESC
             LIMIT ?
         '''
         return self.execute_query(query, (limit,))
+    
+    def search_bills(self, search_term: str) -> List[Dict[str, Any]]:
+        """Search bills by bill number, customer name, or mobile"""
+        query = '''
+            SELECT b.*, 
+                   COALESCE(c.full_name, b.guest_name) as full_name,
+                   c.mobile_number,
+                   u.full_name as created_by_name
+            FROM bills b
+            LEFT JOIN customers c ON b.customer_id = c.id
+            LEFT JOIN users u ON b.created_by = u.id
+            WHERE b.bill_number LIKE ?
+               OR COALESCE(c.full_name, b.guest_name) LIKE ?
+               OR c.mobile_number LIKE ?
+            ORDER BY b.created_at DESC
+        '''
+        search_pattern = f"%{search_term}%"
+        return self.execute_query(query, (search_pattern, search_pattern, search_pattern))
+    
+    def get_bill_by_number(self, bill_number: str) -> Optional[Dict[str, Any]]:
+        """Get bill by bill number with customer info"""
+        query = '''
+            SELECT b.*, 
+                   COALESCE(c.full_name, b.guest_name) as full_name,
+                   c.mobile_number,
+                   u.full_name as created_by_name
+            FROM bills b
+            LEFT JOIN customers c ON b.customer_id = c.id
+            LEFT JOIN users u ON b.created_by = u.id
+            WHERE b.bill_number = ?
+        '''
+        results = self.execute_query(query, (bill_number,))
+        return results[0] if results else None
 
