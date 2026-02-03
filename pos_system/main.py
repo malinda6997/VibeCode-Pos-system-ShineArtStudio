@@ -46,9 +46,9 @@ class MainApplication(ctk.CTk):
         
         # Modern table styling with gradient-like effect
         style.configure("Treeview",
-            background="#1a1a2e",
+            background="#0d0d1a",
             foreground="#e0e0e0",
-            fieldbackground="#1a1a2e",
+            fieldbackground="#0d0d1a",
             font=("Segoe UI", 12),
             rowheight=45,
             borderwidth=0
@@ -56,8 +56,8 @@ class MainApplication(ctk.CTk):
         
         # Modern header styling with accent color
         style.configure("Treeview.Heading",
-            background="#252545",
-            foreground="#00d4ff",
+            background="#1a1a2e",
+            foreground="#8C00FF",
             font=("Segoe UI", 12, "bold"),
             borderwidth=0,
             relief="flat",
@@ -67,11 +67,11 @@ class MainApplication(ctk.CTk):
         # Selection and hover effects
         style.map("Treeview",
             background=[
-                ("selected", "#00d4ff"),
-                ("!selected", "#1a1a2e")
+                ("selected", "#8C00FF"),
+                ("!selected", "#0d0d1a")
             ],
             foreground=[
-                ("selected", "#1a1a2e"),
+                ("selected", "#ffffff"),
                 ("!selected", "#e0e0e0")
             ]
         )
@@ -79,19 +79,19 @@ class MainApplication(ctk.CTk):
         # Header hover effect
         style.map("Treeview.Heading",
             background=[
-                ("active", "#3d3d7a"),
-                ("!active", "#252545")
+                ("active", "#7300D6"),
+                ("!active", "#1a1a2e")
             ],
             foreground=[
-                ("active", "#00ff88"),
-                ("!active", "#00d4ff")
+                ("active", "#ffffff"),
+                ("!active", "#8C00FF")
             ]
         )
         
         # Modern scrollbar styling
         style.configure("Vertical.TScrollbar",
             background="#2d2d5a",
-            troughcolor="#1a1a2e",
+            troughcolor="#0d0d1a",
             borderwidth=0,
             arrowsize=0,
             width=12
@@ -99,7 +99,7 @@ class MainApplication(ctk.CTk):
         
         style.map("Vertical.TScrollbar",
             background=[
-                ("active", "#00d4ff"),
+                ("active", "#8C00FF"),
                 ("!active", "#3d3d7a")
             ]
         )
@@ -208,7 +208,7 @@ class MainApplication(ctk.CTk):
         """Create main application interface with modern sidebar"""
         
         # Main container
-        self.main_container = ctk.CTkFrame(self, fg_color="#0d0d1a")
+        self.main_container = ctk.CTkFrame(self, fg_color="#060606")
         self.main_container.pack(fill="both", expand=True)
         
         # Create sidebar with navigation
@@ -220,7 +220,7 @@ class MainApplication(ctk.CTk):
         right_container.pack(fill="both", expand=True, side="right")
         
         # Top bar
-        top_bar = ctk.CTkFrame(right_container, height=60, fg_color="#1a1a2e")
+        top_bar = ctk.CTkFrame(right_container, height=60, fg_color="#0d0d1a")
         top_bar.pack(fill="x", side="top")
         top_bar.pack_propagate(False)
         
@@ -241,12 +241,13 @@ class MainApplication(ctk.CTk):
             height=35,
             fg_color="#ff4757",
             hover_color="#ff3344",
-            font=ctk.CTkFont(size=12, weight="bold")
+            font=ctk.CTkFont(size=12, weight="bold"),
+            corner_radius=20
         )
         logout_btn.pack(side="right", padx=5)
         
         # Content area
-        self.content_frame = ctk.CTkFrame(right_container, fg_color="#0d0d1a")
+        self.content_frame = ctk.CTkFrame(right_container, fg_color="#060606")
         self.content_frame.pack(fill="both", expand=True, padx=5, pady=5)
         
         # Show default view (Dashboard)

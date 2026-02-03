@@ -11,7 +11,7 @@ class Sidebar(ctk.CTkFrame):
     COLLAPSED_WIDTH = 70
     
     def __init__(self, parent, auth_manager, on_navigate: Callable):
-        super().__init__(parent, fg_color="#1a1a2e", width=self.EXPANDED_WIDTH, corner_radius=0)
+        super().__init__(parent, fg_color="#0d0d1a", width=self.EXPANDED_WIDTH, corner_radius=0)
         self.pack_propagate(False)
         
         self.auth_manager = auth_manager
@@ -47,10 +47,10 @@ class Sidebar(ctk.CTkFrame):
             text="☰",
             font=ctk.CTkFont(size=20),
             fg_color="transparent",
-            hover_color="#2d2d5a",
+            hover_color="#1a1a2e",
             width=40,
             height=40,
-            corner_radius=8,
+            corner_radius=20,
             command=self.toggle_sidebar
         )
         self.toggle_btn.pack(side="left", padx=10)
@@ -88,21 +88,21 @@ class Sidebar(ctk.CTkFrame):
                 self.logo_frame,
                 text="✨ Shine Art Studio",
                 font=ctk.CTkFont(size=16, weight="bold"),
-                text_color="#00d4ff"
+                text_color="#8C00FF"
             )
             self.logo_label.pack(pady=(10, 5))
             self.collapsible_labels.append(self.logo_label)
         
         # Separator
-        sep = ctk.CTkFrame(self, fg_color="#333355", height=2)
+        sep = ctk.CTkFrame(self, fg_color="#1a1a2e", height=2)
         sep.pack(fill="x", padx=20, pady=10)
         
         # Scrollable navigation container
         self.nav_scroll = ctk.CTkScrollableFrame(
             self, 
             fg_color="transparent",
-            scrollbar_button_color="#333355",
-            scrollbar_button_hover_color="#444477"
+            scrollbar_button_color="#1a1a2e",
+            scrollbar_button_hover_color="#8C00FF"
         )
         self.nav_scroll.pack(fill="both", expand=True, padx=5)
         
@@ -141,7 +141,7 @@ class Sidebar(ctk.CTkFrame):
         
         # Admin section - only show for admin users
         if self.auth_manager.is_admin():
-            self.admin_sep = ctk.CTkFrame(self.nav_scroll, fg_color="#333355", height=1)
+            self.admin_sep = ctk.CTkFrame(self.nav_scroll, fg_color="#1a1a2e", height=1)
             self.admin_sep.pack(fill="x", padx=10, pady=10)
             
             self.admin_label = ctk.CTkLabel(
@@ -158,7 +158,7 @@ class Sidebar(ctk.CTkFrame):
                     self.create_nav_button(self.nav_scroll, tab_id, icon, text)
         
         # Separator before bottom items
-        bottom_sep = ctk.CTkFrame(self.nav_scroll, fg_color="#333355", height=1)
+        bottom_sep = ctk.CTkFrame(self.nav_scroll, fg_color="#1a1a2e", height=1)
         bottom_sep.pack(fill="x", padx=10, pady=10)
         
         # Bottom section items (filter by permissions)
@@ -167,7 +167,7 @@ class Sidebar(ctk.CTkFrame):
                 self.create_nav_button(self.nav_scroll, tab_id, icon, text)
         
         # User info at very bottom (fixed)
-        self.user_frame = ctk.CTkFrame(self, fg_color="#252545", corner_radius=12)
+        self.user_frame = ctk.CTkFrame(self, fg_color="#1a1a2e", corner_radius=12)
         self.user_frame.pack(fill="x", padx=12, pady=(10, 15))
         
         user = self.auth_manager.get_current_user()
@@ -191,7 +191,7 @@ class Sidebar(ctk.CTkFrame):
             self.collapsible_labels.append(self.user_name_label)
             
             # Role badge with styling
-            role_color = "#00d4ff" if user['role'] == 'Admin' else "#00ff88"
+            role_color = "#8C00FF" if user['role'] == 'Admin' else "#00ff88"
             self.user_role_label = ctk.CTkLabel(
                 self.user_info_frame,
                 text=f"● {user['role']}",
@@ -226,7 +226,7 @@ class Sidebar(ctk.CTkFrame):
                 self.user_content,
                 text="👤",
                 font=ctk.CTkFont(size=24),
-                text_color="#00d4ff"
+                text_color="#8C00FF"
             )
             # Hidden by default in expanded state
         
@@ -408,10 +408,10 @@ class Sidebar(ctk.CTkFrame):
             text=f"{icon}  {text}",
             font=ctk.CTkFont(size=14),
             fg_color="transparent",
-            hover_color="#2d2d5a",
+            hover_color="#1a1a2e",
             anchor="w",
             height=42,
-            corner_radius=8,
+            corner_radius=20,
             command=lambda t=tab_id: self.navigate(t)
         )
         btn.pack(fill="x", pady=2, padx=5)
@@ -429,6 +429,6 @@ class Sidebar(ctk.CTkFrame):
         
         for tid, btn in self.buttons.items():
             if tid == tab_id:
-                btn.configure(fg_color="#00d4ff", text_color="#1a1a2e")
+                btn.configure(fg_color="#8C00FF", text_color="#ffffff")
             else:
                 btn.configure(fg_color="transparent", text_color="white")

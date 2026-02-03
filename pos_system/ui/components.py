@@ -17,14 +17,14 @@ class ModernToast(ctk.CTkToplevel):
         # Remove window decorations
         self.overrideredirect(True)
         self.attributes('-topmost', True)
-        self.configure(fg_color="#1a1a2e")
+        self.configure(fg_color="#0d0d1a")
         
         # Colors based on type
         colors = {
-            "success": {"bg": "#1e3a2f", "accent": "#00ff88", "icon": "✓"},
+            "success": {"bg": "#1e2f1e", "accent": "#8C00FF", "icon": "✓"},
             "error": {"bg": "#3a1e1e", "accent": "#ff6b6b", "icon": "✕"},
             "warning": {"bg": "#3a2e1e", "accent": "#ffd93d", "icon": "⚠"},
-            "info": {"bg": "#1e2a3a", "accent": "#00d4ff", "icon": "ℹ"},
+            "info": {"bg": "#1e1e2f", "accent": "#8C00FF", "icon": "ℹ"},
         }
         
         style = colors.get(toast_type, colors["info"])
@@ -621,7 +621,7 @@ class BaseFrame(ctk.CTkFrame):
         from tkinter import ttk
         
         # Create container frame with rounded corners effect
-        table_container = ctk.CTkFrame(parent, fg_color="#1a1a2e", corner_radius=10)
+        table_container = ctk.CTkFrame(parent, fg_color="#0d0d1a", corner_radius=10)
         table_container.pack(fill="both", expand=True, padx=5, pady=5)
         
         # Inner frame for table
