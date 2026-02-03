@@ -44,7 +44,7 @@ class BillingFrame(BaseFrame):
         main_container.pack(fill="both", expand=True, padx=20, pady=(0, 20))
 
         # Left panel - Customer and items
-        left_panel = ctk.CTkFrame(main_container, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        left_panel = ctk.CTkFrame(main_container, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         left_panel.pack(side="left", fill="both", expand=True, padx=(0, 10))
 
         # Customer section
@@ -248,8 +248,9 @@ class BillingFrame(BaseFrame):
             text="Change",
             width=70,
             height=28,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=self.open_category_popup
         ).pack(side="right", padx=10, pady=8)
 
@@ -276,10 +277,11 @@ class BillingFrame(BaseFrame):
             text="🎨 Select Item",
             width=180,
             height=40,
-            fg_color="#00ff88",
-            text_color="#1a1a2e",
-            hover_color="#00cc6a",
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
             font=ctk.CTkFont(size=13, weight="bold"),
+            corner_radius=20,
             command=self.open_item_popup,
             state="disabled"
         )
@@ -329,7 +331,8 @@ class BillingFrame(BaseFrame):
             height=30,
             fg_color="#ffa500",
             hover_color="#cc8400",
-            text_color="#1a1a2e"
+            text_color="#1a1a2e",
+            corner_radius=20
         ).pack(side="left", padx=5)
 
         ctk.CTkButton(
@@ -339,7 +342,8 @@ class BillingFrame(BaseFrame):
             width=120,
             height=30,
             fg_color="#ff4757",
-            hover_color="#ff3344"
+            hover_color="#ff3344",
+            corner_radius=20
         ).pack(side="left", padx=5)
 
         ctk.CTkButton(
@@ -348,12 +352,13 @@ class BillingFrame(BaseFrame):
             command=self.clear_cart,
             width=120,
             height=30,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="right", padx=5)
 
         # Right panel - Payment
-        right_panel = ctk.CTkFrame(main_container, width=350, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        right_panel = ctk.CTkFrame(main_container, width=350, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         right_panel.pack(side="right", fill="y", padx=(10, 0))
         right_panel.pack_propagate(False)
 
@@ -509,6 +514,7 @@ class BillingFrame(BaseFrame):
             height=45,
             fg_color="#ff4757",
             hover_color="#ff3344",
+            corner_radius=20,
             font=ctk.CTkFont(size=14, weight="bold")
         ).pack(side="left")
 
@@ -577,7 +583,7 @@ class BillingFrame(BaseFrame):
             popup,
             fg_color="#060606",
             border_width=2,
-            border_color="white",
+            border_color="#444444",
             corner_radius=10,
             scrollbar_button_color="#333355",
             scrollbar_button_hover_color="#444477"
@@ -755,7 +761,7 @@ class BillingFrame(BaseFrame):
             popup,
             fg_color="#060606",
             border_width=2,
-            border_color="white",
+            border_color="#444444",
             corner_radius=10,
             scrollbar_button_color="#333355",
             scrollbar_button_hover_color="#444477"
@@ -854,9 +860,10 @@ class BillingFrame(BaseFrame):
                     text="Add",
                     width=70,
                     height=35,
-                    fg_color="#00ff88",
-                    text_color="#1a1a2e",
-                    hover_color="#00cc6a",
+                    fg_color="#8C00FF",
+                    text_color="#ffffff",
+                    hover_color="#7300D6",
+                    corner_radius=20,
                     command=add_item
                 ).pack(side="right", padx=15, pady=12)
 
@@ -866,8 +873,9 @@ class BillingFrame(BaseFrame):
             text="Cancel",
             width=120,
             height=40,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=close_popup
         ).pack(pady=15)
 
@@ -1079,7 +1087,7 @@ class BillingFrame(BaseFrame):
         )
         main_scroll.pack(fill="both", expand=True, padx=5, pady=5)
 
-        content_frame = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        content_frame = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         content_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         ctk.CTkLabel(
@@ -1162,9 +1170,9 @@ class BillingFrame(BaseFrame):
             command=close_dialog,
             width=130,
             height=45,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
-            corner_radius=8,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(side="left", padx=10)
 
@@ -1274,8 +1282,9 @@ class BillingFrame(BaseFrame):
             command=close_dialog,
             width=100,
             height=35,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
 
         ctk.CTkButton(
@@ -1284,9 +1293,10 @@ class BillingFrame(BaseFrame):
             command=save_qty,
             width=100,
             height=35,
-            fg_color="#00ff88",
-            text_color="#1a1a2e",
-            hover_color="#00cc6a"
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
 
         qty_entry.focus()
@@ -1361,8 +1371,9 @@ class BillingFrame(BaseFrame):
             command=close_dialog,
             width=100,
             height=35,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
 
         ctk.CTkButton(
@@ -1372,7 +1383,8 @@ class BillingFrame(BaseFrame):
             width=100,
             height=35,
             fg_color="#ff4757",
-            hover_color="#ff3344"
+            hover_color="#ff3344",
+            corner_radius=20
         ).pack(side="left", padx=10)
 
     def on_payment_type_change(self):

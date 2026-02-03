@@ -39,7 +39,7 @@ class ProfileFrame(ctk.CTkFrame):
         main_scroll.pack(fill="both", expand=True, padx=30, pady=10)
         
         # Profile Card - Full width
-        profile_card = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        profile_card = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         profile_card.pack(fill="x", pady=10)
         
         # Avatar section
@@ -114,7 +114,7 @@ class ProfileFrame(ctk.CTkFrame):
         self.last_login_detail = self.create_detail_row(details_frame, "Recent Login:", "")
         
         # Change Password Section - Full width
-        password_section = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        password_section = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         password_section.pack(fill="x", pady=10)
         
         ctk.CTkLabel(
@@ -201,7 +201,7 @@ class ProfileFrame(ctk.CTkFrame):
         ).pack(anchor="w")
         
         # Account Activity Section - Full width
-        activity_section = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        activity_section = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         activity_section.pack(fill="x", pady=10)
         
         ctk.CTkLabel(

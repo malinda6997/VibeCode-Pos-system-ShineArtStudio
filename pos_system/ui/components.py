@@ -129,7 +129,7 @@ class ModernConfirmDialog(ctk.CTkToplevel):
         self.overrideredirect(True)
         
         # Main container with border
-        main = ctk.CTkFrame(self, fg_color="#060606", corner_radius=15, border_width=2, border_color="white")
+        main = ctk.CTkFrame(self, fg_color="#060606", corner_radius=15, border_width=2, border_color="#444444")
         main.pack(fill="both", expand=True, padx=2, pady=2)
         
         # Icon
@@ -169,8 +169,9 @@ class ModernConfirmDialog(ctk.CTkToplevel):
             width=120,
             height=40,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=self.on_cancel
         )
         cancel_btn.pack(side="left", padx=10)

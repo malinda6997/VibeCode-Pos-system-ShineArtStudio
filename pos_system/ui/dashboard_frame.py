@@ -72,7 +72,7 @@ class DashboardFrame(ctk.CTkFrame):
         welcome.pack(anchor="w", padx=30, pady=(0, 10))
         
         # Quick actions at the top
-        actions_frame = ctk.CTkFrame(self, fg_color="#060606", corner_radius=20, border_width=2, border_color="white")
+        actions_frame = ctk.CTkFrame(self, fg_color="#060606", corner_radius=20, border_width=2, border_color="#444444")
         actions_frame.pack(fill="x", padx=30, pady=(0, 10))
         
         actions_title = ctk.CTkLabel(
@@ -105,9 +105,9 @@ class DashboardFrame(ctk.CTkFrame):
             text="👤 Add Customer",
             width=150,
             height=40,
-            fg_color="#00ff88",
-            text_color="#000000",
-            hover_color="#00cc6a",
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
             font=ctk.CTkFont(size=12, weight="bold"),
             corner_radius=20,
             command=lambda: self.navigate_to("customers")
@@ -119,9 +119,9 @@ class DashboardFrame(ctk.CTkFrame):
             text="📅 New Booking",
             width=150,
             height=40,
-            fg_color="#c44dff",
+            fg_color="#8C00FF",
             text_color="#ffffff",
-            hover_color="#a33dd6",
+            hover_color="#7300D6",
             font=ctk.CTkFont(size=12, weight="bold"),
             corner_radius=20,
             command=lambda: self.navigate_to("bookings")
@@ -133,9 +133,9 @@ class DashboardFrame(ctk.CTkFrame):
             text="🖼️ Add Frame",
             width=150,
             height=40,
-            fg_color="#ffd93d",
-            text_color="#000000",
-            hover_color="#e6c235",
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
             font=ctk.CTkFont(size=12, weight="bold"),
             corner_radius=20,
             command=lambda: self.navigate_to("frames")
@@ -202,7 +202,7 @@ class DashboardFrame(ctk.CTkFrame):
             placeholder_frame2.pack(side="left", fill="both", expand=True, padx=(10, 0))
         
         # ==================== General Stats (Both Admin and Staff) ====================
-        general_header = ctk.CTkFrame(self.cards_frame, fg_color="#060606", border_width=2, border_color="white", corner_radius=10)
+        general_header = ctk.CTkFrame(self.cards_frame, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=10)
         general_header.pack(fill="x", pady=(10, 10))
         
         ctk.CTkLabel(
@@ -252,7 +252,7 @@ class DashboardFrame(ctk.CTkFrame):
         # Admin-only section: Photo Frame Profit Tracking
         if self.is_admin():
             # Section header
-            profit_header = ctk.CTkFrame(scroll_container, fg_color="#060606", border_width=2, border_color="white", corner_radius=10)
+            profit_header = ctk.CTkFrame(scroll_container, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=10)
             profit_header.pack(fill="x", pady=(20, 10))
             
             ctk.CTkLabel(
@@ -324,10 +324,10 @@ class DashboardFrame(ctk.CTkFrame):
             widgets_row.grid_columnconfigure((0, 1, 2), weight=1, uniform="widgets")
             
             # Upcoming Bookings Widget
-            self.bookings_widget = ctk.CTkFrame(widgets_row, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+            self.bookings_widget = ctk.CTkFrame(widgets_row, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
             self.bookings_widget.grid(row=0, column=0, sticky="nsew", padx=(0, 5))
             
-            bookings_header = ctk.CTkFrame(self.bookings_widget, fg_color="#2d2d5a", corner_radius=10)
+            bookings_header = ctk.CTkFrame(self.bookings_widget, fg_color="#1a1a2e", corner_radius=10)
             bookings_header.pack(fill="x", padx=10, pady=10)
             
             ctk.CTkLabel(
@@ -341,10 +341,10 @@ class DashboardFrame(ctk.CTkFrame):
             self.bookings_list_frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
             
             # Recent Customers Widget
-            self.customers_widget = ctk.CTkFrame(widgets_row, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+            self.customers_widget = ctk.CTkFrame(widgets_row, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
             self.customers_widget.grid(row=0, column=1, sticky="nsew", padx=5)
             
-            customers_header = ctk.CTkFrame(self.customers_widget, fg_color="#2d2d5a", corner_radius=10)
+            customers_header = ctk.CTkFrame(self.customers_widget, fg_color="#1a1a2e", corner_radius=10)
             customers_header.pack(fill="x", padx=10, pady=10)
             
             ctk.CTkLabel(
@@ -358,10 +358,10 @@ class DashboardFrame(ctk.CTkFrame):
             self.customers_list_frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
             
             # Frame Stock Widget
-            self.stock_widget = ctk.CTkFrame(widgets_row, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+            self.stock_widget = ctk.CTkFrame(widgets_row, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
             self.stock_widget.grid(row=0, column=2, sticky="nsew", padx=(5, 0))
             
-            stock_header = ctk.CTkFrame(self.stock_widget, fg_color="#2d2d5a", corner_radius=10)
+            stock_header = ctk.CTkFrame(self.stock_widget, fg_color="#1a1a2e", corner_radius=10)
             stock_header.pack(fill="x", padx=10, pady=10)
             
             ctk.CTkLabel(
@@ -379,7 +379,7 @@ class DashboardFrame(ctk.CTkFrame):
     def create_stat_card(self, parent, title: str, value: str, icon: str, 
                         color: str) -> ctk.CTkFrame:
         """Create a statistics card"""
-        card = ctk.CTkFrame(parent, fg_color="#060606", corner_radius=20, height=140, border_width=2, border_color="white")
+        card = ctk.CTkFrame(parent, fg_color="#060606", corner_radius=20, height=140, border_width=2, border_color="#444444")
         card.pack_propagate(False)
         
         # Icon

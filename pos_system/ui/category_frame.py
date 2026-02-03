@@ -28,7 +28,7 @@ class CategoryManagementFrame(BaseFrame):
         main_container.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Left panel - Form
-        left_panel = ctk.CTkFrame(main_container, fg_color="#060606", border_width=2, border_color="white", corner_radius=15, width=400)
+        left_panel = ctk.CTkFrame(main_container, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15, width=400)
         left_panel.pack(side="left", fill="y", padx=(0, 10))
         left_panel.pack_propagate(False)
         
@@ -105,8 +105,9 @@ class CategoryManagementFrame(BaseFrame):
             command=self.update_category,
             height=40,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             state="disabled"
         )
         self.update_btn.pack(fill="x", pady=5)
@@ -129,8 +130,9 @@ class CategoryManagementFrame(BaseFrame):
             command=self.clear_form,
             height=40,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         clear_btn.pack(fill="x", pady=5)
         
@@ -150,7 +152,7 @@ class CategoryManagementFrame(BaseFrame):
             info_label.pack(pady=(0, 15))
         
         # Right panel - Table
-        right_panel = ctk.CTkFrame(main_container, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        right_panel = ctk.CTkFrame(main_container, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         right_panel.pack(side="right", fill="both", expand=True, padx=(10, 0))
         
         # Search section
@@ -180,7 +182,7 @@ class CategoryManagementFrame(BaseFrame):
         table_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
         
         # Table header
-        table_header = ctk.CTkFrame(table_frame, fg_color="#060606", border_width=2, border_color="white", corner_radius=8, height=45)
+        table_header = ctk.CTkFrame(table_frame, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=8, height=45)
         table_header.pack(fill="x", padx=5, pady=5)
         table_header.pack_propagate(False)
         

@@ -199,7 +199,7 @@ class UserGuideFrame(ctk.CTkFrame):
             )
         
         # Tips Section
-        tips_card = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        tips_card = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         tips_card.pack(fill="x", pady=10)
         
         tips_header = ctk.CTkFrame(tips_card, fg_color="#0d0d1a", corner_radius=10)
@@ -250,7 +250,7 @@ class UserGuideFrame(ctk.CTkFrame):
     
     def create_guide_section(self, parent, icon, title, color, items):
         """Create a guide section with items"""
-        section = ctk.CTkFrame(parent, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        section = ctk.CTkFrame(parent, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         section.pack(fill="x", pady=10)
         
         # Header

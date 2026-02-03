@@ -25,7 +25,7 @@ class BillHistoryFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Search and controls
-        controls_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        controls_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         controls_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         ctk.CTkLabel(
@@ -52,8 +52,9 @@ class BillHistoryFrame(BaseFrame):
             command=self.view_bill_details,
             width=120,
             height=35,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
         
         ctk.CTkButton(
@@ -82,7 +83,7 @@ class BillHistoryFrame(BaseFrame):
             ).pack(side="left", padx=10)
         
         # Bills table
-        table_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        table_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Table header

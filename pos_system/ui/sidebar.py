@@ -10,7 +10,7 @@ class Sidebar(ctk.CTkFrame):
     SIDEBAR_WIDTH = 250
     
     def __init__(self, parent, auth_manager, on_navigate: Callable):
-        super().__init__(parent, fg_color="#0d0d1a", width=self.SIDEBAR_WIDTH, corner_radius=0)
+        super().__init__(parent, fg_color="#060606", width=self.SIDEBAR_WIDTH, corner_radius=0)
         self.pack_propagate(False)
         
         self.auth_manager = auth_manager

@@ -67,7 +67,7 @@ class UsersManagementFrame(ctk.CTkFrame):
         main.pack(fill="both", expand=True, padx=30, pady=10)
         
         # Left panel - Form (scrollable)
-        left = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="white", corner_radius=15, width=400)
+        left = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15, width=400)
         left.pack(side="left", fill="y", padx=(0, 15), pady=0)
         left.pack_propagate(False)
         
@@ -155,6 +155,7 @@ class UsersManagementFrame(ctk.CTkFrame):
             fg_color="#ffd93d",
             text_color="#1a1a2e",
             hover_color="#e6c235",
+            corner_radius=20,
             command=self.update_user,
             state="disabled"
         )
@@ -168,6 +169,7 @@ class UsersManagementFrame(ctk.CTkFrame):
             fg_color="#ff6b6b",
             text_color="white",
             hover_color="#e55555",
+            corner_radius=20,
             command=self.delete_user,
             state="disabled"
         )
@@ -178,14 +180,15 @@ class UsersManagementFrame(ctk.CTkFrame):
             text="🔄 Clear Form",
             height=40,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=self.clear_form
         )
         self.clear_btn.pack(fill="x", pady=5)
         
         # Right panel - Users list
-        right = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        right = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         right.pack(side="right", fill="both", expand=True)
         
         list_title = ctk.CTkLabel(

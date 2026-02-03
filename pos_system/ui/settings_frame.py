@@ -195,6 +195,7 @@ class SettingsFrame(ctk.CTkFrame):
             fg_color="#ffd93d",
             text_color="#1a1a2e",
             hover_color="#e6c235",
+            corner_radius=20,
             command=self.restore_database,
             width=200
         ).pack(side="left")
@@ -209,9 +210,10 @@ class SettingsFrame(ctk.CTkFrame):
             height=50,
             width=200,
             font=ctk.CTkFont(size=15, weight="bold"),
-            fg_color="#00ff88",
-            text_color="#1a1a2e",
-            hover_color="#00cc6a",
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=self.save_settings
         ).pack(side="right")
         
@@ -224,12 +226,13 @@ class SettingsFrame(ctk.CTkFrame):
             fg_color="#ff6b6b",
             text_color="white",
             hover_color="#e55555",
+            corner_radius=20,
             command=self.reset_settings
         ).pack(side="right", padx=15)
     
     def create_section(self, parent, title: str) -> ctk.CTkFrame:
         """Create a settings section"""
-        section = ctk.CTkFrame(parent, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
+        section = ctk.CTkFrame(parent, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         section.pack(fill="x", pady=10)
         
         section_title = ctk.CTkLabel(
