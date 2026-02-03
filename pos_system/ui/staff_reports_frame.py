@@ -124,7 +124,8 @@ class StaffReportsFrame(ctk.CTkFrame):
             height=35,
             fg_color="#2ecc71",
             hover_color="#27ae60",
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=13, weight="bold"),
+            corner_radius=20
         )
         self.download_btn.pack(side="left")
         

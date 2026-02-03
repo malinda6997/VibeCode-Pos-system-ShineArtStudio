@@ -171,7 +171,7 @@ class DashboardFrame(ctk.CTkFrame):
             row1.pack(fill="x", pady=10)
             
             self.today_sales_card = self.create_stat_card(
-                row1, "Today's Sales", "LKR 0.00", "💰", "#00d4ff"
+                row1, "Today's Sales", "LKR 0.00", "💰", "#8C00FF"
             )
             self.today_sales_card.pack(side="left", fill="both", expand=True, padx=(0, 10))
             
@@ -209,7 +209,7 @@ class DashboardFrame(ctk.CTkFrame):
             general_header,
             text="📊 General Statistics",
             font=ctk.CTkFont(size=14, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(pady=10, padx=15, anchor="w")
         
         # Row 3 - General stats (visible to all)
@@ -259,7 +259,7 @@ class DashboardFrame(ctk.CTkFrame):
                 profit_header,
                 text="📊 Photo Frame Profit Analysis (Admin Only)",
                 font=ctk.CTkFont(size=16, weight="bold"),
-                text_color="#00d4ff"
+                text_color="#8C00FF"
             ).pack(pady=15, padx=20, anchor="w")
             
             # Row 5 - Frame profit stats (Admin only)
@@ -267,7 +267,7 @@ class DashboardFrame(ctk.CTkFrame):
             row5.pack(fill="x", pady=10)
             
             self.frames_sold_card = self.create_stat_card(
-                row5, "Total Frames Sold", "0", "🖼️", "#00d4ff"
+                row5, "Total Frames Sold", "0", "🖼️", "#8C00FF"
             )
             self.frames_sold_card.pack(side="left", fill="both", expand=True, padx=(0, 10))
             
@@ -438,7 +438,7 @@ class DashboardFrame(ctk.CTkFrame):
             loading_content,
             text="Refreshing Dashboard...",
             font=ctk.CTkFont(size=18, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         )
         loading_text.pack()
         
@@ -589,7 +589,7 @@ class DashboardFrame(ctk.CTkFrame):
                     info_frame,
                     text=f"📅 {event_date}",
                     font=ctk.CTkFont(size=11, weight="bold"),
-                    text_color="#00d4ff"
+                    text_color="#8C00FF"
                 ).pack(anchor="w")
                 
                 ctk.CTkLabel(
@@ -671,7 +671,7 @@ class DashboardFrame(ctk.CTkFrame):
                     info_frame,
                     text=f"🖼️ {frame.get('frame_name', 'Unknown')}",
                     font=ctk.CTkFont(size=11, weight="bold"),
-                    text_color="#00d4ff"
+                    text_color="#8C00FF"
                 ).pack(anchor="w")
                 
                 ctk.CTkLabel(

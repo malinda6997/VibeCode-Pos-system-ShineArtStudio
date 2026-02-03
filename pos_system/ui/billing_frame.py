@@ -97,7 +97,10 @@ class BillingFrame(BaseFrame):
             text="Search",
             command=self.search_customer,
             width=80,
-            height=30
+            height=30,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=5)
 
         ctk.CTkButton(
@@ -1035,6 +1038,7 @@ class BillingFrame(BaseFrame):
                 hover_color="#3d3d6a",
                 anchor="w",
                 height=35,
+                corner_radius=20,
                 command=lambda c=customer: self.select_suggestion(c)
             )
             btn.pack(fill="x", padx=5, pady=2)
@@ -1241,7 +1245,7 @@ class BillingFrame(BaseFrame):
             dialog,
             text=f"Edit: {item['name']}",
             font=ctk.CTkFont(size=14, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(pady=(20, 15))
 
         qty_frame = ctk.CTkFrame(dialog, fg_color="transparent")

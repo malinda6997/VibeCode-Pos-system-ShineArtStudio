@@ -84,7 +84,10 @@ class FrameManagementFrame(BaseFrame):
             command=self.add_frame,
             width=120,
             height=35,
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=13, weight="bold"),
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         self.add_btn.pack(side="left", padx=5)
         
@@ -111,6 +114,7 @@ class FrameManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold"),
             fg_color="#ff4757",
             hover_color="#ff3344",
+            corner_radius=20,
             state="disabled"
         )
         self.delete_btn.pack(side="left", padx=5)
@@ -144,7 +148,7 @@ class FrameManagementFrame(BaseFrame):
             table_header,
             text="🖼️ Frame Inventory",
             font=ctk.CTkFont(size=14, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", padx=15, pady=10)
         
         self.record_count_label = ctk.CTkLabel(

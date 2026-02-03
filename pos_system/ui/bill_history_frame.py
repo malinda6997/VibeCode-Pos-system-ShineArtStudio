@@ -43,7 +43,10 @@ class BillHistoryFrame(BaseFrame):
             text="Refresh",
             command=self.load_bills,
             width=120,
-            height=35
+            height=35,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
         
         ctk.CTkButton(
@@ -328,7 +331,10 @@ Balance: LKR {bill['balance_amount']:.2f}
             text="Close",
             command=close_dialog,
             width=150,
-            height=40
+            height=40,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(pady=10)
     
     def reprint_bill(self):

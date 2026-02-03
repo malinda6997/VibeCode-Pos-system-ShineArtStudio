@@ -135,58 +135,6 @@ class Sidebar(ctk.CTkFrame):
             if self.auth_manager.has_permission(perm_key):
                 self.create_nav_button(self.nav_scroll, tab_id, icon, text)
         
-        # User info at very bottom (fixed)
-        self.user_frame = ctk.CTkFrame(self, fg_color="#1a1a2e", corner_radius=12)
-        self.user_frame.pack(fill="x", padx=12, pady=(10, 15))
-        
-        user = self.auth_manager.get_current_user()
-        if user:
-            # User info layout
-            self.user_content = ctk.CTkFrame(self.user_frame, fg_color="transparent")
-            self.user_content.pack(fill="x", padx=12, pady=12)
-            
-            # User info (name + role)
-            self.user_info_frame = ctk.CTkFrame(self.user_content, fg_color="transparent")
-            self.user_info_frame.pack(side="left", fill="x", expand=True)
-            
-            self.user_name_label = ctk.CTkLabel(
-                self.user_info_frame,
-                text=user['full_name'],
-                font=ctk.CTkFont(size=12, weight="bold"),
-                text_color="white",
-                anchor="w"
-            )
-            self.user_name_label.pack(anchor="w")
-            
-            # Role badge with styling
-            role_color = "#8C00FF" if user['role'] == 'Admin' else "#00ff88"
-            self.user_role_label = ctk.CTkLabel(
-                self.user_info_frame,
-                text=f"● {user['role']}",
-                font=ctk.CTkFont(size=10, weight="bold"),
-                text_color=role_color,
-                anchor="w"
-            )
-            self.user_role_label.pack(anchor="w")
-            
-            # Recent login info (Admin only)
-            if user['role'] == 'Admin':
-                last_login = user.get('last_login')
-                if last_login:
-                    login_text = f"Recent: {last_login[:16]}" if len(last_login) > 16 else f"Recent: {last_login}"
-                else:
-                    login_text = "First login"
-                self.last_login_label = ctk.CTkLabel(
-                    self.user_info_frame,
-                    text=login_text,
-                    font=ctk.CTkFont(size=9),
-                    text_color="#666666",
-                    anchor="w"
-                )
-                self.last_login_label.pack(anchor="w")
-            else:
-                self.last_login_label = None
-        
         # Set dashboard as active
         self.set_active("dashboard")
     

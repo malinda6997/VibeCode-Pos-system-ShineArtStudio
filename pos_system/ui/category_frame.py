@@ -120,6 +120,7 @@ class CategoryManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold"),
             fg_color="#ff4757",
             hover_color="#ff3344",
+            corner_radius=20,
             state="disabled"
         )
         self.delete_btn.pack(fill="x", pady=5)
@@ -174,7 +175,10 @@ class CategoryManagementFrame(BaseFrame):
             text="Refresh",
             command=self.load_categories,
             width=100,
-            height=35
+            height=35,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
         
         # Table section

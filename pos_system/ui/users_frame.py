@@ -211,7 +211,7 @@ class UsersManagementFrame(ctk.CTkFrame):
             table_header,
             text="👥 User Accounts",
             font=ctk.CTkFont(size=13, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", padx=15, pady=10)
         
         self.record_count_label = ctk.CTkLabel(

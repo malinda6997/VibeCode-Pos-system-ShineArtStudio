@@ -105,7 +105,7 @@ class ModernConfirmDialog(ctk.CTkToplevel):
     """Modern confirmation dialog"""
     
     def __init__(self, parent, title: str, message: str, confirm_text: str = "Yes", 
-                 cancel_text: str = "No", icon: str = "?", accent_color: str = "#00d4ff"):
+                 cancel_text: str = "No", icon: str = "?", accent_color: str = "#8C00FF"):
         super().__init__(parent)
         
         self.result = False
@@ -242,7 +242,7 @@ class Toast:
     
     @staticmethod
     def confirm(parent, title: str, message: str, confirm_text: str = "Yes", 
-                cancel_text: str = "No", icon: str = "?", accent_color: str = "#00d4ff") -> bool:
+                cancel_text: str = "No", icon: str = "?", accent_color: str = "#8C00FF") -> bool:
         """Show confirmation dialog and return result"""
         dialog = ModernConfirmDialog(parent, title, message, confirm_text, cancel_text, icon, accent_color)
         return dialog.get_result()
@@ -645,7 +645,7 @@ class BaseFrame(ctk.CTkFrame):
         # Configure row tags for alternating colors
         tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
         tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
-        tree.tag_configure('selected', background='#00d4ff', foreground='#1a1a2e')
+        tree.tag_configure('selected', background='#8C00FF', foreground='white')
         
         # Modern scrollbar
         scrollbar = ttk.Scrollbar(inner_frame, orient="vertical", command=tree.yview)

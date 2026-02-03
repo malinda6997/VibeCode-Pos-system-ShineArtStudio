@@ -100,7 +100,7 @@ class ProfileFrame(ctk.CTkFrame):
             avatar_frame,
             text="Role",
             font=ctk.CTkFont(size=14),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         )
         self.role_label.pack()
         
@@ -243,7 +243,7 @@ class ProfileFrame(ctk.CTkFrame):
             row,
             text=value,
             font=ctk.CTkFont(size=13),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         )
         value_label.pack(side="left")
         

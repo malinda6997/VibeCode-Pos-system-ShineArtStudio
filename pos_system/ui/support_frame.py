@@ -42,7 +42,7 @@ class SupportFrame(ctk.CTkFrame):
             "Phone Support",
             "Call us directly for immediate assistance",
             "+94 77 123 4567",
-            "#00d4ff",
+            "#8C00FF",
             self.call_support
         )
         
@@ -80,7 +80,7 @@ class SupportFrame(ctk.CTkFrame):
             header_frame,
             text="👨‍💻 Developer Contact Information",
             font=ctk.CTkFont(size=18, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(anchor="w", padx=15, pady=12)
         
         contact_info = ctk.CTkFrame(contact_section, fg_color="transparent")
@@ -186,7 +186,7 @@ class SupportFrame(ctk.CTkFrame):
                 row,
                 text=value,
                 font=ctk.CTkFont(size=13),
-                text_color="#00d4ff"
+                text_color="#8C00FF"
             ).pack(side="left")
         
         # Report Issue Section
@@ -295,8 +295,7 @@ class SupportFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=12, weight="bold"),
             fg_color=color,
             text_color="white" if color != "#ffd93d" else "#1a1a2e",
-            hover_color=color,
-            command=command
+            hover_color=color,            corner_radius=20,            command=command
         ).pack(pady=(0, 20), padx=20, fill="x")
     
     def create_contact_row(self, parent, icon, label, value):
@@ -323,7 +322,7 @@ class SupportFrame(ctk.CTkFrame):
             row,
             text=value,
             font=ctk.CTkFont(size=13),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", pady=10)
     
     def create_faq_item(self, parent, question: str, answer: str):

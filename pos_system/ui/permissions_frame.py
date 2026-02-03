@@ -135,7 +135,8 @@ class PermissionsFrame(ctk.CTkFrame):
             height=35,
             fg_color="#2ecc71",
             hover_color="#27ae60",
-            font=ctk.CTkFont(size=12, weight="bold")
+            font=ctk.CTkFont(size=12, weight="bold"),
+            corner_radius=20
         )
         enable_all_btn.pack(side="left", padx=(0, 10))
         
@@ -147,7 +148,8 @@ class PermissionsFrame(ctk.CTkFrame):
             height=35,
             fg_color="#e74c3c",
             hover_color="#c0392b",
-            font=ctk.CTkFont(size=12, weight="bold")
+            font=ctk.CTkFont(size=12, weight="bold"),
+            corner_radius=20
         )
         disable_all_btn.pack(side="left", padx=(0, 10))
         
@@ -269,7 +271,7 @@ class PermissionsFrame(ctk.CTkFrame):
             info_frame,
             text=f"@{user['username']}",
             font=ctk.CTkFont(size=11),
-            text_color="#00d4ff",
+            text_color="#8C00FF",
             anchor="w"
         )
         username_label.pack(anchor="w")
@@ -305,7 +307,7 @@ class PermissionsFrame(ctk.CTkFrame):
         for widget in self.user_list_frame.winfo_children():
             if hasattr(widget, 'user_id'):
                 if widget.user_id == user_id:
-                    widget.configure(fg_color="#00d4ff")
+                    widget.configure(fg_color="#8C00FF")
                 else:
                     widget.configure(fg_color="#0d0d1a")
         

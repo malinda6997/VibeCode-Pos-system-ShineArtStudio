@@ -72,7 +72,7 @@ class UserGuideFrame(ctk.CTkFrame):
             main,
             "🚀",
             "Quick Start Guide",
-            "#00d4ff",
+            "#8C00FF",
             [
                 ("Step 1: Login", "Enter your username and password. Default admin: admin / admin123"),
                 ("Step 2: Navigate", "Use the sidebar to access different sections of the app"),
