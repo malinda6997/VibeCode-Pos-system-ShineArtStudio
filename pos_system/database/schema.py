@@ -271,6 +271,33 @@ class DatabaseSchema:
             )
         ''')
         
+        # Manual Expenses table for miscellaneous expenses
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS manual_expenses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                description TEXT NOT NULL,
+                amount REAL NOT NULL,
+                expense_date DATE NOT NULL,
+                created_by INTEGER NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (created_by) REFERENCES users (id)
+            )
+        ''')
+        
+        # Daily Balance table to track opening/closing balances
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS daily_balances (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                balance_date DATE UNIQUE NOT NULL,
+                opening_balance REAL DEFAULT 0,
+                total_income REAL DEFAULT 0,
+                total_expenses REAL DEFAULT 0,
+                closing_balance REAL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
         self.conn.commit()
         self.close()
         
