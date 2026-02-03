@@ -86,7 +86,7 @@ class PermissionsFrame(ctk.CTkFrame):
         right_panel.pack(side="right", fill="both", expand=True)
         
         # Selected user info
-        self.selected_user_frame = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=8)
+        self.selected_user_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=8)
         self.selected_user_frame.pack(fill="x", padx=20, pady=20)
         
         self.selected_user_label = ctk.CTkLabel(
@@ -158,15 +158,16 @@ class PermissionsFrame(ctk.CTkFrame):
             command=self.save_permissions,
             width=150,
             height=40,
-            fg_color="#00d4ff",
-            hover_color="#00a8cc",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             font=ctk.CTkFont(size=14, weight="bold")
         )
         self.save_btn.pack(side="right")
     
     def create_permission_row(self, perm_key: str, perm_name: str, perm_desc: str):
         """Create a permission toggle row"""
-        row_frame = ctk.CTkFrame(self.perm_scroll, fg_color="#252545", corner_radius=8)
+        row_frame = ctk.CTkFrame(self.perm_scroll, fg_color="#0d0d1a", corner_radius=8)
         row_frame.pack(fill="x", pady=5)
         
         content = ctk.CTkFrame(row_frame, fg_color="transparent")
@@ -199,7 +200,7 @@ class PermissionsFrame(ctk.CTkFrame):
             content,
             text="",
             width=50,
-            progress_color="#00d4ff",
+            progress_color="#8C00FF",
             button_color="white",
             button_hover_color="#f0f0f0",
             fg_color="#444466"
@@ -233,7 +234,7 @@ class PermissionsFrame(ctk.CTkFrame):
         """Create a user selection card"""
         card = ctk.CTkFrame(
             self.user_list_frame,
-            fg_color="#252545",
+            fg_color="#0d0d1a",
             corner_radius=8,
             cursor="hand2"
         )
@@ -306,7 +307,7 @@ class PermissionsFrame(ctk.CTkFrame):
                 if widget.user_id == user_id:
                     widget.configure(fg_color="#00d4ff")
                 else:
-                    widget.configure(fg_color="#252545")
+                    widget.configure(fg_color="#0d0d1a")
         
         # Enable switches
         self.toggle_switches_state(True)

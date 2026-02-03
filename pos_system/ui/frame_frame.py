@@ -24,7 +24,7 @@ class FrameManagementFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Input section
-        input_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
+        input_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         input_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         # Row 0: Frame name and Size
@@ -130,11 +130,11 @@ class FrameManagementFrame(BaseFrame):
             self.delete_btn.configure(state="disabled")
         
         # Table section
-        table_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
+        table_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Table header
-        table_header = ctk.CTkFrame(table_frame, fg_color="#252545", corner_radius=10, height=50)
+        table_header = ctk.CTkFrame(table_frame, fg_color="#0d0d1a", corner_radius=10, height=50)
         table_header.pack(fill="x", padx=10, pady=(10, 5))
         table_header.pack_propagate(False)
         
@@ -200,8 +200,8 @@ class FrameManagementFrame(BaseFrame):
             self.tree.column("Created At", width=180)
         
         # Configure row tags for alternating colors
-        self.tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        self.tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        self.tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
+        self.tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         self.tree.tag_configure('lowstock', background='#3a2020', foreground='#ff6b6b')
         
         # Scrollbar

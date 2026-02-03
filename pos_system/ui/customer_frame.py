@@ -24,7 +24,7 @@ class CustomerManagementFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Input section
-        input_frame = ctk.CTkFrame(self, fg_color="#0d0d1a", corner_radius=20)
+        input_frame = ctk.CTkFrame(self, fg_color="#060606", corner_radius=20, border_width=2, border_color="white")
         input_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         # Full name
@@ -99,7 +99,7 @@ class CustomerManagementFrame(BaseFrame):
         clear_btn.pack(side="left", padx=5)
         
         # Search section
-        search_frame = ctk.CTkFrame(self, fg_color="#0d0d1a", corner_radius=20)
+        search_frame = ctk.CTkFrame(self, fg_color="#060606", corner_radius=20, border_width=2, border_color="white")
         search_frame.pack(fill="x", padx=20, pady=(0, 10))
         
         search_label = ctk.CTkLabel(search_frame, text="Search:", font=ctk.CTkFont(size=13, weight="bold"))
@@ -122,7 +122,7 @@ class CustomerManagementFrame(BaseFrame):
         refresh_btn.pack(side="left", padx=10)
         
         # Table section
-        table_frame = ctk.CTkFrame(self, fg_color="#0d0d1a", corner_radius=20)
+        table_frame = ctk.CTkFrame(self, fg_color="#060606", corner_radius=20, border_width=2, border_color="white")
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Table header

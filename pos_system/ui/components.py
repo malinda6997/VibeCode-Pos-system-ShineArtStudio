@@ -129,7 +129,7 @@ class ModernConfirmDialog(ctk.CTkToplevel):
         self.overrideredirect(True)
         
         # Main container with border
-        main = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15, border_width=2, border_color="#333355")
+        main = ctk.CTkFrame(self, fg_color="#060606", corner_radius=15, border_width=2, border_color="white")
         main.pack(fill="both", expand=True, padx=2, pady=2)
         
         # Icon
@@ -642,8 +642,8 @@ class BaseFrame(ctk.CTkFrame):
             tree.column(col, width=width, anchor=anchor)
         
         # Configure row tags for alternating colors
-        tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
+        tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         tree.tag_configure('selected', background='#00d4ff', foreground='#1a1a2e')
         
         # Modern scrollbar

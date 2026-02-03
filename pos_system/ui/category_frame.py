@@ -28,12 +28,12 @@ class CategoryManagementFrame(BaseFrame):
         main_container.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Left panel - Form
-        left_panel = ctk.CTkFrame(main_container, fg_color="#1e1e3f", corner_radius=15, width=400)
+        left_panel = ctk.CTkFrame(main_container, fg_color="#060606", border_width=2, border_color="white", corner_radius=15, width=400)
         left_panel.pack(side="left", fill="y", padx=(0, 10))
         left_panel.pack_propagate(False)
         
         # Form section
-        form_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
+        form_frame = ctk.CTkFrame(left_panel, fg_color="#0d0d1a", corner_radius=10)
         form_frame.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
@@ -92,9 +92,10 @@ class CategoryManagementFrame(BaseFrame):
             command=self.add_category,
             height=40,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc"
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         self.add_btn.pack(fill="x", pady=5)
         
@@ -149,11 +150,11 @@ class CategoryManagementFrame(BaseFrame):
             info_label.pack(pady=(0, 15))
         
         # Right panel - Table
-        right_panel = ctk.CTkFrame(main_container, fg_color="#1e1e3f", corner_radius=15)
+        right_panel = ctk.CTkFrame(main_container, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         right_panel.pack(side="right", fill="both", expand=True, padx=(10, 0))
         
         # Search section
-        search_frame = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=10)
+        search_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10)
         search_frame.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
@@ -175,11 +176,11 @@ class CategoryManagementFrame(BaseFrame):
         ).pack(side="left", padx=10)
         
         # Table section
-        table_frame = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=10)
+        table_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10)
         table_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
         
         # Table header
-        table_header = ctk.CTkFrame(table_frame, fg_color="#1e1e3f", corner_radius=8, height=45)
+        table_header = ctk.CTkFrame(table_frame, fg_color="#060606", border_width=2, border_color="white", corner_radius=8, height=45)
         table_header.pack(fill="x", padx=5, pady=5)
         table_header.pack_propagate(False)
         
@@ -187,7 +188,7 @@ class CategoryManagementFrame(BaseFrame):
             table_header,
             text="📋 Category Records",
             font=ctk.CTkFont(size=13, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", padx=15, pady=10)
         
         self.record_count_label = ctk.CTkLabel(
@@ -218,8 +219,8 @@ class CategoryManagementFrame(BaseFrame):
         self.tree.column("Created At", width=180)
         
         # Configure row tags
-        self.tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        self.tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        self.tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
+        self.tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         
         # Scrollbar
         scrollbar = ttk.Scrollbar(table_container, orient="vertical", command=self.tree.yview)

@@ -179,9 +179,10 @@ class SettingsFrame(ctk.CTkFrame):
             text="📁 Backup Database",
             height=45,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc",
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=self.backup_database,
             width=200
         ).pack(side="left", padx=(0, 15))
@@ -228,7 +229,7 @@ class SettingsFrame(ctk.CTkFrame):
     
     def create_section(self, parent, title: str) -> ctk.CTkFrame:
         """Create a settings section"""
-        section = ctk.CTkFrame(parent, fg_color="#1e1e3f", corner_radius=15)
+        section = ctk.CTkFrame(parent, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         section.pack(fill="x", pady=10)
         
         section_title = ctk.CTkLabel(

@@ -44,11 +44,11 @@ class BillingFrame(BaseFrame):
         main_container.pack(fill="both", expand=True, padx=20, pady=(0, 20))
 
         # Left panel - Customer and items
-        left_panel = ctk.CTkFrame(main_container, fg_color="#1e1e3f", corner_radius=15)
+        left_panel = ctk.CTkFrame(main_container, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         left_panel.pack(side="left", fill="both", expand=True, padx=(0, 10))
 
         # Customer section
-        customer_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
+        customer_frame = ctk.CTkFrame(left_panel, fg_color="#0d0d1a", corner_radius=10)
         customer_frame.pack(fill="x", padx=15, pady=15)
 
         customer_label = ctk.CTkLabel(
@@ -70,7 +70,7 @@ class BillingFrame(BaseFrame):
             onvalue="on",
             offvalue="off",
             command=self.toggle_guest_customer,
-            progress_color="#00d4ff",
+            progress_color="#8C00FF",
             button_color="#00ff88",
             button_hover_color="#00cc6a"
         )
@@ -106,9 +106,10 @@ class BillingFrame(BaseFrame):
             command=self.add_new_customer,
             width=150,
             height=30,
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc",
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20,
             font=ctk.CTkFont(size=12, weight="bold")
         ).pack(side="left", padx=5)
 
@@ -199,7 +200,7 @@ class BillingFrame(BaseFrame):
         self.no_customer_label.pack(pady=10)
 
         # Add items section - POPUP BASED
-        items_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
+        items_frame = ctk.CTkFrame(left_panel, fg_color="#0d0d1a", corner_radius=10)
         items_frame.pack(fill="x", padx=15, pady=(0, 15))
 
         items_label = ctk.CTkLabel(
@@ -261,9 +262,10 @@ class BillingFrame(BaseFrame):
             text="📁 Select Category",
             width=180,
             height=40,
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc",
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20,
             font=ctk.CTkFont(size=13, weight="bold"),
             command=self.open_category_popup
         )
@@ -284,7 +286,7 @@ class BillingFrame(BaseFrame):
         self.select_item_btn.pack(side="left", padx=5)
 
         # Cart table
-        cart_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
+        cart_frame = ctk.CTkFrame(left_panel, fg_color="#0d0d1a", corner_radius=10)
         cart_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
 
         cart_label = ctk.CTkLabel(
@@ -351,7 +353,7 @@ class BillingFrame(BaseFrame):
         ).pack(side="right", padx=5)
 
         # Right panel - Payment
-        right_panel = ctk.CTkFrame(main_container, width=350, fg_color="#1e1e3f", corner_radius=15)
+        right_panel = ctk.CTkFrame(main_container, width=350, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         right_panel.pack(side="right", fill="y", padx=(10, 0))
         right_panel.pack_propagate(False)
 
@@ -395,7 +397,7 @@ class BillingFrame(BaseFrame):
         self.discount_entry.bind("<KeyRelease>", lambda e: self.calculate_totals())
 
         # Total
-        total_frame = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=8)
+        total_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=8)
         total_frame.pack(fill="x", padx=20, pady=15)
         ctk.CTkLabel(
             total_frame,
@@ -411,7 +413,7 @@ class BillingFrame(BaseFrame):
         self.total_label.pack(side="right", padx=10, pady=10)
 
         # Payment Type Selector
-        payment_type_frame = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=8)
+        payment_type_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=8)
         payment_type_frame.pack(fill="x", padx=20, pady=10)
 
         ctk.CTkLabel(
@@ -493,8 +495,9 @@ class BillingFrame(BaseFrame):
             width=150,
             height=45,
             font=ctk.CTkFont(size=14, weight="bold"),
-            fg_color="#1f538d",
-            hover_color="#14375e"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=(0, 10))
 
         # Clear All button
@@ -566,13 +569,15 @@ class BillingFrame(BaseFrame):
             popup,
             text="📁 Select Category",
             font=ctk.CTkFont(size=20, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(pady=(20, 15))
 
         # Scrollable category list
         scroll_frame = ctk.CTkScrollableFrame(
             popup,
-            fg_color="#1e1e3f",
+            fg_color="#060606",
+            border_width=2,
+            border_color="white",
             corner_radius=10,
             scrollbar_button_color="#333355",
             scrollbar_button_hover_color="#444477"
@@ -590,7 +595,7 @@ class BillingFrame(BaseFrame):
             ).pack(pady=50)
         else:
             for cat in categories:
-                cat_frame = ctk.CTkFrame(scroll_frame, fg_color="#252545", corner_radius=10)
+                cat_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
                 cat_frame.pack(fill="x", pady=5, padx=5)
 
                 info_frame = ctk.CTkFrame(cat_frame, fg_color="transparent")
@@ -639,9 +644,10 @@ class BillingFrame(BaseFrame):
                     text="Select",
                     width=80,
                     height=35,
-                    fg_color="#00d4ff",
-                    text_color="#1a1a2e",
-                    hover_color="#00a8cc",
+                    fg_color="#8C00FF",
+                    text_color="white",
+                    hover_color="#7300D6",
+                    corner_radius=20,
                     command=select_cat
                 ).pack(side="right", padx=15, pady=12)
 
@@ -712,7 +718,7 @@ class BillingFrame(BaseFrame):
             popup,
             text=title_text,
             font=ctk.CTkFont(size=20, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(pady=(20, 10))
 
         # Show selected category info for services
@@ -747,7 +753,9 @@ class BillingFrame(BaseFrame):
         # Scrollable item list
         scroll_frame = ctk.CTkScrollableFrame(
             popup,
-            fg_color="#1e1e3f",
+            fg_color="#060606",
+            border_width=2,
+            border_color="white",
             corner_radius=10,
             scrollbar_button_color="#333355",
             scrollbar_button_hover_color="#444477"
@@ -769,7 +777,7 @@ class BillingFrame(BaseFrame):
             ).pack(pady=50)
         else:
             for item in items:
-                item_frame = ctk.CTkFrame(scroll_frame, fg_color="#252545", corner_radius=10)
+                item_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
                 item_frame.pack(fill="x", pady=5, padx=5)
 
                 info_frame = ctk.CTkFrame(item_frame, fg_color="transparent")
@@ -1071,14 +1079,14 @@ class BillingFrame(BaseFrame):
         )
         main_scroll.pack(fill="both", expand=True, padx=5, pady=5)
 
-        content_frame = ctk.CTkFrame(main_scroll, fg_color="#1e1e3f", corner_radius=15)
+        content_frame = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         content_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         ctk.CTkLabel(
             content_frame,
             text="➕ Add New Customer",
             font=ctk.CTkFont(size=20, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(pady=(25, 30))
 
         form_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
@@ -1166,10 +1174,10 @@ class BillingFrame(BaseFrame):
             command=save_customer,
             width=160,
             height=45,
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc",
-            corner_radius=8,
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20,
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(side="left", padx=10)
 

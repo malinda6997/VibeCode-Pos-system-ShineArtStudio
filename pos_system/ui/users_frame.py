@@ -67,7 +67,7 @@ class UsersManagementFrame(ctk.CTkFrame):
         main.pack(fill="both", expand=True, padx=30, pady=10)
         
         # Left panel - Form (scrollable)
-        left = ctk.CTkFrame(main, fg_color="#1e1e3f", corner_radius=15, width=400)
+        left = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="white", corner_radius=15, width=400)
         left.pack(side="left", fill="y", padx=(0, 15), pady=0)
         left.pack_propagate(False)
         
@@ -139,9 +139,10 @@ class UsersManagementFrame(ctk.CTkFrame):
             text="➕ Add User",
             height=40,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc",
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=lambda: self.add_user()
         )
         self.add_btn.pack(fill="x", pady=5)
@@ -184,7 +185,7 @@ class UsersManagementFrame(ctk.CTkFrame):
         self.clear_btn.pack(fill="x", pady=5)
         
         # Right panel - Users list
-        right = ctk.CTkFrame(main, fg_color="#1e1e3f", corner_radius=15)
+        right = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         right.pack(side="right", fill="both", expand=True)
         
         list_title = ctk.CTkLabel(
@@ -199,7 +200,7 @@ class UsersManagementFrame(ctk.CTkFrame):
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Table header with record count
-        table_header = ctk.CTkFrame(table_frame, fg_color="#252545", corner_radius=10, height=45)
+        table_header = ctk.CTkFrame(table_frame, fg_color="#0d0d1a", corner_radius=10, height=45)
         table_header.pack(fill="x", pady=(0, 5))
         table_header.pack_propagate(False)
         
@@ -238,8 +239,8 @@ class UsersManagementFrame(ctk.CTkFrame):
         self.tree.column("Status", width=80, anchor="center")
         
         # Configure row tags
-        self.tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        self.tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        self.tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
+        self.tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         self.tree.tag_configure('admin', background='#1e3a2f', foreground='#00ff88')
         self.tree.tag_configure('disabled', background='#3a1e1e', foreground='#ff6b6b')
         

@@ -69,11 +69,11 @@ class SupportFrame(ctk.CTkFrame):
         )
         
         # Contact Information Section
-        contact_section = ctk.CTkFrame(main, fg_color="#1e1e3f", corner_radius=15)
+        contact_section = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         contact_section.pack(fill="x", pady=10)
         
         # Section Header
-        header_frame = ctk.CTkFrame(contact_section, fg_color="#252545", corner_radius=10)
+        header_frame = ctk.CTkFrame(contact_section, fg_color="#0d0d1a", corner_radius=10)
         header_frame.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
@@ -100,11 +100,11 @@ class SupportFrame(ctk.CTkFrame):
             self.create_contact_row(contact_info, icon, label, value)
         
         # FAQ Section
-        faq_section = ctk.CTkFrame(main, fg_color="#1e1e3f", corner_radius=15)
+        faq_section = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         faq_section.pack(fill="x", pady=10)
         
         # Section Header
-        faq_header = ctk.CTkFrame(faq_section, fg_color="#252545", corner_radius=10)
+        faq_header = ctk.CTkFrame(faq_section, fg_color="#0d0d1a", corner_radius=10)
         faq_header.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
@@ -140,11 +140,11 @@ class SupportFrame(ctk.CTkFrame):
             self.create_faq_item(faq_content, question, answer)
         
         # System Information
-        system_section = ctk.CTkFrame(main, fg_color="#1e1e3f", corner_radius=15)
+        system_section = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         system_section.pack(fill="x", pady=10)
         
         # Section Header
-        sys_header = ctk.CTkFrame(system_section, fg_color="#252545", corner_radius=10)
+        sys_header = ctk.CTkFrame(system_section, fg_color="#0d0d1a", corner_radius=10)
         sys_header.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
@@ -158,7 +158,7 @@ class SupportFrame(ctk.CTkFrame):
         system_info.pack(fill="x", padx=25, pady=(0, 20))
         
         # System info in a grid
-        info_frame = ctk.CTkFrame(system_info, fg_color="#252545", corner_radius=10)
+        info_frame = ctk.CTkFrame(system_info, fg_color="#0d0d1a", corner_radius=10)
         info_frame.pack(fill="x", pady=5)
         
         info_items = [
@@ -190,11 +190,11 @@ class SupportFrame(ctk.CTkFrame):
             ).pack(side="left")
         
         # Report Issue Section
-        report_section = ctk.CTkFrame(main, fg_color="#1e1e3f", corner_radius=15)
+        report_section = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         report_section.pack(fill="x", pady=10)
         
         # Section Header
-        report_header = ctk.CTkFrame(report_section, fg_color="#252545", corner_radius=10)
+        report_header = ctk.CTkFrame(report_section, fg_color="#0d0d1a", corner_radius=10)
         report_header.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
@@ -217,7 +217,7 @@ class SupportFrame(ctk.CTkFrame):
             report_content, 
             height=120, 
             font=ctk.CTkFont(size=13),
-            fg_color="#252545",
+            fg_color="#0d0d1a",
             border_width=2,
             border_color="#333355"
         )
@@ -251,7 +251,7 @@ class SupportFrame(ctk.CTkFrame):
     
     def create_help_card(self, parent, icon, title, desc, contact, color, command):
         """Create a help card"""
-        card = ctk.CTkFrame(parent, fg_color="#1e1e3f", corner_radius=15, width=250)
+        card = ctk.CTkFrame(parent, fg_color="#060606", border_width=2, border_color="white", corner_radius=15, width=250)
         card.pack(side="left", fill="both", expand=True, padx=5)
         
         # Icon circle
@@ -299,7 +299,7 @@ class SupportFrame(ctk.CTkFrame):
     
     def create_contact_row(self, parent, icon, label, value):
         """Create a contact info row"""
-        row = ctk.CTkFrame(parent, fg_color="#252545", corner_radius=8)
+        row = ctk.CTkFrame(parent, fg_color="#0d0d1a", corner_radius=8)
         row.pack(fill="x", pady=4)
         
         ctk.CTkLabel(
@@ -326,7 +326,7 @@ class SupportFrame(ctk.CTkFrame):
     
     def create_faq_item(self, parent, question: str, answer: str):
         """Create an FAQ item"""
-        item = ctk.CTkFrame(parent, fg_color="#252545", corner_radius=10)
+        item = ctk.CTkFrame(parent, fg_color="#0d0d1a", corner_radius=10)
         item.pack(fill="x", pady=4)
         
         q_label = ctk.CTkLabel(

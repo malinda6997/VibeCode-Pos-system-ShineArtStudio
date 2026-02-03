@@ -5,13 +5,12 @@ import os
 
 
 class Sidebar(ctk.CTkFrame):
-    """Modern collapsible sidebar navigation component with emoji icons and scrollable content"""
+    """Modern static sidebar navigation component with emoji icons and scrollable content"""
     
-    EXPANDED_WIDTH = 250
-    COLLAPSED_WIDTH = 70
+    SIDEBAR_WIDTH = 250
     
     def __init__(self, parent, auth_manager, on_navigate: Callable):
-        super().__init__(parent, fg_color="#0d0d1a", width=self.EXPANDED_WIDTH, corner_radius=0)
+        super().__init__(parent, fg_color="#0d0d1a", width=self.SIDEBAR_WIDTH, corner_radius=0)
         self.pack_propagate(False)
         
         self.auth_manager = auth_manager
@@ -20,15 +19,11 @@ class Sidebar(ctk.CTkFrame):
         self.buttons: Dict[str, ctk.CTkButton] = {}
         self.button_data: Dict[str, Tuple[str, str]] = {}  # Store icon and text for each button
         self.user_avatar = None
-        self.is_collapsed = False
         
-        # Store references to collapsible elements
-        self.collapsible_labels: List[ctk.CTkLabel] = []
-        self.collapsible_frames: List[ctk.CTkFrame] = []
+        # Store references to elements
         self.logo_label = None
         self.logo_img_label = None
         self.sidebar_logo_image = None
-        self.sidebar_logo_image_small = None
         self.user_frame = None
         self.user_info_frame = None
         
@@ -36,24 +31,6 @@ class Sidebar(ctk.CTkFrame):
     
     def create_sidebar(self):
         """Create sidebar layout with scrollable navigation"""
-        
-        # Toggle button at top
-        toggle_frame = ctk.CTkFrame(self, fg_color="transparent", height=50)
-        toggle_frame.pack(fill="x", pady=(10, 0))
-        toggle_frame.pack_propagate(False)
-        
-        self.toggle_btn = ctk.CTkButton(
-            toggle_frame,
-            text="☰",
-            font=ctk.CTkFont(size=20),
-            fg_color="transparent",
-            hover_color="#1a1a2e",
-            width=40,
-            height=40,
-            corner_radius=20,
-            command=self.toggle_sidebar
-        )
-        self.toggle_btn.pack(side="left", padx=10)
         
         # Logo section (fixed at top)
         self.logo_frame = ctk.CTkFrame(self, fg_color="transparent", height=70)
@@ -73,12 +50,6 @@ class Sidebar(ctk.CTkFrame):
                 target_width = max(min(target_width, 220), 160)
                 self.sidebar_logo_image = ctk.CTkImage(light_image=logo_img, dark_image=logo_img, size=(target_width, target_height))
                 
-                # Small logo for collapsed state
-                small_height = 35
-                small_width = int(small_height * aspect_ratio)
-                small_width = min(small_width, 50)
-                self.sidebar_logo_image_small = ctk.CTkImage(light_image=logo_img, dark_image=logo_img, size=(small_width, small_height))
-                
                 self.logo_img_label = ctk.CTkLabel(self.logo_frame, image=self.sidebar_logo_image, text="")
                 self.logo_img_label.pack(pady=(10, 5))
         except Exception as e:
@@ -91,7 +62,6 @@ class Sidebar(ctk.CTkFrame):
                 text_color="#8C00FF"
             )
             self.logo_label.pack(pady=(10, 5))
-            self.collapsible_labels.append(self.logo_label)
         
         # Separator
         sep = ctk.CTkFrame(self, fg_color="#1a1a2e", height=2)
@@ -151,7 +121,6 @@ class Sidebar(ctk.CTkFrame):
                 text_color="#666666"
             )
             self.admin_label.pack(anchor="w", padx=15, pady=(5, 5))
-            self.collapsible_labels.append(self.admin_label)
             
             for tab_id, icon, text, perm_key in admin_items:
                 if self.auth_manager.has_permission(perm_key):
@@ -188,7 +157,6 @@ class Sidebar(ctk.CTkFrame):
                 anchor="w"
             )
             self.user_name_label.pack(anchor="w")
-            self.collapsible_labels.append(self.user_name_label)
             
             # Role badge with styling
             role_color = "#8C00FF" if user['role'] == 'Admin' else "#00ff88"
@@ -200,7 +168,6 @@ class Sidebar(ctk.CTkFrame):
                 anchor="w"
             )
             self.user_role_label.pack(anchor="w")
-            self.collapsible_labels.append(self.user_role_label)
             
             # Recent login info (Admin only)
             if user['role'] == 'Admin':
@@ -217,129 +184,11 @@ class Sidebar(ctk.CTkFrame):
                     anchor="w"
                 )
                 self.last_login_label.pack(anchor="w")
-                self.collapsible_labels.append(self.last_login_label)
             else:
                 self.last_login_label = None
-            
-            # User icon for collapsed state
-            self.user_icon_label = ctk.CTkLabel(
-                self.user_content,
-                text="👤",
-                font=ctk.CTkFont(size=24),
-                text_color="#8C00FF"
-            )
-            # Hidden by default in expanded state
         
         # Set dashboard as active
         self.set_active("dashboard")
-    
-    def toggle_sidebar(self):
-        """Toggle between expanded and collapsed states"""
-        if self.is_collapsed:
-            self.expand_sidebar()
-        else:
-            self.collapse_sidebar()
-    
-    def collapse_sidebar(self):
-        """Collapse sidebar to show only icons - optimized for performance"""
-        self.is_collapsed = True
-        
-        # Update toggle button
-        self.toggle_btn.configure(text="▶")
-        
-        # Hide ALL text - show only icons in buttons
-        for tab_id, btn in self.buttons.items():
-            icon, text = self.button_data[tab_id]
-            btn.configure(text=icon, anchor="center", width=50)
-        
-        # Completely hide all collapsible labels
-        for label in self.collapsible_labels:
-            label.pack_forget()
-        
-        # Hide admin label if exists
-        if hasattr(self, 'admin_label'):
-            self.admin_label.pack_forget()
-        
-        # Hide logo completely
-        if self.logo_img_label:
-            self.logo_img_label.pack_forget()
-        if self.logo_label:
-            self.logo_label.pack_forget()
-        
-        # Minimize logo frame
-        self.logo_frame.configure(height=10)
-        
-        # Hide user info completely, show only icon
-        if self.user_info_frame:
-            self.user_info_frame.pack_forget()
-            self.user_name_label.pack_forget()
-            self.user_role_label.pack_forget()
-            if self.last_login_label:
-                self.last_login_label.pack_forget()
-            self.user_icon_label.pack(side="left", padx=5)
-        
-        # Update user frame padding
-        if self.user_frame:
-            self.user_frame.pack_configure(padx=8)
-            self.user_content.pack_configure(padx=8, pady=8)
-        
-        # Apply width change
-        self._animate_width(self.EXPANDED_WIDTH, self.COLLAPSED_WIDTH)
-        
-        # Force update to ensure all changes are applied
-        self.update_idletasks()
-    
-    def expand_sidebar(self):
-        """Expand sidebar to show full content - optimized for performance"""
-        self.is_collapsed = False
-        
-        # Apply width change first
-        self._animate_width(self.COLLAPSED_WIDTH, self.EXPANDED_WIDTH)
-        
-        # Update toggle button
-        self.toggle_btn.configure(text="☰")
-        
-        # Restore full text in buttons
-        for tab_id, btn in self.buttons.items():
-            icon, text = self.button_data[tab_id]
-            btn.configure(text=f"{icon}  {text}", anchor="w", width=0)
-        
-        # Restore admin label if exists
-        if hasattr(self, 'admin_label') and self.admin_label in self.collapsible_labels:
-            self.admin_label.pack(anchor="w", padx=15, pady=(5, 5))
-        
-        # Restore logo
-        if self.logo_img_label and self.sidebar_logo_image:
-            self.logo_img_label.configure(image=self.sidebar_logo_image)
-            self.logo_img_label.pack(pady=(10, 5))
-        elif self.logo_label:
-            self.logo_label.pack(pady=(10, 5))
-        
-        # Restore logo frame height
-        self.logo_frame.configure(height=70)
-        
-        # Restore user info
-        if self.user_info_frame:
-            self.user_icon_label.pack_forget()
-            self.user_info_frame.pack(side="left", fill="x", expand=True)
-            self.user_name_label.pack(anchor="w")
-            self.user_role_label.pack(anchor="w")
-            if self.last_login_label:
-                self.last_login_label.pack(anchor="w")
-        
-        # Update user frame padding
-        if self.user_frame:
-            self.user_frame.pack_configure(padx=12)
-            self.user_content.pack_configure(padx=12, pady=12)
-        
-        # Force update
-        self.update_idletasks()
-    
-    def _animate_width(self, start_width: int, end_width: int, steps: int = 10):
-        """Set sidebar width instantly for smooth performance"""
-        # Instant width change - no animation lag
-        self.configure(width=end_width)
-        self.update_idletasks()
     
     def get_user_initials(self, full_name: str) -> str:
         """Get user initials from full name"""

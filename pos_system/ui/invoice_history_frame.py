@@ -25,7 +25,7 @@ class InvoiceHistoryFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Search and controls
-        controls_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
+        controls_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         controls_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         ctk.CTkLabel(
@@ -62,9 +62,10 @@ class InvoiceHistoryFrame(BaseFrame):
             command=self.reprint_invoice,
             width=140,
             height=35,
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc"
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
         
         # Admin-only delete buttons
@@ -92,11 +93,11 @@ class InvoiceHistoryFrame(BaseFrame):
             ).pack(side="left", padx=10)
         
         # Invoices table
-        table_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
+        table_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="white", corner_radius=15)
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Table header
-        table_header = ctk.CTkFrame(table_frame, fg_color="#252545", corner_radius=10, height=50)
+        table_header = ctk.CTkFrame(table_frame, fg_color="#0d0d1a", corner_radius=10, height=50)
         table_header.pack(fill="x", padx=10, pady=(10, 5))
         table_header.pack_propagate(False)
         
@@ -104,7 +105,7 @@ class InvoiceHistoryFrame(BaseFrame):
             table_header,
             text="📸 Booking Invoice Records",
             font=ctk.CTkFont(size=14, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", padx=15, pady=10)
         
         self.record_count_label = ctk.CTkLabel(
@@ -141,8 +142,8 @@ class InvoiceHistoryFrame(BaseFrame):
         self.tree.column("Balance", width=110, anchor="e")
         
         # Configure row tags
-        self.tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        self.tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        self.tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
+        self.tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         self.tree.tag_configure('hasbalance', background='#3a2e1e', foreground='#ffd93d')
         
         scrollbar = ttk.Scrollbar(table_container, orient="vertical", command=self.tree.yview)
