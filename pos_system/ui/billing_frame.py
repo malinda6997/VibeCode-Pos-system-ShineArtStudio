@@ -322,9 +322,10 @@ class BillingFrame(BaseFrame):
         )
         self.select_item_btn.pack(side="left", padx=5)
 
-        # Cart table - FIXED: Store as instance variable to prevent disappearing
-        self.cart_frame = ctk.CTkFrame(left_panel, fg_color="#0d0d1a", corner_radius=20, border_width=2, border_color="#444444")
+        # Cart table - ULTRA-STABLE: Fixed height with grid_propagate to prevent shifting
+        self.cart_frame = ctk.CTkFrame(left_panel, fg_color="#0d0d1a", corner_radius=20, border_width=2, border_color="#444444", height=400)
         self.cart_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        self.cart_frame.pack_propagate(False)  # Lock the size - prevent resizing
 
         cart_label = ctk.CTkLabel(
             self.cart_frame,
