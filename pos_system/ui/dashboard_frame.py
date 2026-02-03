@@ -25,9 +25,16 @@ class DashboardFrame(ctk.CTkFrame):
         # Filter variables
         self.filter_mode = "daily"  # daily, weekly, monthly
         self.selected_date = datetime.now().strftime('%Y-%m-%d')
+        self.selected_month = datetime.now().month
+        self.selected_year = datetime.now().year
+        self.selected_week = 1
         
         self.create_widgets()
         self.load_stats()
+        
+        # Initialize report button visibility
+        if self.is_admin():
+            self.update_report_button_visibility()
         
         # Auto-refresh on startup
         self.update_daily_balance()
@@ -149,6 +156,108 @@ class DashboardFrame(ctk.CTkFrame):
             command=lambda: self.apply_filter("monthly")
         )
         self.monthly_filter_btn.pack(side="left", padx=5)
+        
+        # Separator
+        separator = ctk.CTkFrame(filter_btn_frame, width=2, height=30, fg_color="#444444")
+        separator.pack(side="left", padx=15)
+        
+        # Year Selector
+        ctk.CTkLabel(
+            filter_btn_frame,
+            text="Year:",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color="#ffffff"
+        ).pack(side="left", padx=(0, 5))
+        
+        current_year = datetime.now().year
+        # Year starts from 2026
+        years = [str(year) for year in range(2026, current_year + 2)]
+        self.year_selector = ctk.CTkOptionMenu(
+            filter_btn_frame,
+            values=years,
+            width=100,
+            height=35,
+            fg_color="#2d2d5a",
+            button_color="#8C00FF",
+            button_hover_color="#7300D6",
+            dropdown_fg_color="#2d2d5a",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            corner_radius=15,
+            command=self.on_year_changed
+        )
+        self.year_selector.set(str(current_year))
+        self.year_selector.pack(side="left", padx=5)
+        
+        # Month Selector
+        ctk.CTkLabel(
+            filter_btn_frame,
+            text="Month:",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color="#ffffff"
+        ).pack(side="left", padx=(15, 5))
+        
+        months = ["January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December"]
+        self.month_selector = ctk.CTkOptionMenu(
+            filter_btn_frame,
+            values=months,
+            width=130,
+            height=35,
+            fg_color="#2d2d5a",
+            button_color="#8C00FF",
+            button_hover_color="#7300D6",
+            dropdown_fg_color="#2d2d5a",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            corner_radius=15,
+            command=self.on_month_changed
+        )
+        self.month_selector.set(months[datetime.now().month - 1])
+        self.month_selector.pack(side="left", padx=5)
+        
+        # Week Selector
+        ctk.CTkLabel(
+            filter_btn_frame,
+            text="Week:",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color="#ffffff"
+        ).pack(side="left", padx=(15, 5))
+        
+        weeks = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"]
+        self.week_selector = ctk.CTkOptionMenu(
+            filter_btn_frame,
+            values=weeks,
+            width=100,
+            height=35,
+            fg_color="#2d2d5a",
+            button_color="#8C00FF",
+            button_hover_color="#7300D6",
+            dropdown_fg_color="#2d2d5a",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            corner_radius=15,
+            command=self.on_week_changed
+        )
+        self.week_selector.set("Week 1")
+        self.week_selector.pack(side="left", padx=5)
+        
+        # Date Picker Toggle
+        ctk.CTkLabel(
+            filter_btn_frame,
+            text="Custom Date:",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color="#ffffff"
+        ).pack(side="left", padx=(15, 5))
+        
+        self.date_picker_toggle = ctk.CTkSwitch(
+            filter_btn_frame,
+            text="",
+            width=50,
+            height=25,
+            progress_color="#8C00FF",
+            button_color="#ffffff",
+            button_hover_color="#e0e0e0",
+            command=self.toggle_date_picker
+        )
+        self.date_picker_toggle.pack(side="left", padx=5)
         
         # Selected period label
         self.period_label = ctk.CTkLabel(
@@ -344,8 +453,8 @@ class DashboardFrame(ctk.CTkFrame):
             report_btn_frame = ctk.CTkFrame(report_frame, fg_color="transparent")
             report_btn_frame.pack(fill="x", padx=20, pady=(0, 15))
             
-            # Daily Report Button
-            daily_report_btn = ctk.CTkButton(
+            # Daily Report Button (Hidden by default)
+            self.daily_report_btn = ctk.CTkButton(
                 report_btn_frame,
                 text="📅 Generate Daily Report",
                 width=200,
@@ -357,10 +466,10 @@ class DashboardFrame(ctk.CTkFrame):
                 corner_radius=20,
                 command=lambda: self.generate_report("daily")
             )
-            daily_report_btn.pack(side="left", padx=5)
+            # Don't pack by default - will be shown based on filter
             
-            # Weekly Report Button
-            weekly_report_btn = ctk.CTkButton(
+            # Weekly Report Button (Hidden by default)
+            self.weekly_report_btn = ctk.CTkButton(
                 report_btn_frame,
                 text="📆 Generate Weekly Report",
                 width=200,
@@ -372,10 +481,10 @@ class DashboardFrame(ctk.CTkFrame):
                 corner_radius=20,
                 command=lambda: self.generate_report("weekly")
             )
-            weekly_report_btn.pack(side="left", padx=5)
+            # Don't pack by default - will be shown based on filter
             
-            # Monthly Report Button
-            monthly_report_btn = ctk.CTkButton(
+            # Monthly Report Button (Hidden by default)
+            self.monthly_report_btn = ctk.CTkButton(
                 report_btn_frame,
                 text="📊 Generate Monthly Report",
                 width=200,
@@ -387,7 +496,10 @@ class DashboardFrame(ctk.CTkFrame):
                 corner_radius=20,
                 command=lambda: self.generate_report("monthly")
             )
-            monthly_report_btn.pack(side="left", padx=5)
+            # Don't pack by default - will be shown based on filter
+            
+            # Store reference to report button frame
+            self.report_btn_frame = report_btn_frame
         
         # ==================== Financial Cards ====================
         if self.is_admin():
@@ -498,6 +610,97 @@ class DashboardFrame(ctk.CTkFrame):
         
         return card
     
+    def toggle_date_picker(self):
+        """Toggle date picker visibility and functionality"""
+        if self.date_picker_toggle.get():
+            # Date picker is ON - show custom date selection
+            # For now, we'll use the daily filter as the custom date mode
+            self.apply_filter("daily")
+            messagebox.showinfo(
+                "Date Picker Enabled",
+                "Custom date picker is now active!\n\nYou can select specific dates using the Year, Month, and Week selectors.\n\nTip: Use 'Daily' filter for specific dates."
+            )
+        else:
+            # Date picker is OFF - return to normal filtering
+            pass
+    
+    def update_report_button_visibility(self):
+        """Update visibility of report buttons based on current filter mode"""
+        # Hide all buttons first
+        self.daily_report_btn.pack_forget()
+        self.weekly_report_btn.pack_forget()
+        self.monthly_report_btn.pack_forget()
+        
+        # Show only the relevant button based on filter mode
+        if self.filter_mode == "daily" or self.date_picker_toggle.get():
+            # Show daily report button for daily filter or custom date
+            self.daily_report_btn.pack(side="left", padx=5)
+        elif self.filter_mode == "weekly":
+            # Show weekly report button for weekly filter
+            self.weekly_report_btn.pack(side="left", padx=5)
+        elif self.filter_mode == "monthly":
+            # Show monthly report button for monthly filter
+            self.monthly_report_btn.pack(side="left", padx=5)
+    
+    def on_year_changed(self, selected_year: str):
+        """Handle year selection change"""
+        self.selected_year = int(selected_year)
+        self.update_period_label()
+        self.load_stats()
+        self.update_report_button_visibility()
+    
+    def on_month_changed(self, selected_month: str):
+        """Handle month selection change"""
+        months = ["January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December"]
+        self.selected_month = months.index(selected_month) + 1
+        self.update_period_label()
+        self.load_stats()
+        self.update_report_button_visibility()
+    
+    def on_week_changed(self, selected_week: str):
+        """Handle week selection change"""
+        self.selected_week = int(selected_week.split()[1])  # Extract number from "Week X"
+        self.update_period_label()
+        self.load_stats()
+        self.update_report_button_visibility()
+    
+    def update_period_label(self):
+        """Update the period label based on current selections"""
+        months = ["January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December"]
+        
+        if self.filter_mode == "daily":
+            self.period_label.configure(text=f"Viewing: {datetime.now().strftime('%B %d, %Y')}")
+        elif self.filter_mode == "weekly":
+            # Calculate week date range
+            start_date, end_date = self.get_week_range(self.selected_year, self.selected_month, self.selected_week)
+            self.period_label.configure(text=f"Viewing: {start_date.strftime('%b %d')} - {end_date.strftime('%b %d, %Y')} (Week {self.selected_week})")
+        elif self.filter_mode == "monthly":
+            month_name = months[self.selected_month - 1]
+            self.period_label.configure(text=f"Viewing: {month_name} {self.selected_year}")
+    
+    def get_week_range(self, year: int, month: int, week_num: int):
+        """Calculate start and end dates for a specific week of a month"""
+        from calendar import monthrange
+        
+        # Get first day of month
+        first_day = datetime(year, month, 1)
+        
+        # Calculate start date of the week
+        start_day = 1 + (week_num - 1) * 7
+        
+        # Get last day of month
+        _, last_day_of_month = monthrange(year, month)
+        
+        # Calculate end day of the week (7 days later or last day of month)
+        end_day = min(start_day + 6, last_day_of_month)
+        
+        start_date = datetime(year, month, start_day)
+        end_date = datetime(year, month, end_day)
+        
+        return start_date, end_date
+    
     def apply_filter(self, filter_mode: str):
         """Apply date filter"""
         self.filter_mode = filter_mode
@@ -509,18 +712,15 @@ class DashboardFrame(ctk.CTkFrame):
         
         if filter_mode == "daily":
             self.daily_filter_btn.configure(fg_color="#8C00FF")
-            self.period_label.configure(text=f"Viewing: {datetime.now().strftime('%B %d, %Y')}")
         elif filter_mode == "weekly":
             self.weekly_filter_btn.configure(fg_color="#8C00FF")
-            end_date = datetime.now()
-            start_date = end_date - timedelta(days=6)
-            self.period_label.configure(text=f"Viewing: {start_date.strftime('%b %d')} - {end_date.strftime('%b %d, %Y')}")
         elif filter_mode == "monthly":
             self.monthly_filter_btn.configure(fg_color="#8C00FF")
-            self.period_label.configure(text=f"Viewing: {datetime.now().strftime('%B %Y')}")
         
-        # Refresh stats with new filter
+        # Update period label and refresh stats
+        self.update_period_label()
         self.load_stats()
+        self.update_report_button_visibility()
     
     def add_expense(self):
         """Add manual expense"""
@@ -573,10 +773,24 @@ class DashboardFrame(ctk.CTkFrame):
             if report_type == "daily":
                 result = generate_daily_report()
             elif report_type == "weekly":
-                result = generate_weekly_report()
+                # Check if using specific week filter
+                if self.filter_mode == "weekly":
+                    # Generate report for specific week
+                    start_date, end_date = self.get_week_range(self.selected_year, self.selected_month, self.selected_week)
+                    result = generate_weekly_report(
+                        start_date=start_date.strftime('%Y-%m-%d'),
+                        end_date=end_date.strftime('%Y-%m-%d')
+                    )
+                else:
+                    result = generate_weekly_report()
             elif report_type == "monthly":
-                today = datetime.now()
-                result = generate_monthly_report(year=today.year, month=today.month)
+                # Check if using specific month filter
+                if self.filter_mode == "monthly":
+                    # Generate report for specific month and year
+                    result = generate_monthly_report(year=self.selected_year, month=self.selected_month)
+                else:
+                    today = datetime.now()
+                    result = generate_monthly_report(year=today.year, month=today.month)
             else:
                 messagebox.showerror("Error", "Invalid report type")
                 return
@@ -595,8 +809,23 @@ class DashboardFrame(ctk.CTkFrame):
                         f"Total Customers: {user_insights.get('total_customers', 0)}\n"
                     )
                 
+                # Add filter information to message
+                filter_info = ""
+                if report_type == "weekly" and self.filter_mode == "weekly":
+                    start_date, end_date = self.get_week_range(self.selected_year, self.selected_month, self.selected_week)
+                    months = ["January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"]
+                    month_name = months[self.selected_month - 1]
+                    filter_info = f"\n📅 Period: Week {self.selected_week} of {month_name} {self.selected_year}\n"
+                elif report_type == "monthly" and self.filter_mode == "monthly":
+                    months = ["January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"]
+                    month_name = months[self.selected_month - 1]
+                    filter_info = f"\n📅 Period: {month_name} {self.selected_year}\n"
+                
                 message = (
-                    f"✅ {report_type.capitalize()} Executive Report Generated!\n\n"
+                    f"✅ {report_type.capitalize()} Executive Report Generated!\n"
+                    f"{filter_info}\n"
                     f"📊 Financial Summary:\n"
                     f"Opening Balance: LKR {summary['opening_balance']:,.2f}\n"
                     f"Total Income: LKR {summary['total_income']:,.2f}\n"
@@ -661,17 +890,30 @@ class DashboardFrame(ctk.CTkFrame):
         if self.is_admin():
             stats = self.dashboard_service.get_admin_dashboard_stats()
             
-            # Update balance summary
+            # Update balance summary based on filter mode
             opening_balance = self.dashboard_service.get_opening_balance(today)
-            total_income = stats['today_sales']
             
+            # Get income and expenses based on filter
             if self.filter_mode == "daily":
+                total_income = stats['today_sales']
                 total_expenses = self.dashboard_service.get_expenses_by_date(today)
             elif self.filter_mode == "weekly":
-                total_expenses = self.dashboard_service.get_weekly_expenses()
+                # Get specific week range
+                start_date, end_date = self.get_week_range(self.selected_year, self.selected_month, self.selected_week)
+                total_income = self.dashboard_service.get_income_by_range(
+                    start_date.strftime('%Y-%m-%d'),
+                    end_date.strftime('%Y-%m-%d')
+                )
+                total_expenses = self.dashboard_service.get_expenses_by_range(
+                    start_date.strftime('%Y-%m-%d'),
+                    end_date.strftime('%Y-%m-%d')
+                )
             elif self.filter_mode == "monthly":
-                total_expenses = self.dashboard_service.get_monthly_expenses()
+                # Get specific month data
+                total_income = self.dashboard_service.get_income_by_month(self.selected_year, self.selected_month)
+                total_expenses = self.dashboard_service.get_expenses_by_month(self.selected_year, self.selected_month)
             else:
+                total_income = 0.0
                 total_expenses = 0.0
             
             net_profit = total_income - total_expenses

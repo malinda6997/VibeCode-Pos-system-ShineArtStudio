@@ -696,12 +696,29 @@ def generate_daily_report(db_path='pos_database.db', target_date=None):
     return generator.generate_report(target_date, target_date, 'Daily')
 
 
-def generate_weekly_report(db_path='pos_database.db', end_date=None):
-    if end_date is None:
+def generate_weekly_report(db_path='pos_database.db', start_date=None, end_date=None):
+    """
+    Generate weekly report. Can be called with:
+    - No parameters: generates report for last 7 days
+    - end_date only: generates report for 7 days ending on end_date
+    - start_date and end_date: generates report for the specific date range
+    """
+    if start_date is None and end_date is None:
+        # Default: last 7 days
         end_date = datetime.now()
+        start_date = end_date - timedelta(days=6)
+    elif start_date is None and end_date is not None:
+        # end_date provided, calculate start_date
+        if isinstance(end_date, str):
+            end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        start_date = end_date - timedelta(days=6)
     else:
-        end_date = datetime.strptime(end_date, '%Y-%m-%d')
-    start_date = end_date - timedelta(days=6)
+        # Both provided
+        if isinstance(start_date, str):
+            start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        if isinstance(end_date, str):
+            end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    
     generator = ExecutiveReportGenerator(db_path)
     return generator.generate_report(start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), 'Weekly')
 
