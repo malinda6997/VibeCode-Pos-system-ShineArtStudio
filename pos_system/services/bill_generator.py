@@ -288,12 +288,30 @@ class BillGenerator:
         advance_amount = bill_data.get('advance_amount', 0) or 0
         balance_due = bill_data.get('balance_due', 0) or 0
         
+        # Determine payment status
+        payment_status = "FULL PAYMENT" if balance_due == 0 else "ADVANCE PAYMENT"
+        
+        # Payment status label - Bold and clear
+        payment_status_style = ParagraphStyle(
+            'PaymentStatus',
+            fontSize=10,
+            textColor=colors.HexColor('#000000'),  # Pure Black
+            fontName='Helvetica-Bold',
+            alignment=TA_CENTER,
+            spaceAfter=2*mm,
+            spaceBefore=0,
+            leading=12
+        )
+        
+        story.append(Paragraph(f"<b>[ {payment_status} ]</b>", payment_status_style))
+        story.append(Spacer(1, 2*mm))
+        
         if advance_amount > 0 and balance_due > 0:
-            # Advance payment
-            story.append(Paragraph(f"Advance Paid: Rs. {advance_amount:.2f}", right_total_style))
-            story.append(Paragraph(f"<b>Balance Due: Rs. {balance_due:.2f}</b>", grand_total_style))
+            # ADVANCE PAYMENT
+            story.append(Paragraph(f"<b>Advance Paid: Rs. {advance_amount:.2f}</b>", right_total_style))
+            story.append(Paragraph(f"<b>Remaining Balance: Rs. {balance_due:.2f}</b>", grand_total_style))
         else:
-            # Full payment - Cash and Change
+            # FULL PAYMENT - Cash and Change
             cash_given = bill_data.get('cash_given', 0) or 0
             if cash_given > 0:
                 story.append(Paragraph(f"Cash Received: Rs. {cash_given:.2f}", right_total_style))
