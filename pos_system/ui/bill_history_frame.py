@@ -2,6 +2,8 @@ import customtkinter as ctk
 from tkinter import ttk
 from ui.components import BaseFrame, MessageDialog
 from services.bill_generator import BillGenerator
+from datetime import datetime
+import os
 
 
 class BillHistoryFrame(BaseFrame):
@@ -11,6 +13,7 @@ class BillHistoryFrame(BaseFrame):
         super().__init__(parent, auth_manager, db_manager)
         self.bill_generator = BillGenerator()
         self.filter_type = "all"  # 'all', 'registered', 'guest'
+        self.payment_status = "all"  # 'all', 'paid', 'pending'
         self.create_widgets()
         self.load_bills()
     
@@ -92,6 +95,31 @@ class BillHistoryFrame(BaseFrame):
             hover_color="#7300D6"
         ).pack(side="left", padx=3)
         
+        # Payment Status Filter (NEW)
+        payment_filter_frame = ctk.CTkFrame(controls_frame, fg_color="transparent")
+        payment_filter_frame.pack(side="left", padx=20)
+        
+        ctk.CTkLabel(
+            payment_filter_frame,
+            text="Payment Status:",
+            font=ctk.CTkFont(size=12, weight="bold")
+        ).pack(side="left", padx=5)
+        
+        self.payment_status_selector = ctk.CTkSegmentedButton(
+            payment_filter_frame,
+            values=["All", "Fully Paid", "Pending"],
+            command=self.on_payment_status_change,
+            selected_color="#8C00FF",
+            selected_hover_color="#7300D6",
+            unselected_color="#2d2d5a",
+            unselected_hover_color="#3d3d7a",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            corner_radius=20,
+            border_width=2
+        )
+        self.payment_status_selector.set("All")
+        self.payment_status_selector.pack(side="left", padx=5)
+        
         ctk.CTkButton(
             controls_frame,
             text="View Details",
@@ -113,6 +141,20 @@ class BillHistoryFrame(BaseFrame):
             text_color="white",
             hover_color="#7300D6",
             corner_radius=20
+        ).pack(side="left", padx=10)
+        
+        # Settle Balance button (NEW)
+        ctk.CTkButton(
+            controls_frame,
+            text="💵 Settle Balance",
+            command=self.settle_balance,
+            width=160,
+            height=35,
+            fg_color="#ffa500",
+            text_color="white",
+            hover_color="#ff8c00",
+            corner_radius=20,
+            font=ctk.CTkFont(size=13, weight="bold")
         ).pack(side="left", padx=10)
         
         # Admin-only delete buttons
@@ -199,7 +241,7 @@ class BillHistoryFrame(BaseFrame):
         # Get all bills
         all_bills = self.db_manager.get_all_bills(limit=500)
         
-        # Apply filter
+        # Apply customer type filter
         self.filter_type = self.filter_var.get()
         if self.filter_type == "registered":
             bills = [b for b in all_bills if b['customer_id'] is not None]
@@ -207,6 +249,12 @@ class BillHistoryFrame(BaseFrame):
             bills = [b for b in all_bills if b['customer_id'] is None and b['guest_name']]
         else:  # all
             bills = all_bills
+        
+        # Apply payment status filter (NEW)
+        if self.payment_status == "paid":
+            bills = [b for b in bills if (b.get('balance_due', 0) or 0) == 0]
+        elif self.payment_status == "pending":
+            bills = [b for b in bills if (b.get('balance_due', 0) or 0) > 0]
         
         for i, bill in enumerate(bills):
             # Calculate balance
@@ -244,6 +292,16 @@ class BillHistoryFrame(BaseFrame):
         """Apply the selected filter and reload bills"""
         self.load_bills()
     
+    def on_payment_status_change(self, value):
+        """Handle payment status filter change"""
+        if value == "All":
+            self.payment_status = "all"
+        elif value == "Fully Paid":
+            self.payment_status = "paid"
+        elif value == "Pending":
+            self.payment_status = "pending"
+        self.load_bills()
+    
     def search_bills(self):
         """Search bills with filter support"""
         search_term = self.search_entry.get().strip()
@@ -258,7 +316,7 @@ class BillHistoryFrame(BaseFrame):
         # Search in bills table
         all_bills = self.db_manager.search_bills(search_term)
         
-        # Apply filter
+        # Apply customer type filter
         self.filter_type = self.filter_var.get()
         if self.filter_type == "registered":
             bills = [b for b in all_bills if b['customer_id'] is not None]
@@ -266,6 +324,12 @@ class BillHistoryFrame(BaseFrame):
             bills = [b for b in all_bills if b['customer_id'] is None and b['guest_name']]
         else:  # all
             bills = all_bills
+        
+        # Apply payment status filter (NEW)
+        if self.payment_status == "paid":
+            bills = [b for b in bills if (b.get('balance_due', 0) or 0) == 0]
+        elif self.payment_status == "pending":
+            bills = [b for b in bills if (b.get('balance_due', 0) or 0) > 0]
         
         for i, bill in enumerate(bills):
             # Calculate balance
@@ -512,3 +576,557 @@ Balance Due: LKR {balance:.2f}
         
         # Restore focus to main window
         self.restore_focus()
+    
+    def settle_balance(self):
+        """Settle the remaining balance for a pending bill"""
+        selection = self.tree.selection()
+        if not selection:
+            MessageDialog.show_error("Error", "Please select a bill to settle")
+            return
+        
+        item = self.tree.item(selection[0])
+        bill_number = item['values'][0]
+        balance_str = item['values'][7]  # Balance column
+        
+        # Check if bill has pending balance
+        try:
+            balance = float(balance_str)
+        except:
+            balance = 0
+        
+        if balance <= 0:
+            MessageDialog.show_error("Error", "This bill is already fully paid")
+            return
+        
+        # Get full bill data
+        bill = self.db_manager.get_bill_by_number(bill_number)
+        if not bill:
+            MessageDialog.show_error("Error", "Bill not found")
+            return
+        
+        # Get bill items
+        items = self.db_manager.get_bill_items(bill['id'])
+        
+        # Create settlement dialog
+        self.show_settlement_dialog(bill, items)
+    
+    def show_settlement_dialog(self, bill, items):
+        """Show modern settlement dialog with payment input"""
+        dialog = ctk.CTkToplevel(self)
+        dialog.title(f"Settle Balance - Bill #{bill['bill_number']}")
+        dialog.geometry("600x700")
+        dialog.transient(self.winfo_toplevel())
+        dialog.grab_set()
+        dialog.configure(fg_color="#1a1a2e")
+        dialog.resizable(False, False)
+        
+        def close_dialog():
+            try:
+                dialog.grab_release()
+            except:
+                pass
+            dialog.destroy()
+            self.winfo_toplevel().focus_force()
+        
+        dialog.protocol("WM_DELETE_WINDOW", close_dialog)
+        
+        # Center dialog
+        dialog.update_idletasks()
+        x = (dialog.winfo_screenwidth() // 2) - 300
+        y = (dialog.winfo_screenheight() // 2) - 350
+        dialog.geometry(f"600x700+{x}+{y}")
+        
+        # Title
+        title_frame = ctk.CTkFrame(dialog, fg_color="#8C00FF", corner_radius=20)
+        title_frame.pack(fill="x", padx=20, pady=20)
+        
+        ctk.CTkLabel(
+            title_frame,
+            text=f"\ud83d\udcb5 Balance Settlement",
+            font=ctk.CTkFont(size=22, weight="bold"),
+            text_color="white"
+        ).pack(pady=15)
+        
+        # Scrollable content
+        scroll_frame = ctk.CTkScrollableFrame(
+            dialog,
+            fg_color="#0d0d1a",
+            corner_radius=20,
+            border_width=2,
+            border_color="#444444"
+        )
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
+        
+        # Original Bill Details Section
+        details_section = ctk.CTkFrame(scroll_frame, fg_color="#1e3a2f", corner_radius=15, border_width=2, border_color="#00ff88")
+        details_section.pack(fill="x", padx=15, pady=15)
+        
+        ctk.CTkLabel(
+            details_section,
+            text="\ud83d\udccb Original Bill Details",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#00ff88"
+        ).pack(pady=10)
+        
+        bill_info = f"""Bill Number: {bill['bill_number']}
+Original Date: {bill['created_at']}
+Customer: {bill.get('full_name') or bill.get('guest_name', 'Unknown')}
+Mobile: {bill.get('mobile_number', 'N/A')}"""
+        
+        ctk.CTkLabel(
+            details_section,
+            text=bill_info,
+            font=ctk.CTkFont(size=13),
+            justify="left",
+            text_color="white"
+        ).pack(pady=10, padx=20)
+        
+        # Items Purchased
+        items_section = ctk.CTkFrame(scroll_frame, fg_color="#2d2d5a", corner_radius=15)
+        items_section.pack(fill="x", padx=15, pady=10)
+        
+        ctk.CTkLabel(
+            items_section,
+            text="\ud83d\udce6 Items Purchased",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color="#8C00FF"
+        ).pack(pady=10)
+        
+        for item in items:
+            item_text = f"{item['item_name']} x{item['quantity']} - Rs. {item['total_price']:.2f}"
+            ctk.CTkLabel(
+                items_section,
+                text=item_text,
+                font=ctk.CTkFont(size=12),
+                text_color="white"
+            ).pack(anchor="w", padx=20, pady=2)
+        
+        ctk.CTkLabel(items_section, text="").pack(pady=5)
+        
+        # Financial Summary Section
+        financial_section = ctk.CTkFrame(scroll_frame, fg_color="#1a1a3e", corner_radius=15, border_width=2, border_color="#ffd93d")
+        financial_section.pack(fill="x", padx=15, pady=10)
+        
+        ctk.CTkLabel(
+            financial_section,
+            text="\ud83d\udcca Financial Summary",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#ffd93d"
+        ).pack(pady=10)
+        
+        total_amount = bill['total_amount']
+        advance_paid = bill.get('advance_amount', 0) or 0
+        balance_due = bill.get('balance_due', 0) or 0
+        
+        # Financial details
+        fin_details_frame = ctk.CTkFrame(financial_section, fg_color="transparent")
+        fin_details_frame.pack(fill="x", padx=20, pady=10)
+        
+        # Total Amount
+        total_frame = ctk.CTkFrame(fin_details_frame, fg_color="transparent")
+        total_frame.pack(fill="x", pady=3)
+        ctk.CTkLabel(total_frame, text="Total Amount:", font=ctk.CTkFont(size=13)).pack(side="left")
+        ctk.CTkLabel(total_frame, text=f"Rs. {total_amount:.2f}", font=ctk.CTkFont(size=13, weight="bold"), text_color="white").pack(side="right")
+        
+        # Advance Paid
+        advance_frame = ctk.CTkFrame(fin_details_frame, fg_color="transparent")
+        advance_frame.pack(fill="x", pady=3)
+        ctk.CTkLabel(advance_frame, text="Advance Paid:", font=ctk.CTkFont(size=13), text_color="#00ff88").pack(side="left")
+        ctk.CTkLabel(advance_frame, text=f"Rs. {advance_paid:.2f}", font=ctk.CTkFont(size=13, weight="bold"), text_color="#00ff88").pack(side="right")
+        
+        # Remaining Balance
+        balance_frame = ctk.CTkFrame(fin_details_frame, fg_color="transparent")
+        balance_frame.pack(fill="x", pady=3)
+        ctk.CTkLabel(balance_frame, text="Remaining Balance:", font=ctk.CTkFont(size=14, weight="bold"), text_color="#ff6b6b").pack(side="left")
+        ctk.CTkLabel(balance_frame, text=f"Rs. {balance_due:.2f}", font=ctk.CTkFont(size=16, weight="bold"), text_color="#ff6b6b").pack(side="right")
+        
+        # Payment Input Section
+        payment_section = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=15, border_width=2, border_color="#8C00FF")
+        payment_section.pack(fill="x", padx=15, pady=15)
+        
+        ctk.CTkLabel(
+            payment_section,
+            text="\ud83d\udcb0 Payment Details",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#8C00FF"
+        ).pack(pady=10)
+        
+        # Cash Received Input
+        cash_frame = ctk.CTkFrame(payment_section, fg_color="transparent")
+        cash_frame.pack(fill="x", padx=20, pady=10)
+        
+        ctk.CTkLabel(
+            cash_frame,
+            text="Cash Received:",
+            font=ctk.CTkFont(size=14, weight="bold")
+        ).pack(side="left")
+        
+        cash_entry = ctk.CTkEntry(
+            cash_frame,
+            width=180,
+            height=45,
+            font=ctk.CTkFont(size=16, weight="bold"),
+            placeholder_text="Enter amount",
+            corner_radius=20,
+            border_width=2,
+            border_color="#8C00FF"
+        )
+        cash_entry.pack(side="right")
+        cash_entry.insert(0, f"{balance_due:.2f}")
+        
+        # Change Display
+        change_frame = ctk.CTkFrame(payment_section, fg_color="transparent")
+        change_frame.pack(fill="x", padx=20, pady=10)
+        
+        ctk.CTkLabel(
+            change_frame,
+            text="Change to Return:",
+            font=ctk.CTkFont(size=14, weight="bold")
+        ).pack(side="left")
+        
+        change_label = ctk.CTkLabel(
+            change_frame,
+            text="Rs. 0.00",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#00ff88"
+        )
+        change_label.pack(side="right")
+        
+        def calculate_change(event=None):
+            try:
+                cash = float(cash_entry.get() or 0)
+                change = cash - balance_due
+                if change >= 0:
+                    change_label.configure(text=f"Rs. {change:.2f}", text_color="#00ff88")
+                else:
+                    change_label.configure(text=f"Rs. {change:.2f}", text_color="#ff6b6b")
+            except:
+                change_label.configure(text="Invalid", text_color="#ff6b6b")
+        
+        cash_entry.bind("<KeyRelease>", calculate_change)
+        calculate_change()
+        
+        # Action Buttons
+        btn_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        btn_frame.pack(pady=20)
+        
+        def process_settlement():
+            try:
+                cash_received = float(cash_entry.get() or 0)
+            except:
+                MessageDialog.show_error("Error", "Please enter a valid cash amount")
+                return
+            
+            if cash_received < balance_due:
+                MessageDialog.show_error("Error", f"Cash received (Rs. {cash_received:.2f}) is less than balance due (Rs. {balance_due:.2f})")
+                return
+            
+            # Update bill in database - mark as fully paid
+            try:
+                # Update bill - set balance to 0, update advance amount
+                self.db_manager.execute_query(
+                    '''UPDATE bills 
+                       SET advance_amount = total_amount,
+                           balance_due = 0
+                       WHERE id = ?''',
+                    (bill['id'],)
+                )
+                self.db_manager.conn.commit()
+                
+                # Generate settlement receipt
+                settlement_data = {
+                    'bill_number': bill['bill_number'],
+                    'original_date': bill['created_at'],
+                    'settlement_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    'total_amount': total_amount,
+                    'advance_paid': advance_paid,
+                    'balance_settled': balance_due,
+                    'cash_received': cash_received,
+                    'change_given': cash_received - balance_due,
+                    'created_by_name': bill.get('created_by_name', 'Staff')
+                }
+                
+                # Handle guest vs registered customer
+                if bill.get('guest_name'):
+                    customer = {
+                        'full_name': bill['guest_name'],
+                        'mobile_number': 'Guest Customer'
+                    }
+                else:
+                    customer = {
+                        'full_name': bill['full_name'] or 'Unknown',
+                        'mobile_number': bill['mobile_number'] or 'N/A'
+                    }
+                
+                # Generate settlement receipt
+                pdf_path = self.generate_settlement_receipt(settlement_data, items, customer)
+                
+                MessageDialog.show_success("Success", f"Balance settled successfully!\nReceipt generated.")
+                close_dialog()
+                self.load_bills()
+                
+                # Open the receipt
+                self.bill_generator.open_bill(pdf_path)
+                
+            except Exception as e:
+                MessageDialog.show_error("Error", f"Failed to settle balance: {str(e)}")
+        
+        ctk.CTkButton(
+            btn_frame,
+            text="Cancel",
+            command=close_dialog,
+            width=150,
+            height=50,
+            fg_color="#555555",
+            hover_color="#444444",
+            corner_radius=20,
+            font=ctk.CTkFont(size=14, weight="bold")
+        ).pack(side="left", padx=10)
+        
+        ctk.CTkButton(
+            btn_frame,
+            text="✔ Process Settlement",
+            command=process_settlement,
+            width=220,
+            height=50,
+            fg_color="#00ff88",
+            text_color="#1a1a2e",
+            hover_color="#00cc6a",
+            corner_radius=20,
+            font=ctk.CTkFont(size=14, weight="bold")
+        ).pack(side="left", padx=10)
+        
+        cash_entry.focus()
+    
+    def generate_settlement_receipt(self, settlement_data, items, customer):
+        """Generate a professional settlement receipt"""
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib.units import inch, mm
+        from reportlab.lib.styles import ParagraphStyle
+        from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+        from reportlab.lib import colors
+        
+        filename = f"SETTLEMENT_{settlement_data['bill_number']}.pdf"
+        filepath = os.path.join(self.bill_generator.bills_folder, filename)
+        
+        # Thermal receipt size
+        page_width = 80 * mm
+        page_height = 250 * mm
+        
+        doc = SimpleDocTemplate(
+            filepath,
+            pagesize=(page_width, page_height),
+            leftMargin=3*mm,
+            rightMargin=3*mm,
+            topMargin=3*mm,
+            bottomMargin=3*mm
+        )
+        
+        story = []
+        
+        # Define styles
+        header_style = ParagraphStyle(
+            'Header',
+            fontSize=11,
+            textColor=colors.black,
+            alignment=TA_CENTER,
+            fontName='Helvetica-Bold',
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=13
+        )
+        
+        subheader_style = ParagraphStyle(
+            'Subheader',
+            fontSize=8,
+            textColor=colors.black,
+            alignment=TA_CENTER,
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=10
+        )
+        
+        left_meta_style = ParagraphStyle(
+            'LeftMeta',
+            fontSize=8,
+            textColor=colors.black,
+            alignment=TA_LEFT,
+            fontName='Helvetica',
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=10
+        )
+        
+        right_total_style = ParagraphStyle(
+            'RightTotal',
+            fontSize=8,
+            textColor=colors.black,
+            alignment=TA_RIGHT,
+            fontName='Helvetica',
+            spaceAfter=2,
+            spaceBefore=0,
+            leading=10
+        )
+        
+        grand_total_style = ParagraphStyle(
+            'GrandTotal',
+            fontSize=10,
+            textColor=colors.black,
+            alignment=TA_RIGHT,
+            fontName='Helvetica-Bold',
+            spaceAfter=2,
+            spaceBefore=0,
+            leading=12
+        )
+        
+        footer_elegant_style = ParagraphStyle(
+            'FooterElegant',
+            fontSize=8,
+            textColor=colors.HexColor('#666666'),
+            fontName='Times-Italic',
+            alignment=TA_CENTER,
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=10
+        )
+        
+        def create_thin_line():
+            from reportlab.platypus import Table as ReportLabTable
+            line_data = [['']]
+            line_table = ReportLabTable(line_data, colWidths=[page_width - 6*mm])
+            line_table.setStyle(TableStyle([
+                ('LINEABOVE', (0, 0), (-1, 0), 0.5, colors.black),
+                ('TOPPADDING', (0, 0), (-1, -1), 0),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+            ]))
+            return line_table
+        
+        # === HEADER WITH LOGO ===
+        logo_path = os.path.join('assets', 'logos', 'billLogo.png')
+        if os.path.exists(logo_path):
+            logo = Image(logo_path, width=20*mm, height=20*mm)
+            logo.hAlign = 'CENTER'
+            story.append(logo)
+            story.append(Spacer(1, 2*mm))
+        
+        # Studio name and details
+        story.append(Paragraph("<b>Shine Art Studio</b>", header_style))
+        story.append(Paragraph("No.12, Main Street, Colombo 07", subheader_style))
+        story.append(Paragraph("Tel: +94 77 123 4567", subheader_style))
+        story.append(Spacer(1, 4*mm))
+        story.append(create_thin_line())
+        story.append(Spacer(1, 3*mm))
+        
+        # === SETTLEMENT REFERENCE ===
+        story.append(Paragraph("<b>BALANCE SETTLEMENT RECEIPT</b>", header_style))
+        story.append(Spacer(1, 3*mm))
+        story.append(Paragraph(f"Reference: Bill No. {settlement_data['bill_number']}", left_meta_style))
+        story.append(Spacer(1, 2*mm))
+        
+        # Customer details
+        story.append(Paragraph(f"Customer: {customer['full_name']}", left_meta_style))
+        story.append(Paragraph(f"Mobile: {customer['mobile_number']}", left_meta_style))
+        story.append(Spacer(1, 2*mm))
+        
+        # Dates
+        story.append(Paragraph(f"Original Date: {settlement_data['original_date']}", left_meta_style))
+        story.append(Paragraph(f"Settlement Date: {settlement_data['settlement_date']}", left_meta_style))
+        story.append(Spacer(1, 4*mm))
+        story.append(create_thin_line())
+        story.append(Spacer(1, 3*mm))
+        
+        # === PAYMENT HISTORY SECTION ===
+        story.append(Paragraph("<b>Payment History</b>", left_meta_style))
+        story.append(Spacer(1, 2*mm))
+        
+        # History details
+        story.append(Paragraph(f"Advance Paid (on {settlement_data['original_date'][:10]}):", left_meta_style))
+        story.append(Paragraph(f"Rs. {settlement_data['advance_paid']:.2f}", right_total_style))
+        story.append(Spacer(1, 2*mm))
+        
+        story.append(Paragraph("<b>Balance Settled Today:</b>", left_meta_style))
+        story.append(Paragraph(f"<b>Rs. {settlement_data['balance_settled']:.2f}</b>", grand_total_style))
+        story.append(Spacer(1, 4*mm))
+        story.append(create_thin_line())
+        story.append(Spacer(1, 3*mm))
+        
+        # === ITEMS TABLE ===
+        story.append(Paragraph("<b>Items Purchased</b>", left_meta_style))
+        story.append(Spacer(1, 2*mm))
+        
+        # Build items table
+        item_data = [['Item', 'Qty', 'Amount']]
+        for item in items:
+            item_data.append([
+                Paragraph(item['item_name'], left_meta_style),
+                str(item['quantity']),
+                f"Rs. {item['total_price']:.2f}"
+            ])
+        
+        col_widths = [42*mm, 12*mm, 20*mm]
+        item_table = Table(item_data, colWidths=col_widths)
+        item_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#F0F0F0')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+            ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 2*mm),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2*mm),
+            ('LEFTPADDING', (0, 0), (-1, -1), 1*mm),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 1*mm),
+            ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.HexColor('#CCCCCC')),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        story.append(item_table)
+        story.append(Spacer(1, 4*mm))
+        story.append(create_thin_line())
+        story.append(Spacer(1, 3*mm))
+        
+        # === FINAL SETTLEMENT TOTALS ===
+        story.append(Paragraph("<b>Final Settlement</b>", left_meta_style))
+        story.append(Spacer(1, 2*mm))
+        
+        story.append(Paragraph(f"Total Bill Amount: Rs. {settlement_data['total_amount']:.2f}", right_total_style))
+        story.append(Paragraph(f"Previously Paid: Rs. {settlement_data['advance_paid']:.2f}", right_total_style))
+        story.append(Paragraph(f"Balance Settled: Rs. {settlement_data['balance_settled']:.2f}", right_total_style))
+        story.append(Spacer(1, 2*mm))
+        
+        # Cash and change
+        story.append(Paragraph(f"Cash Received: Rs. {settlement_data['cash_received']:.2f}", right_total_style))
+        if settlement_data['change_given'] > 0:
+            story.append(Paragraph(f"Change Returned: Rs. {settlement_data['change_given']:.2f}", right_total_style))
+        
+        story.append(Spacer(1, 2*mm))
+        story.append(Paragraph("<b>STATUS: FULLY PAID</b>", grand_total_style))
+        story.append(Spacer(1, 4*mm))
+        story.append(create_thin_line())
+        story.append(Spacer(1, 4*mm))
+        
+        # === FOOTER ===
+        story.append(Paragraph("<i>Thank you for settling your balance!</i>", footer_elegant_style))
+        story.append(Paragraph("<i>Capturing your dreams, Creating the art.</i>", footer_elegant_style))
+        story.append(Spacer(1, 4*mm))
+        
+        # Developer credit
+        developer_style = ParagraphStyle(
+            'DeveloperCredit',
+            fontSize=5,
+            textColor=colors.HexColor('#999999'),
+            fontName='Helvetica',
+            alignment=TA_CENTER,
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=6
+        )
+        story.append(Paragraph("System Developed by: Malinda Prabath | Email: malindaprabath876@gmail.com", developer_style))
+        story.append(Spacer(1, 2*mm))
+        
+        # Build PDF
+        doc.build(story)
+        
+        return filepath
