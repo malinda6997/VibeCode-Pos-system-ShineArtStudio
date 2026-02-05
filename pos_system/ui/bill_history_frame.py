@@ -42,26 +42,40 @@ class BillHistoryFrame(BaseFrame):
         self.search_entry.pack(side="left", padx=10, pady=15)
         self.search_entry.bind("<KeyRelease>", lambda e: self.search_bills())
         
-        ctk.CTkButton(
-            controls_frame,
-            text="Refresh",
-            command=self.load_bills,
-            width=120,
-            height=35,
-            fg_color="#8C00FF",
-            hover_color="#7300D6",
-            corner_radius=20
-        ).pack(side="left", padx=10)
+        # Payment Status Filter - MOVED TO LEFT
+        payment_filter_frame = ctk.CTkFrame(controls_frame, fg_color="transparent")
+        payment_filter_frame.pack(side="left", padx=15)
         
-        # Filter frame
+        ctk.CTkLabel(
+            payment_filter_frame,
+            text="Payment Status:",
+            font=ctk.CTkFont(size=12, weight="bold")
+        ).pack(side="left", padx=5)
+        
+        self.payment_status_selector = ctk.CTkSegmentedButton(
+            payment_filter_frame,
+            values=["All", "Fully Paid", "Pending"],
+            command=self.on_payment_status_change,
+            selected_color="#8C00FF",
+            selected_hover_color="#7300D6",
+            unselected_color="#2d2d5a",
+            unselected_hover_color="#3d3d7a",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            corner_radius=20,
+            border_width=2
+        )
+        self.payment_status_selector.set("All")
+        self.payment_status_selector.pack(side="left")
+        
+        # Customer Type Filter
         filter_frame = ctk.CTkFrame(controls_frame, fg_color="transparent")
-        filter_frame.pack(side="left", padx=15)
+        filter_frame.pack(side="left", padx=20)
         
         ctk.CTkLabel(
             filter_frame,
-            text="Filter:",
+            text="Customer:",
             font=ctk.CTkFont(size=12, weight="bold")
-        ).pack(side="left", padx=5)
+        ).pack(side="left", padx=(0, 5))
         
         self.filter_var = ctk.StringVar(value="all")
         
@@ -95,30 +109,18 @@ class BillHistoryFrame(BaseFrame):
             hover_color="#7300D6"
         ).pack(side="left", padx=3)
         
-        # Payment Status Filter (NEW)
-        payment_filter_frame = ctk.CTkFrame(controls_frame, fg_color="transparent")
-        payment_filter_frame.pack(side="left", padx=20)
-        
-        ctk.CTkLabel(
-            payment_filter_frame,
-            text="Payment Status:",
-            font=ctk.CTkFont(size=12, weight="bold")
-        ).pack(side="left", padx=5)
-        
-        self.payment_status_selector = ctk.CTkSegmentedButton(
-            payment_filter_frame,
-            values=["All", "Fully Paid", "Pending"],
-            command=self.on_payment_status_change,
-            selected_color="#8C00FF",
-            selected_hover_color="#7300D6",
-            unselected_color="#2d2d5a",
-            unselected_hover_color="#3d3d7a",
-            font=ctk.CTkFont(size=12, weight="bold"),
+        # Add Refresh button
+        ctk.CTkButton(
+            controls_frame,
+            text="🔄 Refresh",
+            command=self.load_bills,
+            width=120,
+            height=35,
+            fg_color="#4a4a6a",
+            hover_color="#5a5a7a",
             corner_radius=20,
-            border_width=2
-        )
-        self.payment_status_selector.set("All")
-        self.payment_status_selector.pack(side="left", padx=5)
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(side="right", padx=10)
         
         ctk.CTkButton(
             controls_frame,
@@ -129,33 +131,32 @@ class BillHistoryFrame(BaseFrame):
             fg_color="#8C00FF",
             hover_color="#7300D6",
             corner_radius=20
-        ).pack(side="left", padx=10)
+        ).pack(side="right", padx=5)
         
         ctk.CTkButton(
             controls_frame,
-            text="Reprint Bill",
+            text="💰 Settle Balance",
+            command=self.settle_balance,
+            width=150,
+            height=35,
+            fg_color="#00cc66",
+            text_color="white",
+            hover_color="#00aa55",
+            corner_radius=20,
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(side="right", padx=5)
+        
+        ctk.CTkButton(
+            controls_frame,
+            text="🖨 Reprint",
             command=self.reprint_bill,
-            width=140,
+            width=120,
             height=35,
             fg_color="#8C00FF",
             text_color="white",
             hover_color="#7300D6",
             corner_radius=20
-        ).pack(side="left", padx=10)
-        
-        # Settle Balance button (NEW)
-        ctk.CTkButton(
-            controls_frame,
-            text="💵 Settle Balance",
-            command=self.settle_balance,
-            width=160,
-            height=35,
-            fg_color="#ffa500",
-            text_color="white",
-            hover_color="#ff8c00",
-            corner_radius=20,
-            font=ctk.CTkFont(size=13, weight="bold")
-        ).pack(side="left", padx=10)
+        ).pack(side="right", padx=5)
         
         # Admin-only delete buttons
         if self.auth_manager.current_user and self.auth_manager.current_user.get('role') == 'Admin':
@@ -230,8 +231,111 @@ class BillHistoryFrame(BaseFrame):
         self.tree.pack(side="left", fill="both", expand=True, padx=(5, 0), pady=5)
         scrollbar.pack(side="right", fill="y", pady=5, padx=(0, 5))
         
-        # Double-click to view
-        self.tree.bind("<Double-Button-1>", lambda e: self.view_bill_details())
+        # Double-click to view details or settle if pending
+        self.tree.bind("<Double-Button-1>", self.on_double_click)
+        # Right-click context menu
+        self.tree.bind("<Button-3>", self.show_context_menu)
+    
+    def on_double_click(self, event):
+        """Handle double-click on bill row"""
+        selection = self.tree.selection()
+        if not selection:
+            return
+        
+        item = self.tree.item(selection[0])
+        balance_str = item['values'][7]  # Balance column
+        
+        try:
+            balance = float(balance_str)
+        except:
+            balance = 0
+        
+        # If pending balance, open settlement dialog; otherwise view details
+        if balance > 0:
+            self.settle_balance()
+        else:
+            self.view_bill_details()
+    
+    def show_context_menu(self, event):
+        """Show right-click context menu"""
+        # Select row under cursor
+        row_id = self.tree.identify_row(event.y)
+        if row_id:
+            self.tree.selection_set(row_id)
+            
+            # Get bill balance
+            item = self.tree.item(row_id)
+            balance_str = item['values'][7]
+            
+            try:
+                balance = float(balance_str)
+            except:
+                balance = 0
+            
+            # Create context menu
+            menu = ctk.CTkToplevel(self)
+            menu.wm_overrideredirect(True)
+            menu.configure(fg_color="#2d2d2d", corner_radius=15)
+            
+            # Position menu at cursor
+            x = event.x_root
+            y = event.y_root
+            menu.geometry(f"+{x}+{y}")
+            
+            # Menu frame for rounded appearance
+            menu_frame = ctk.CTkFrame(menu, fg_color="#2d2d2d", corner_radius=15)
+            menu_frame.pack(padx=2, pady=2)
+            
+            # Menu items
+            if balance > 0:
+                ctk.CTkButton(
+                    menu_frame,
+                    text="💰 Settle Balance",
+                    command=lambda: [menu.destroy(), self.settle_balance()],
+                    fg_color="#00cc66",
+                    hover_color="#00aa55",
+                    corner_radius=15,
+                    width=180,
+                    height=35,
+                    font=ctk.CTkFont(size=12, weight="bold")
+                ).pack(padx=5, pady=(5, 3))
+            
+            ctk.CTkButton(
+                menu_frame,
+                text="📄 View Details",
+                command=lambda: [menu.destroy(), self.view_bill_details()],
+                fg_color="#8C00FF",
+                hover_color="#7300D6",
+                corner_radius=15,
+                width=180,
+                height=35,
+                font=ctk.CTkFont(size=12)
+            ).pack(padx=5, pady=3)
+            
+            ctk.CTkButton(
+                menu_frame,
+                text="🖨 Reprint Bill",
+                command=lambda: [menu.destroy(), self.reprint_bill()],
+                fg_color="#8C00FF",
+                hover_color="#7300D6",
+                corner_radius=15,
+                width=180,
+                height=35,
+                font=ctk.CTkFont(size=12)
+            ).pack(padx=5, pady=(3, 5))
+            
+            # Close menu when clicking elsewhere
+            def close_menu(e=None):
+                try:
+                    menu.destroy()
+                except:
+                    pass
+            
+            menu.bind("<FocusOut>", close_menu)
+            menu.bind("<Escape>", close_menu)
+            self.winfo_toplevel().bind("<Button-1>", lambda e: close_menu(), add="+")
+            
+            menu.focus_set()
     
     def load_bills(self):
         """Load bills from bills table with filter support"""
@@ -663,15 +767,22 @@ Balance Due: LKR {balance:.2f}
         
         ctk.CTkLabel(
             details_section,
-            text="\ud83d\udccb Original Bill Details",
+            text="📋 Original Bill Details",
             font=ctk.CTkFont(size=16, weight="bold"),
             text_color="#00ff88"
         ).pack(pady=10)
         
+        # Parse date to show original advance date clearly
+        original_date = bill['created_at']
+        if ' ' in original_date:
+            advance_date = original_date.split(' ')[0]  # Get date part only
+        else:
+            advance_date = original_date
+        
         bill_info = f"""Bill Number: {bill['bill_number']}
-Original Date: {bill['created_at']}
+Original Advance Date: {advance_date}
 Customer: {bill.get('full_name') or bill.get('guest_name', 'Unknown')}
-Mobile: {bill.get('mobile_number', 'N/A')}"""
+Mobile: {bill.get('mobile_number', 'Guest Customer')}"""
         
         ctk.CTkLabel(
             details_section,
@@ -823,15 +934,21 @@ Mobile: {bill.get('mobile_number', 'N/A')}"""
             
             # Update bill in database - mark as fully paid
             try:
-                # Update bill - set balance to 0, update advance amount
-                self.db_manager.execute_query(
+                # Update bill - add the settlement amount to advance_amount and set balance to 0
+                new_advance = advance_paid + balance_due
+                
+                # Use execute_update for proper database transaction
+                success = self.db_manager.execute_update(
                     '''UPDATE bills 
-                       SET advance_amount = total_amount,
+                       SET advance_amount = ?,
                            balance_due = 0
                        WHERE id = ?''',
-                    (bill['id'],)
+                    (new_advance, bill['id'])
                 )
-                self.db_manager.conn.commit()
+                
+                if not success:
+                    MessageDialog.show_error("Error", "Failed to update bill in database")
+                    return
                 
                 # Generate settlement receipt
                 settlement_data = {
@@ -993,25 +1110,35 @@ Mobile: {bill.get('mobile_number', 'N/A')}"""
         
         def create_thin_line():
             from reportlab.platypus import Table as ReportLabTable
-            line_data = [['']]
-            line_table = ReportLabTable(line_data, colWidths=[page_width - 6*mm])
+            line_data = [['─' * 60]]
+            line_table = ReportLabTable(line_data, colWidths=[74*mm])
             line_table.setStyle(TableStyle([
-                ('LINEABOVE', (0, 0), (-1, 0), 0.5, colors.black),
-                ('TOPPADDING', (0, 0), (-1, -1), 0),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 8),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#CCCCCC')),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+                ('TOPPADDING', (0, 0), (-1, -1), 0),
             ]))
             return line_table
         
         # === HEADER WITH LOGO ===
-        logo_path = os.path.join('assets', 'logos', 'billLogo.png')
+        logo_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'logos', 'billLogo.png')
         if os.path.exists(logo_path):
-            logo = Image(logo_path, width=20*mm, height=20*mm)
-            logo.hAlign = 'CENTER'
-            story.append(logo)
+            try:
+                logo = Image(logo_path, width=60*mm, height=20*mm)
+                logo.hAlign = 'CENTER'
+                story.append(logo)
+                story.append(Spacer(1, 3*mm))
+            except:
+                # Fallback to text if logo fails
+                story.append(Paragraph("<b>Shine Art Studio</b>", header_style))
+                story.append(Spacer(1, 2*mm))
+        else:
+            # Fallback if logo doesn't exist
+            story.append(Paragraph("<b>Shine Art Studio</b>", header_style))
             story.append(Spacer(1, 2*mm))
         
-        # Studio name and details
-        story.append(Paragraph("<b>Shine Art Studio</b>", header_style))
         story.append(Paragraph("No.12, Main Street, Colombo 07", subheader_style))
         story.append(Paragraph("Tel: +94 77 123 4567", subheader_style))
         story.append(Spacer(1, 4*mm))
@@ -1021,7 +1148,16 @@ Mobile: {bill.get('mobile_number', 'N/A')}"""
         # === SETTLEMENT REFERENCE ===
         story.append(Paragraph("<b>BALANCE SETTLEMENT RECEIPT</b>", header_style))
         story.append(Spacer(1, 3*mm))
-        story.append(Paragraph(f"Reference: Bill No. {settlement_data['bill_number']}", left_meta_style))
+        
+        # Extract date from original date
+        original_date = settlement_data['original_date']
+        if ' ' in original_date:
+            advance_date_display = original_date.split(' ')[0]
+        else:
+            advance_date_display = original_date
+        
+        story.append(Paragraph(f"<b>Settlement Receipt for Bill No:</b> {settlement_data['bill_number']}", left_meta_style))
+        story.append(Paragraph(f"<b>Original Advance Date:</b> {advance_date_display}", left_meta_style))
         story.append(Spacer(1, 2*mm))
         
         # Customer details
@@ -1029,23 +1165,28 @@ Mobile: {bill.get('mobile_number', 'N/A')}"""
         story.append(Paragraph(f"Mobile: {customer['mobile_number']}", left_meta_style))
         story.append(Spacer(1, 2*mm))
         
-        # Dates
-        story.append(Paragraph(f"Original Date: {settlement_data['original_date']}", left_meta_style))
+        # Settlement date
         story.append(Paragraph(f"Settlement Date: {settlement_data['settlement_date']}", left_meta_style))
         story.append(Spacer(1, 4*mm))
         story.append(create_thin_line())
         story.append(Spacer(1, 3*mm))
         
-        # === PAYMENT HISTORY SECTION ===
-        story.append(Paragraph("<b>Payment History</b>", left_meta_style))
+        # === FINANCIAL BREAKDOWN ===
+        story.append(Paragraph("<b>Financial Breakdown</b>", left_meta_style))
         story.append(Spacer(1, 2*mm))
         
-        # History details
-        story.append(Paragraph(f"Advance Paid (on {settlement_data['original_date'][:10]}):", left_meta_style))
-        story.append(Paragraph(f"Rs. {settlement_data['advance_paid']:.2f}", right_total_style))
+        # Show: Total - Original Advance = Final Settlement
+        story.append(Paragraph(f"Total Amount:", left_meta_style))
+        story.append(Paragraph(f"Rs. {settlement_data['total_amount']:.2f}", right_total_style))
+        story.append(Spacer(1, 1*mm))
+        
+        story.append(Paragraph(f"Original Advance (Paid on {advance_date_display}):", left_meta_style))
+        story.append(Paragraph(f"- Rs. {settlement_data['advance_paid']:.2f}", right_total_style))
+        story.append(Spacer(1, 2*mm))
+        story.append(create_thin_line())
         story.append(Spacer(1, 2*mm))
         
-        story.append(Paragraph("<b>Balance Settled Today:</b>", left_meta_style))
+        story.append(Paragraph("<b>Final Settlement Amount:</b>", left_meta_style))
         story.append(Paragraph(f"<b>Rs. {settlement_data['balance_settled']:.2f}</b>", grand_total_style))
         story.append(Spacer(1, 4*mm))
         story.append(create_thin_line())
