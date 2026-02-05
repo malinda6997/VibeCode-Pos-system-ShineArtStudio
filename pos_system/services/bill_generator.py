@@ -6,24 +6,25 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.graphics.shapes import Drawing, Line as RLLine
 from datetime import datetime
 import os
 
 
 class BillGenerator:
-    """Generate thermal receipt style bills (black & white only)"""
+    """Generate high-contrast thermal receipt bills (Pure Black & White ONLY)"""
     
     def __init__(self, bills_folder='bills'):
         self.bills_folder = bills_folder
         os.makedirs(bills_folder, exist_ok=True)
     
     def generate_bill(self, bill_data, items, customer_data):
-        """Generate compact thermal style receipt bill - black & white only"""
+        """Generate thermal style receipt bill - 300 DPI, Pure Black & White, No Gray"""
         
         filename = f"BILL_{bill_data['bill_number']}.pdf"
         filepath = os.path.join(self.bills_folder, filename)
         
-        # Thermal receipt size: narrow width (80mm)
+        # Thermal receipt size: 80mm width (standard thermal printer)
         page_width = 80 * mm
         page_height = 200 * mm  # Dynamic, will expand as needed
         
@@ -37,70 +38,50 @@ class BillGenerator:
         )
         
         story = []
-        styles = getSampleStyleSheet()
         
-        # Compact styles - minimal spacing
-        header_style = ParagraphStyle(
-            'BillHeader',
-            fontSize=11,
-            textColor=colors.black,
+        # === PURE BLACK & WHITE STYLES (No Gray) ===
+        # Studio name - Bold centered
+        studio_name_style = ParagraphStyle(
+            'StudioName',
+            fontSize=12,
+            textColor=colors.HexColor('#000000'),  # Pure Black
             alignment=TA_CENTER,
             fontName='Helvetica-Bold',
-            spaceAfter=0,
+            spaceAfter=1*mm,
             spaceBefore=0,
-            leading=13
+            leading=14
         )
         
+        # Address and contact - centered
         subheader_style = ParagraphStyle(
             'BillSubheader',
-            fontSize=8,
-            textColor=colors.black,
+            fontSize=9,
+            textColor=colors.HexColor('#000000'),  # Pure Black
             alignment=TA_CENTER,
-            spaceAfter=0,
+            spaceAfter=0.5*mm,
             spaceBefore=0,
-            leading=10
+            leading=11
         )
         
-        normal_style = ParagraphStyle(
-            'BillNormal',
-            fontSize=8,
-            textColor=colors.black,
-            alignment=TA_LEFT,
-            spaceAfter=0,
-            spaceBefore=0,
-            leading=10
-        )
-        
-        mono_style = ParagraphStyle(
-            'BillMono',
-            fontSize=7,
-            textColor=colors.black,
-            alignment=TA_LEFT,
-            fontName='Courier',
-            spaceAfter=0,
-            spaceBefore=0,
-            leading=9
-        )
-        
-        center_style = ParagraphStyle(
-            'BillCenter',
-            fontSize=8,
-            textColor=colors.black,
-            alignment=TA_CENTER,
-            spaceAfter=0,
-            spaceBefore=0,
-            leading=10
-        )
-        
-        # === MINIMALIST LUXURY STYLES ===
-        # Left-aligned metadata style
+        # Left-aligned metadata (Bill No, Date, Cashier, Customer)
         left_meta_style = ParagraphStyle(
             'LeftMeta',
-            fontSize=8,
-            textColor=colors.black,
+            fontSize=9,
+            textColor=colors.HexColor('#000000'),  # Pure Black
             fontName='Helvetica',
             alignment=TA_LEFT,
-            spaceAfter=1.5*mm,
+            spaceAfter=1*mm,
+            spaceBefore=0,
+            leading=11
+        )
+        
+        # Normal text for table items
+        normal_style = ParagraphStyle(
+            'BillNormal',
+            fontSize=9,
+            textColor=colors.HexColor('#000000'),  # Pure Black
+            alignment=TA_LEFT,
+            spaceAfter=0,
             spaceBefore=0,
             leading=11
         )
@@ -108,8 +89,8 @@ class BillGenerator:
         # Right-aligned totals style
         right_total_style = ParagraphStyle(
             'RightTotal',
-            fontSize=8,
-            textColor=colors.black,
+            fontSize=9,
+            textColor=colors.HexColor('#000000'),  # Pure Black
             fontName='Helvetica',
             alignment=TA_RIGHT,
             spaceAfter=1*mm,
@@ -117,43 +98,53 @@ class BillGenerator:
             leading=11
         )
         
-        # Grand total bold style
+        # Grand total - BOLD and larger
         grand_total_style = ParagraphStyle(
             'GrandTotal',
-            fontSize=11,
-            textColor=colors.black,
+            fontSize=12,
+            textColor=colors.HexColor('#000000'),  # Pure Black
             fontName='Helvetica-Bold',
             alignment=TA_RIGHT,
             spaceAfter=0,
             spaceBefore=0,
-            leading=13
+            leading=14
         )
         
-        # Elegant footer style
+        # Elegant tagline footer
         footer_elegant_style = ParagraphStyle(
             'FooterElegant',
-            fontSize=8,
-            textColor=colors.black,
+            fontSize=9,
+            textColor=colors.HexColor('#000000'),  # Pure Black
             fontName='Times-Italic',
             alignment=TA_CENTER,
             spaceAfter=0,
             spaceBefore=0,
-            leading=10
+            leading=11
         )
         
-        # Ultra-thin solid gray line (not dashed) - Fixed import
-        from reportlab.graphics.shapes import Drawing, Line as RLLine
+        # Developer credit - small but still pure black
+        developer_style = ParagraphStyle(
+            'DeveloperCredit',
+            fontSize=6,
+            textColor=colors.HexColor('#000000'),  # Pure Black (not gray)
+            fontName='Helvetica',
+            alignment=TA_CENTER,
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=7
+        )
         
-        def create_thin_line():
+        # Hair-thin solid BLACK line separator (0.5pt)
+        def create_black_separator():
             drawing = Drawing(74*mm, 1*mm)
             line = RLLine(0, 0.5*mm, 74*mm, 0.5*mm)
-            line.strokeColor = colors.HexColor('#CCCCCC')
-            line.strokeWidth = 0.5
+            line.strokeColor = colors.HexColor('#000000')  # Pure Black
+            line.strokeWidth = 0.5  # Hair-thin line
             drawing.add(line)
             return drawing
         
-        # === HEADER & BRANDING (CENTERED ONLY) ===
-        # Logo at top center
+        # === OFFICIAL BRANDING & HEADER (CENTERED) ===
+        # Logo at top center - Pure B&W rendering
         logo_path = os.path.join('assets', 'logos', 'billLogo.png')
         if os.path.exists(logo_path):
             try:
@@ -161,19 +152,23 @@ class BillGenerator:
                 logo.hAlign = 'CENTER'
                 story.append(logo)
                 story.append(Spacer(1, 2*mm))
-            except:
-                pass
+            except Exception as e:
+                print(f"Logo error: {e}")
+        
+        # Studio Name - BOLD
+        story.append(Paragraph("<b>STUDIO SHINE ART</b>", studio_name_style))
+        story.append(Spacer(1, 1*mm))
         
         # Centered studio identity
         story.append(Paragraph("No: 52/1/1, Maravila Road, Nattandiya", subheader_style))
         story.append(Paragraph("Reg No: 26/3610 | Tel: 0767898604 / 0322051680", subheader_style))
         story.append(Spacer(1, 3*mm))
         
-        # Ultra-thin solid gray separator
-        story.append(create_thin_line())
+        # Solid BLACK separator (no gray)
+        story.append(create_black_separator())
         story.append(Spacer(1, 3*mm))
         
-        # === BILL METADATA (PROFESSIONAL LEFT-ALIGN) ===
+        # === BODY & TRANSACTION DETAILS (LEFT-ALIGNED) ===
         # Extract date and time
         date_str = bill_data['created_at']
         try:
@@ -191,7 +186,7 @@ class BillGenerator:
         cashier = bill_data.get('created_by_name', 'Staff')
         customer_name = customer_data.get('full_name', 'Guest')
         
-        # All metadata left-aligned with adequate spacing
+        # All metadata LEFT-ALIGNED (Clean Sans-Serif)
         story.append(Paragraph(f"<b>Bill No:</b> {bill_data['bill_number']}", left_meta_style))
         story.append(Paragraph(f"<b>Date/Time:</b> {bill_date} | {bill_time}", left_meta_style))
         story.append(Paragraph(f"<b>Cashier:</b> {cashier}", left_meta_style))
@@ -202,26 +197,26 @@ class BillGenerator:
             story.append(Paragraph(f"<b>Mobile:</b> {mobile}", left_meta_style))
         
         story.append(Spacer(1, 3*mm))
-        story.append(create_thin_line())
+        story.append(create_black_separator())
         story.append(Spacer(1, 3*mm))
         
-        # === THE ITEM TABLE (MODERN STANDARD) ===
-        # Table header style - subtle bold
+        # === ITEMIZATION TABLE (MINIMALIST GRID - No Gray Backgrounds) ===
+        # Table header style - BOLD
         table_header_style = ParagraphStyle(
             'TableHeader',
-            fontSize=8,
-            textColor=colors.black,
+            fontSize=9,
+            textColor=colors.HexColor('#000000'),  # Pure Black
             fontName='Helvetica-Bold',
             alignment=TA_LEFT,
             spaceAfter=0,
             spaceBefore=0,
-            leading=10
+            leading=11
         )
         
         # Build table data with proper alignment
         table_data = []
         
-        # Header row
+        # Header row: ITEM (Left), QTY (Center), AMT (Right)
         header_row = [
             Paragraph("<b>ITEM</b>", table_header_style),
             Paragraph("<b>QTY</b>", ParagraphStyle('TableHeaderCenter', parent=table_header_style, alignment=TA_CENTER)),
@@ -242,33 +237,33 @@ class BillGenerator:
             ]
             table_data.append(item_row)
         
-        # Create table with clean styling
+        # Create table with PURE BLACK & WHITE styling
         item_table = Table(table_data, colWidths=[42*mm, 15*mm, 17*mm])
         item_table.setStyle(TableStyle([
-            # Header styling
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#F5F5F5')),
-            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            # NO BACKGROUND (Pure White)
+            ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#FFFFFF')),  # Pure White
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#000000')),  # Pure Black
             ('ALIGN', (0, 0), (0, -1), 'LEFT'),
             ('ALIGN', (1, 0), (1, -1), 'CENTER'),
             ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
             ('TOPPADDING', (0, 0), (-1, -1), 2*mm),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 2*mm),
             ('LEFTPADDING', (0, 0), (-1, -1), 1*mm),
             ('RIGHTPADDING', (0, 0), (-1, -1), 1*mm),
-            # Subtle line below header
-            ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.HexColor('#CCCCCC')),
-            # Professional spacing with whitespace (no lines between items)
+            # Solid BLACK line below header only
+            ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.HexColor('#000000')),  # Pure Black
+            # No vertical lines (minimalist)
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ]))
         
         story.append(item_table)
         story.append(Spacer(1, 4*mm))
-        story.append(create_thin_line())
+        story.append(create_black_separator())
         story.append(Spacer(1, 3*mm))
         
-        # === FINANCIAL SUMMARY (RIGHT-ALIGNED BLOCK) ===
+        # === SUMMARY & FOOTER (PROFESSIONAL FINISH) ===
         subtotal = bill_data['subtotal']
         discount = bill_data.get('discount', 0) or 0
         service_charge = bill_data.get('service_charge', 0) or 0
@@ -285,7 +280,7 @@ class BillGenerator:
         
         story.append(Spacer(1, 2*mm))
         
-        # Grand Total - larger and bold (focal point)
+        # Grand Total - BOLD and larger (focal point)
         story.append(Paragraph(f"<b>TOTAL: Rs. {total:.2f}</b>", grand_total_style))
         story.append(Spacer(1, 2*mm))
         
@@ -307,25 +302,15 @@ class BillGenerator:
                     story.append(Paragraph(f"Change: Rs. {change:.2f}", right_total_style))
         
         story.append(Spacer(1, 4*mm))
-        story.append(create_thin_line())
+        story.append(create_black_separator())
         story.append(Spacer(1, 4*mm))
         
-        # === THE FOOTER (PROFESSIONAL SIGNATURE) ===
-        # Elegant tagline - centered with serif font
+        # === FOOTER (PROFESSIONAL SIGNATURE) ===
+        # Elegant tagline
         story.append(Paragraph("<i>Capturing your dreams, Creating the art.</i>", footer_elegant_style))
         story.append(Spacer(1, 4*mm))
         
-        # Developer credit - tiny subtle gray font
-        developer_style = ParagraphStyle(
-            'DeveloperCredit',
-            fontSize=5,
-            textColor=colors.HexColor('#999999'),
-            fontName='Helvetica',
-            alignment=TA_CENTER,
-            spaceAfter=0,
-            spaceBefore=0,
-            leading=6
-        )
+        # Developer attribution - Pure Black (not gray)
         story.append(Paragraph("System Developed by: Malinda Prabath | Email: malindaprabath876@gmail.com", developer_style))
         story.append(Spacer(1, 2*mm))
         
