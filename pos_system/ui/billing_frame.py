@@ -44,11 +44,11 @@ class BillingFrame(BaseFrame):
         main_container.pack(fill="both", expand=True, padx=20, pady=(0, 20))
 
         # Left panel - Customer and items
-        left_panel = ctk.CTkFrame(main_container, fg_color="#1e1e3f", corner_radius=15)
+        left_panel = ctk.CTkFrame(main_container, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         left_panel.pack(side="left", fill="both", expand=True, padx=(0, 10))
 
         # Customer section
-        customer_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
+        customer_frame = ctk.CTkFrame(left_panel, fg_color="#0d0d1a", corner_radius=10)
         customer_frame.pack(fill="x", padx=15, pady=15)
 
         customer_label = ctk.CTkLabel(
@@ -70,7 +70,7 @@ class BillingFrame(BaseFrame):
             onvalue="on",
             offvalue="off",
             command=self.toggle_guest_customer,
-            progress_color="#00d4ff",
+            progress_color="#8C00FF",
             button_color="#00ff88",
             button_hover_color="#00cc6a"
         )
@@ -88,7 +88,7 @@ class BillingFrame(BaseFrame):
         self.search_container.pack(fill="x", padx=15, pady=5)
 
         ctk.CTkLabel(self.search_container, text="Mobile Number:").pack(side="left", padx=5)
-        self.mobile_search = ctk.CTkEntry(self.search_container, width=150, height=30)
+        self.mobile_search = ctk.CTkEntry(self.search_container, width=150, height=30, corner_radius=15, border_width=1)
         self.mobile_search.pack(side="left", padx=5)
         self.mobile_search.bind("<KeyRelease>", self.on_mobile_search_change)
 
@@ -97,7 +97,10 @@ class BillingFrame(BaseFrame):
             text="Search",
             command=self.search_customer,
             width=80,
-            height=30
+            height=30,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=5)
 
         ctk.CTkButton(
@@ -106,9 +109,10 @@ class BillingFrame(BaseFrame):
             command=self.add_new_customer,
             width=150,
             height=30,
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc",
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20,
             font=ctk.CTkFont(size=12, weight="bold")
         ).pack(side="left", padx=5)
 
@@ -116,7 +120,7 @@ class BillingFrame(BaseFrame):
         self.guest_name_container = ctk.CTkFrame(customer_frame, fg_color="transparent")
 
         ctk.CTkLabel(self.guest_name_container, text="Customer Name:").pack(side="left", padx=5)
-        self.guest_name_entry = ctk.CTkEntry(self.guest_name_container, width=250, height=30, placeholder_text="Enter guest customer name")
+        self.guest_name_entry = ctk.CTkEntry(self.guest_name_container, width=250, height=30, placeholder_text="Enter guest customer name", corner_radius=15, border_width=1)
         self.guest_name_entry.pack(side="left", padx=5)
 
         ctk.CTkButton(
@@ -198,105 +202,142 @@ class BillingFrame(BaseFrame):
         )
         self.no_customer_label.pack(pady=10)
 
-        # Add items section - POPUP BASED
-        items_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
+        # Add items section - MODERN DESIGN
+        items_frame = ctk.CTkFrame(left_panel, fg_color="#0d0d1a", corner_radius=20, border_width=2, border_color="#444444")
         items_frame.pack(fill="x", padx=15, pady=(0, 15))
 
         items_label = ctk.CTkLabel(
             items_frame,
-            text="Add Items",
-            font=ctk.CTkFont(size=16, weight="bold")
+            text="Add Items to Cart",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#8C00FF"
         )
-        items_label.pack(pady=(10, 15))
+        items_label.pack(pady=(15, 5))
 
-        # Item type selector
+        # Item type selector - MODERN SEGMENTED BUTTON
         type_container = ctk.CTkFrame(items_frame, fg_color="transparent")
-        type_container.pack(fill="x", padx=15, pady=5)
+        type_container.pack(fill="x", padx=15, pady=10)
 
-        ctk.CTkLabel(type_container, text="Item Type:").pack(side="left", padx=5)
+        ctk.CTkLabel(
+            type_container,
+            text="Select Item Type:",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(anchor="w", padx=5, pady=(0, 5))
+        
         self.item_type = ctk.CTkSegmentedButton(
             type_container,
-            values=["Service", "Frame"],
-            command=self.on_item_type_change
+            values=["Services", "Frames"],
+            command=self.on_item_type_change,
+            selected_color="#8C00FF",
+            selected_hover_color="#7300D6",
+            unselected_color="#2d2d5a",
+            unselected_hover_color="#3d3d7a",
+            font=ctk.CTkFont(size=13, weight="bold"),
+            corner_radius=20,
+            border_width=2
         )
-        self.item_type.pack(side="left", padx=10)
-        self.item_type.set("Service")
+        self.item_type.pack(fill="x", padx=5)
+        self.item_type.set("Services")  # Default to Services
 
-        # Selected category display
-        self.selected_category_frame = ctk.CTkFrame(items_frame, fg_color="#1e3a2f", corner_radius=8)
+        # Selected category display - ENHANCED
+        self.selected_category_frame = ctk.CTkFrame(items_frame, fg_color="#1e3a2f", corner_radius=10, border_width=2, border_color="#00ff88")
+        
+        category_info_frame = ctk.CTkFrame(self.selected_category_frame, fg_color="transparent")
+        category_info_frame.pack(side="left", fill="x", expand=True, padx=15, pady=10)
         
         self.selected_category_label = ctk.CTkLabel(
-            self.selected_category_frame,
+            category_info_frame,
             text="No category selected",
-            font=ctk.CTkFont(size=13, weight="bold"),
-            text_color="#00ff88"
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color="#00ff88",
+            anchor="w"
         )
-        self.selected_category_label.pack(side="left", padx=15, pady=10)
+        self.selected_category_label.pack(anchor="w")
+        
+        # Service cost display - PROMINENT
+        self.category_cost_display = ctk.CTkLabel(
+            category_info_frame,
+            text="Service Cost: Rs. 0.00",
+            font=ctk.CTkFont(size=13, weight="bold"),
+            text_color="#ffd93d",
+            anchor="w"
+        )
+        self.category_cost_display.pack(anchor="w", pady=(3, 0))
 
         # Free service indicator
         self.free_service_label = ctk.CTkLabel(
-            self.selected_category_frame,
+            category_info_frame,
             text="",
             font=ctk.CTkFont(size=11),
-            text_color="#ffd93d"
+            text_color="#ffd93d",
+            anchor="w"
         )
-        self.free_service_label.pack(side="left", padx=5, pady=10)
+        self.free_service_label.pack(anchor="w", pady=(2, 0))
 
         ctk.CTkButton(
             self.selected_category_frame,
             text="Change",
             width=70,
             height=28,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=self.open_category_popup
         ).pack(side="right", padx=10, pady=8)
 
-        # Popup trigger buttons
+        # Popup trigger buttons - MODERN DESIGN
         btn_container = ctk.CTkFrame(items_frame, fg_color="transparent")
-        btn_container.pack(fill="x", padx=15, pady=10)
+        btn_container.pack(fill="x", padx=15, pady=15)
 
         self.select_category_btn = ctk.CTkButton(
             btn_container,
             text="📁 Select Category",
-            width=180,
-            height=40,
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc",
-            font=ctk.CTkFont(size=13, weight="bold"),
+            width=190,
+            height=45,
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            border_width=2,
+            border_color="#8C00FF",
             command=self.open_category_popup
         )
         self.select_category_btn.pack(side="left", padx=5)
 
         self.select_item_btn = ctk.CTkButton(
             btn_container,
-            text="🎨 Select Item",
-            width=180,
-            height=40,
-            fg_color="#00ff88",
-            text_color="#1a1a2e",
-            hover_color="#00cc6a",
-            font=ctk.CTkFont(size=13, weight="bold"),
+            text="🎨 Select Service",
+            width=190,
+            height=45,
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            corner_radius=20,
+            border_width=2,
+            border_color="#8C00FF",
             command=self.open_item_popup,
             state="disabled"
         )
         self.select_item_btn.pack(side="left", padx=5)
 
-        # Cart table
-        cart_frame = ctk.CTkFrame(left_panel, fg_color="#252545", corner_radius=10)
-        cart_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        # Cart table - ULTRA-STABLE: Fixed height with grid_propagate to prevent shifting
+        self.cart_frame = ctk.CTkFrame(left_panel, fg_color="#0d0d1a", corner_radius=20, border_width=2, border_color="#444444", height=400)
+        self.cart_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        self.cart_frame.pack_propagate(False)  # Lock the size - prevent resizing
 
         cart_label = ctk.CTkLabel(
-            cart_frame,
-            text="Cart Items",
-            font=ctk.CTkFont(size=16, weight="bold")
+            self.cart_frame,
+            text="🛒 Cart Items",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#8C00FF"
         )
-        cart_label.pack(pady=(10, 10))
+        cart_label.pack(pady=(15, 10))
 
         # Cart treeview
         columns = ("Item", "Type", "Qty", "Price", "Total")
-        self.cart_tree = ttk.Treeview(cart_frame, columns=columns, show="headings", height=8)
+        self.cart_tree = ttk.Treeview(self.cart_frame, columns=columns, show="headings", height=8)
 
         self.cart_tree.heading("Item", text="Item Name")
         self.cart_tree.heading("Type", text="Type")
@@ -315,19 +356,21 @@ class BillingFrame(BaseFrame):
         # Bind double-click to remove item
         self.cart_tree.bind("<Double-1>", self.on_cart_item_double_click)
 
-        # Cart action buttons
-        cart_btn_frame = ctk.CTkFrame(cart_frame, fg_color="transparent")
-        cart_btn_frame.pack(fill="x", padx=10, pady=(0, 10))
+        # Cart action buttons - MODERN DESIGN
+        cart_btn_frame = ctk.CTkFrame(self.cart_frame, fg_color="transparent")
+        cart_btn_frame.pack(fill="x", padx=10, pady=(0, 15))
 
         ctk.CTkButton(
             cart_btn_frame,
             text="✏️ Edit Qty",
             command=self.edit_cart_item,
             width=120,
-            height=30,
+            height=35,
             fg_color="#ffa500",
             hover_color="#cc8400",
-            text_color="#1a1a2e"
+            text_color="#1a1a2e",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            corner_radius=20
         ).pack(side="left", padx=5)
 
         ctk.CTkButton(
@@ -335,123 +378,164 @@ class BillingFrame(BaseFrame):
             text="🗑️ Remove",
             command=self.remove_from_cart,
             width=120,
-            height=30,
+            height=35,
             fg_color="#ff4757",
-            hover_color="#ff3344"
+            hover_color="#ff3344",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            corner_radius=20
         ).pack(side="left", padx=5)
 
         ctk.CTkButton(
             cart_btn_frame,
-            text="🗑️ Clear Cart",
+            text="🗑️ Clear All",
             command=self.clear_cart,
             width=120,
-            height=30,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            height=35,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            corner_radius=20
         ).pack(side="right", padx=5)
 
-        # Right panel - Payment
-        right_panel = ctk.CTkFrame(main_container, width=350, fg_color="#1e1e3f", corner_radius=15)
+        # Right panel - Payment - MODERNIZED
+        right_panel = ctk.CTkFrame(main_container, width=380, fg_color="#060606", border_width=3, border_color="#8C00FF", corner_radius=20)
         right_panel.pack(side="right", fill="y", padx=(10, 0))
         right_panel.pack_propagate(False)
 
-        payment_label = ctk.CTkLabel(
-            right_panel,
-            text="Payment Details",
-            font=ctk.CTkFont(size=18, weight="bold")
-        )
-        payment_label.pack(pady=(20, 20))
+        # Header with icon
+        payment_header = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=15)
+        payment_header.pack(fill="x", padx=15, pady=(15, 10))
+        
+        ctk.CTkLabel(
+            payment_header,
+            text="💳 Payment Details",
+            font=ctk.CTkFont(size=20, weight="bold"),
+            text_color="#8C00FF"
+        ).pack(pady=12)
 
-        # Subtotal
-        subtotal_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
-        subtotal_frame.pack(fill="x", padx=20, pady=5)
-        ctk.CTkLabel(subtotal_frame, text="Subtotal:", font=ctk.CTkFont(size=13)).pack(side="left")
+        # Subtotal - ENHANCED
+        subtotal_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10)
+        subtotal_frame.pack(fill="x", padx=15, pady=8)
+        
+        ctk.CTkLabel(
+            subtotal_frame,
+            text="Subtotal:",
+            font=ctk.CTkFont(size=14)
+        ).pack(side="left", padx=15, pady=10)
+        
         self.subtotal_label = ctk.CTkLabel(
             subtotal_frame,
             text="LKR 0.00",
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=15, weight="bold"),
+            text_color="white"
         )
-        self.subtotal_label.pack(side="right")
+        self.subtotal_label.pack(side="right", padx=15, pady=10)
 
-        # Category Service Cost Display (read-only)
-        service_cost_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
-        service_cost_frame.pack(fill="x", padx=20, pady=5)
-        ctk.CTkLabel(service_cost_frame, text="Service Charge:", font=ctk.CTkFont(size=13)).pack(side="left")
+        # Service Charge - PROMINENT DISPLAY
+        service_cost_frame = ctk.CTkFrame(right_panel, fg_color="#2d2d1a", corner_radius=10, border_width=2, border_color="#ffd93d")
+        service_cost_frame.pack(fill="x", padx=15, pady=8)
+        
+        ctk.CTkLabel(
+            service_cost_frame,
+            text="💰 Service Charge:",
+            font=ctk.CTkFont(size=14, weight="bold")
+        ).pack(side="left", padx=15, pady=10)
+        
         self.service_cost_label = ctk.CTkLabel(
             service_cost_frame,
             text="LKR 0.00",
-            font=ctk.CTkFont(size=13),
+            font=ctk.CTkFont(size=15, weight="bold"),
             text_color="#ffd93d"
         )
-        self.service_cost_label.pack(side="right")
+        self.service_cost_label.pack(side="right", padx=15, pady=10)
 
-        # Discount
-        discount_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
-        discount_frame.pack(fill="x", padx=20, pady=10)
-        ctk.CTkLabel(discount_frame, text="Discount:", font=ctk.CTkFont(size=13)).pack(side="left")
-        self.discount_entry = ctk.CTkEntry(discount_frame, width=100, height=30)
+        # Discount - ENHANCED
+        discount_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10)
+        discount_frame.pack(fill="x", padx=15, pady=8)
+        
+        ctk.CTkLabel(
+            discount_frame,
+            text="Discount:",
+            font=ctk.CTkFont(size=14)
+        ).pack(side="left", padx=15, pady=10)
+        
+        self.discount_entry = ctk.CTkEntry(
+            discount_frame,
+            width=120,
+            height=35,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            border_color="#8C00FF",
+            border_width=2,
+            corner_radius=15
+        )
         self.discount_entry.insert(0, "0")
-        self.discount_entry.pack(side="right")
+        self.discount_entry.pack(side="right", padx=15, pady=10)
         self.discount_entry.bind("<KeyRelease>", lambda e: self.calculate_totals())
 
-        # Total
-        total_frame = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=8)
-        total_frame.pack(fill="x", padx=20, pady=15)
+        # Total - HIGH CONTRAST DISPLAY
+        total_frame = ctk.CTkFrame(right_panel, fg_color="#1a1a3e", corner_radius=15, border_width=3, border_color="#00ff88")
+        total_frame.pack(fill="x", padx=15, pady=15)
+        
         ctk.CTkLabel(
             total_frame,
-            text="Total Amount:",
-            font=ctk.CTkFont(size=15, weight="bold")
-        ).pack(side="left", padx=10, pady=10)
+            text="💵 TOTAL AMOUNT:",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="white"
+        ).pack(side="left", padx=15, pady=15)
+        
         self.total_label = ctk.CTkLabel(
             total_frame,
             text="LKR 0.00",
-            font=ctk.CTkFont(size=18, weight="bold"),
+            font=ctk.CTkFont(size=22, weight="bold"),
             text_color="#00ff88"
         )
-        self.total_label.pack(side="right", padx=10, pady=10)
+        self.total_label.pack(side="right", padx=15, pady=15)
 
-        # Payment Type Selector
-        payment_type_frame = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=8)
-        payment_type_frame.pack(fill="x", padx=20, pady=10)
+        # Payment Type Selector - CONDITIONAL VISIBILITY
+        self.payment_type_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10, border_width=2, border_color="#444444")
+        # Don't pack yet - will be shown conditionally
 
         ctk.CTkLabel(
-            payment_type_frame,
-            text="Payment Type:",
-            font=ctk.CTkFont(size=13, weight="bold")
-        ).pack(anchor="w", padx=10, pady=(10, 5))
+            self.payment_type_frame,
+            text="Payment Method:",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color="#8C00FF"
+        ).pack(anchor="w", padx=15, pady=(15, 5))
 
         self.payment_type_var = ctk.StringVar(value="full")
 
-        payment_radio_frame = ctk.CTkFrame(payment_type_frame, fg_color="transparent")
-        payment_radio_frame.pack(fill="x", padx=10, pady=(0, 10))
+        payment_radio_frame = ctk.CTkFrame(self.payment_type_frame, fg_color="transparent")
+        payment_radio_frame.pack(fill="x", padx=15, pady=(5, 15))
 
         self.full_payment_radio = ctk.CTkRadioButton(
             payment_radio_frame,
-            text="Full Payment",
+            text="💵 Full Payment",
             variable=self.payment_type_var,
             value="full",
             command=self.on_payment_type_change,
             fg_color="#00ff88",
-            hover_color="#00cc6a"
+            hover_color="#00cc6a",
+            font=ctk.CTkFont(size=12, weight="bold")
         )
         self.full_payment_radio.pack(side="left", padx=10)
 
         self.advance_payment_radio = ctk.CTkRadioButton(
             payment_radio_frame,
-            text="Advance Payment",
+            text="💳 Advance Payment",
             variable=self.payment_type_var,
             value="advance",
             command=self.on_payment_type_change,
             fg_color="#ffa500",
-            hover_color="#cc8400"
+            hover_color="#cc8400",
+            font=ctk.CTkFont(size=12, weight="bold")
         )
         self.advance_payment_radio.pack(side="left", padx=10)
 
-        # Advance Payment (only for advance payment type)
+        # Advance Payment (only for advance payment type and Frames)
         self.advance_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
-        self.advance_frame.pack(fill="x", padx=20, pady=10)
+        # Don't pack initially - will be shown only for Frames
         ctk.CTkLabel(self.advance_frame, text="Advance Amount:", font=ctk.CTkFont(size=13)).pack(side="left")
-        self.advance_entry = ctk.CTkEntry(self.advance_frame, width=120, height=35, state="disabled")
+        self.advance_entry = ctk.CTkEntry(self.advance_frame, width=120, height=35, state="disabled", corner_radius=15, border_width=1)
         self.advance_entry.insert(0, "0")
         self.advance_entry.pack(side="right")
         self.advance_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
@@ -461,7 +545,7 @@ class BillingFrame(BaseFrame):
         paid_frame.pack(fill="x", padx=20, pady=10)
         self.paid_label_widget = ctk.CTkLabel(paid_frame, text="Cash Received:", font=ctk.CTkFont(size=13))
         self.paid_label_widget.pack(side="left")
-        self.paid_entry = ctk.CTkEntry(paid_frame, width=120, height=35, placeholder_text="For receipt")
+        self.paid_entry = ctk.CTkEntry(paid_frame, width=120, height=35, placeholder_text="For receipt", corner_radius=15, border_width=1)
         self.paid_entry.pack(side="right")
         # Cash received does not affect calculations, only for receipt printing
 
@@ -481,32 +565,38 @@ class BillingFrame(BaseFrame):
         )
         self.balance_label.pack(side="right")
 
-        # Action buttons container
+        # Action buttons container - LARGE AND TOUCH-FRIENDLY
         action_btn_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
-        action_btn_frame.pack(fill="x", padx=20, pady=30)
+        action_btn_frame.pack(fill="x", padx=15, pady=(20, 25))
 
-        # Generate Bill button (for normal sales - NO booking)
+        # Generate Bill button - PRIMARY ACTION
         ctk.CTkButton(
             action_btn_frame,
             text="💵 Generate Bill",
             command=self.generate_bill,
-            width=150,
-            height=45,
-            font=ctk.CTkFont(size=14, weight="bold"),
-            fg_color="#1f538d",
-            hover_color="#14375e"
+            width=160,
+            height=55,
+            font=ctk.CTkFont(size=16, weight="bold"),
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=25,
+            border_width=3,
+            border_color="#8C00FF"
         ).pack(side="left", padx=(0, 10))
 
-        # Clear All button
+        # Clear All button - SECONDARY ACTION
         ctk.CTkButton(
             action_btn_frame,
             text="🔄 Clear All",
             command=self.clear_all,
-            width=130,
-            height=45,
+            width=140,
+            height=55,
             fg_color="#ff4757",
             hover_color="#ff3344",
-            font=ctk.CTkFont(size=14, weight="bold")
+            corner_radius=25,
+            font=ctk.CTkFont(size=16, weight="bold"),
+            border_width=3,
+            border_color="#ff4757"
         ).pack(side="left")
 
     def load_categories(self):
@@ -516,7 +606,7 @@ class BillingFrame(BaseFrame):
         self.categories_data = {cat['category_name']: cat for cat in categories}
 
     def on_item_type_change(self, item_type):
-        """Handle item type change"""
+        """Handle item type change with conditional Payment Type visibility"""
         self.category_service_cost = 0
         self.selected_category_name = None
         self.selected_category_id = None
@@ -524,23 +614,34 @@ class BillingFrame(BaseFrame):
         self.services_map = {}
         self.frames_map = {}
         
-        if item_type == "Service":
+        if item_type == "Services":
+            # Services selected
             self.select_category_btn.configure(text="📁 Select Category", state="normal")
             self.select_item_btn.configure(text="🎨 Select Service", state="disabled")
             self.selected_category_frame.pack_forget()
-        else:
+            
+            # HIDE Payment Type AND Advance Payment for Services
+            self.payment_type_frame.pack_forget()
+            self.advance_frame.pack_forget()
+            
+        else:  # Frames
+            # Frames selected
             self.select_category_btn.configure(text="📁 Select Category", state="disabled")
             self.select_item_btn.configure(text="🖼️ Select Frame", state="normal")
             self.selected_category_frame.pack_forget()
             self.load_frames()
+            
+            # SHOW Payment Type AND Advance Payment for Frames
+            self.payment_type_frame.pack(fill="x", padx=20, pady=10, before=self.advance_frame)
+            self.advance_frame.pack(fill="x", padx=20, pady=10)
         
         self.calculate_totals()
 
     def open_category_popup(self):
-        """Open popup for category selection"""
+        """Open popup for category selection - OPTIMIZED WIDER DESIGN"""
         popup = ctk.CTkToplevel(self)
         popup.title("Select Category")
-        popup.geometry("500x500")
+        popup.geometry("650x550")  # Wider popup
         popup.transient(self.winfo_toplevel())
         popup.grab_set()
         popup.configure(fg_color="#1a1a2e")
@@ -557,22 +658,24 @@ class BillingFrame(BaseFrame):
         popup.protocol("WM_DELETE_WINDOW", close_popup)
 
         popup.update_idletasks()
-        x = (popup.winfo_screenwidth() // 2) - 250
-        y = (popup.winfo_screenheight() // 2) - 250
-        popup.geometry(f"500x500+{x}+{y}")
+        x = (popup.winfo_screenwidth() // 2) - 325  # Centered
+        y = (popup.winfo_screenheight() // 2) - 275
+        popup.geometry(f"650x550+{x}+{y}")
 
         # Title
         ctk.CTkLabel(
             popup,
             text="📁 Select Category",
             font=ctk.CTkFont(size=20, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(pady=(20, 15))
 
         # Scrollable category list
         scroll_frame = ctk.CTkScrollableFrame(
             popup,
-            fg_color="#1e1e3f",
+            fg_color="#060606",
+            border_width=2,
+            border_color="#444444",
             corner_radius=10,
             scrollbar_button_color="#333355",
             scrollbar_button_hover_color="#444477"
@@ -590,7 +693,7 @@ class BillingFrame(BaseFrame):
             ).pack(pady=50)
         else:
             for cat in categories:
-                cat_frame = ctk.CTkFrame(scroll_frame, fg_color="#252545", corner_radius=10)
+                cat_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
                 cat_frame.pack(fill="x", pady=5, padx=5)
 
                 info_frame = ctk.CTkFrame(cat_frame, fg_color="transparent")
@@ -604,16 +707,19 @@ class BillingFrame(BaseFrame):
                     anchor="w"
                 ).pack(anchor="w")
 
-                # Service cost info
+                # Service cost info - PROMINENT DISPLAY
                 service_cost = cat.get('service_cost', 0) or 0
                 if service_cost > 0:
+                    service_cost_frame = ctk.CTkFrame(info_frame, fg_color="#2d2d1a", corner_radius=8)
+                    service_cost_frame.pack(anchor="w", pady=(5, 0), fill="x")
+                    
                     ctk.CTkLabel(
-                        info_frame,
-                        text=f"Service Charge: Rs. {service_cost:.2f}",
-                        font=ctk.CTkFont(size=11),
+                        service_cost_frame,
+                        text=f"💰 Service Charge: Rs. {service_cost:,.2f}",
+                        font=ctk.CTkFont(size=12, weight="bold"),
                         text_color="#ffd93d",
                         anchor="w"
-                    ).pack(anchor="w")
+                    ).pack(anchor="w", padx=8, pady=5)
 
                 # Check for free service (price = 0)
                 category_id = cat['id']
@@ -639,9 +745,10 @@ class BillingFrame(BaseFrame):
                     text="Select",
                     width=80,
                     height=35,
-                    fg_color="#00d4ff",
-                    text_color="#1a1a2e",
-                    hover_color="#00a8cc",
+                    fg_color="#8C00FF",
+                    text_color="white",
+                    hover_color="#7300D6",
+                    corner_radius=20,
                     command=select_cat
                 ).pack(side="right", padx=15, pady=12)
 
@@ -657,7 +764,7 @@ class BillingFrame(BaseFrame):
         ).pack(pady=15)
 
     def on_category_selected(self, category, free_service_name=None):
-        """Handle category selection"""
+        """Handle category selection with prominent service cost display"""
         self.selected_category_name = category['category_name']
         self.selected_category_id = category['id']
         self.category_service_cost = float(category.get('service_cost', 0) or 0)
@@ -667,25 +774,38 @@ class BillingFrame(BaseFrame):
         services = self.db_manager.get_services_by_category(self.selected_category_id)
         self.services_map = {s['service_name']: s for s in services}
 
-        # Update UI
+        # Update UI with prominent service cost
         self.selected_category_label.configure(text=f"📁 {self.selected_category_name}")
+        
+        # Display service cost prominently
+        if self.category_service_cost > 0:
+            self.category_cost_display.configure(
+                text=f"💰 Service Cost: Rs. {self.category_service_cost:,.2f}",
+                text_color="#ffd93d"
+            )
+        else:
+            self.category_cost_display.configure(text="Service Cost: Rs. 0.00", text_color="#888888")
         
         if free_service_name:
             self.free_service_label.configure(text=f"🎁 Free: {free_service_name}")
         else:
             self.free_service_label.configure(text="")
 
-        self.selected_category_frame.pack(fill="x", padx=15, pady=5, before=self.select_category_btn.master)
+        self.selected_category_frame.pack(fill="x", padx=15, pady=10, before=self.select_category_btn.master)
         self.select_item_btn.configure(state="normal")
+        
+        # AUTO-FOCUS: Focus on select item button after category selection
+        self.after(100, lambda: self.select_item_btn.focus())
+        
         self.calculate_totals()
 
     def open_item_popup(self):
-        """Open popup for item selection"""
+        """Open popup for item selection - OPTIMIZED WITH INLINE QUANTITY"""
         item_type = self.item_type.get()
         
         popup = ctk.CTkToplevel(self)
         popup.title(f"Select {item_type}")
-        popup.geometry("600x550")
+        popup.geometry("750x600")  # Wider popup for better UX
         popup.transient(self.winfo_toplevel())
         popup.grab_set()
         popup.configure(fg_color="#1a1a2e")
@@ -702,65 +822,67 @@ class BillingFrame(BaseFrame):
         popup.protocol("WM_DELETE_WINDOW", close_popup)
 
         popup.update_idletasks()
-        x = (popup.winfo_screenwidth() // 2) - 300
-        y = (popup.winfo_screenheight() // 2) - 275
-        popup.geometry(f"600x550+{x}+{y}")
+        x = (popup.winfo_screenwidth() // 2) - 375  # Centered
+        y = (popup.winfo_screenheight() // 2) - 300
+        popup.geometry(f"750x600+{x}+{y}")
 
         # Title
-        title_text = "🎨 Select Service" if item_type == "Service" else "🖼️ Select Frame"
+        title_text = "🎨 Select Service" if item_type == "Services" else "🖼️ Select Frame"
         ctk.CTkLabel(
             popup,
             text=title_text,
             font=ctk.CTkFont(size=20, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(pady=(20, 10))
 
         # Show selected category info for services
-        if item_type == "Service" and self.selected_category_name:
-            cat_info = ctk.CTkFrame(popup, fg_color="#1e3a2f", corner_radius=8)
+        if item_type == "Services" and self.selected_category_name:
+            cat_info = ctk.CTkFrame(popup, fg_color="#1e3a2f", corner_radius=10, border_width=2, border_color="#00ff88")
             cat_info.pack(fill="x", padx=20, pady=(0, 10))
             
             ctk.CTkLabel(
                 cat_info,
-                text=f"Category: {self.selected_category_name}",
-                font=ctk.CTkFont(size=12, weight="bold"),
+                text=f"📁 Category: {self.selected_category_name}",
+                font=ctk.CTkFont(size=13, weight="bold"),
                 text_color="#00ff88"
-            ).pack(side="left", padx=15, pady=8)
+            ).pack(side="left", padx=15, pady=10)
 
             if self.free_service_name:
                 ctk.CTkLabel(
                     cat_info,
                     text=f"🎁 Free: {self.free_service_name}",
-                    font=ctk.CTkFont(size=11),
+                    font=ctk.CTkFont(size=12),
                     text_color="#ffd93d"
-                ).pack(side="right", padx=15, pady=8)
-
-        # Quantity input
-        qty_frame = ctk.CTkFrame(popup, fg_color="transparent")
-        qty_frame.pack(fill="x", padx=20, pady=5)
-
-        ctk.CTkLabel(qty_frame, text="Quantity:", font=ctk.CTkFont(size=13)).pack(side="left", padx=5)
-        qty_entry = ctk.CTkEntry(qty_frame, width=80, height=35)
-        qty_entry.insert(0, "1")
-        qty_entry.pack(side="left", padx=10)
+                ).pack(side="right", padx=15, pady=10)
+        
+        # Info label for quantity
+        info_label = ctk.CTkLabel(
+            popup,
+            text="👉 Enter quantity next to each item and click 'Add to Cart'",
+            font=ctk.CTkFont(size=12),
+            text_color="#888888"
+        )
+        info_label.pack(padx=20, pady=(0, 5))
 
         # Scrollable item list
         scroll_frame = ctk.CTkScrollableFrame(
             popup,
-            fg_color="#1e1e3f",
+            fg_color="#060606",
+            border_width=2,
+            border_color="#444444",
             corner_radius=10,
             scrollbar_button_color="#333355",
             scrollbar_button_hover_color="#444477"
         )
         scroll_frame.pack(fill="both", expand=True, padx=20, pady=10)
 
-        if item_type == "Service":
+        if item_type == "Services":
             items = list(self.services_map.values())
         else:
             items = list(self.frames_map.values())
 
         if not items:
-            msg = "No services in this category" if item_type == "Service" else "No frames available"
+            msg = "No services in this category" if item_type == "Services" else "No frames available"
             ctk.CTkLabel(
                 scroll_frame,
                 text=msg,
@@ -769,39 +891,40 @@ class BillingFrame(BaseFrame):
             ).pack(pady=50)
         else:
             for item in items:
-                item_frame = ctk.CTkFrame(scroll_frame, fg_color="#252545", corner_radius=10)
-                item_frame.pack(fill="x", pady=5, padx=5)
+                item_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=12, border_width=2, border_color="#444444")
+                item_frame.pack(fill="x", pady=8, padx=8)
 
+                # Left side - Item info
                 info_frame = ctk.CTkFrame(item_frame, fg_color="transparent")
-                info_frame.pack(side="left", fill="x", expand=True, padx=15, pady=12)
+                info_frame.pack(side="left", fill="x", expand=True, padx=15, pady=15)
 
-                if item_type == "Service":
+                if item_type == "Services":
                     name = item['service_name']
                     price = item.get('price', 0)
                     
                     ctk.CTkLabel(
                         info_frame,
                         text=name,
-                        font=ctk.CTkFont(size=14, weight="bold"),
+                        font=ctk.CTkFont(size=15, weight="bold"),
                         text_color="white",
                         anchor="w"
                     ).pack(anchor="w")
 
                     # Price display - highlight free service
                     if price == 0:
-                        price_text = "FREE (Rs. 0.00)"
+                        price_text = "🎁 FREE (Rs. 0.00)"
                         price_color = "#00ff88"
                     else:
-                        price_text = f"Rs. {price:.2f}"
+                        price_text = f"💵 Unit Price: Rs. {price:,.2f}"
                         price_color = "#ffd93d"
 
                     ctk.CTkLabel(
                         info_frame,
                         text=price_text,
-                        font=ctk.CTkFont(size=12, weight="bold"),
+                        font=ctk.CTkFont(size=13, weight="bold"),
                         text_color=price_color,
                         anchor="w"
-                    ).pack(anchor="w")
+                    ).pack(anchor="w", pady=(3, 0))
                 else:
                     name = f"{item['frame_name']} - {item['size']}"
                     price = item.get('price', 0)
@@ -810,47 +933,80 @@ class BillingFrame(BaseFrame):
                     ctk.CTkLabel(
                         info_frame,
                         text=item['frame_name'],
-                        font=ctk.CTkFont(size=14, weight="bold"),
+                        font=ctk.CTkFont(size=15, weight="bold"),
                         text_color="white",
                         anchor="w"
                     ).pack(anchor="w")
 
                     ctk.CTkLabel(
                         info_frame,
-                        text=f"Size: {item['size']} | Rs. {price:.2f}",
-                        font=ctk.CTkFont(size=12),
+                        text=f"Size: {item['size']} | Rs. {price:,.2f}",
+                        font=ctk.CTkFont(size=13),
                         text_color="#ffd93d",
                         anchor="w"
-                    ).pack(anchor="w")
+                    ).pack(anchor="w", pady=(3, 0))
 
                     stock_color = "#00ff88" if stock > 5 else "#ff6b6b"
                     ctk.CTkLabel(
                         info_frame,
-                        text=f"Stock: {stock}",
-                        font=ctk.CTkFont(size=11),
+                        text=f"📦 Stock: {stock}",
+                        font=ctk.CTkFont(size=12),
                         text_color=stock_color,
                         anchor="w"
-                    ).pack(anchor="w")
+                    ).pack(anchor="w", pady=(2, 0))
 
-                def add_item(i=item, t=item_type):
-                    qty_str = qty_entry.get().strip()
+                # Right side - Quantity + Add button (INLINE)
+                action_frame = ctk.CTkFrame(item_frame, fg_color="transparent")
+                action_frame.pack(side="right", padx=15, pady=15)
+                
+                # Quantity label
+                ctk.CTkLabel(
+                    action_frame,
+                    text="Qty:",
+                    font=ctk.CTkFont(size=12, weight="bold"),
+                    text_color="#888888"
+                ).pack(pady=(0, 5))
+                
+                # Quantity input (inline)
+                qty_entry = ctk.CTkEntry(
+                    action_frame,
+                    width=70,
+                    height=40,
+                    font=ctk.CTkFont(size=15, weight="bold"),
+                    border_color="#8C00FF",
+                    border_width=2,
+                    justify="center",
+                    corner_radius=15
+                )
+                qty_entry.insert(0, "1")  # Default to 1
+                qty_entry.pack(pady=(0, 8))
+
+                def add_item(i=item, t=item_type, qe=qty_entry):
+                    qty_str = qe.get().strip()
                     if not qty_str or not qty_str.isdigit() or int(qty_str) <= 0:
                         MessageDialog.show_error("Error", "Please enter a valid quantity")
                         return
                     qty = int(qty_str)
                     self.add_item_to_cart(i, t, qty)
                     close_popup()
+                    # Visual feedback - briefly highlight cart
+                    self.cart_frame.configure(border_color="#00ff88")
+                    self.after(500, lambda: self.cart_frame.configure(border_color="#444444"))
 
                 ctk.CTkButton(
-                    item_frame,
-                    text="Add",
-                    width=70,
-                    height=35,
-                    fg_color="#00ff88",
-                    text_color="#1a1a2e",
-                    hover_color="#00cc6a",
+                    action_frame,
+                    text="➕ Add",
+                    width=100,
+                    height=45,
+                    fg_color="#8C00FF",
+                    text_color="#ffffff",
+                    hover_color="#7300D6",
+                    corner_radius=20,
+                    font=ctk.CTkFont(size=13, weight="bold"),
+                    border_width=2,
+                    border_color="#8C00FF",
                     command=add_item
-                ).pack(side="right", padx=15, pady=12)
+                ).pack()
 
         # Cancel button
         ctk.CTkButton(
@@ -858,14 +1014,15 @@ class BillingFrame(BaseFrame):
             text="Cancel",
             width=120,
             height=40,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=close_popup
         ).pack(pady=15)
 
     def add_item_to_cart(self, item, item_type, qty):
         """Add selected item to cart - handles duplicates by updating qty"""
-        if item_type == "Service":
+        if item_type == "Services":
             item_id = item['id']
             item_name = item['service_name']
             unit_price = item.get('price', 0)
@@ -1019,6 +1176,7 @@ class BillingFrame(BaseFrame):
                 hover_color="#3d3d6a",
                 anchor="w",
                 height=35,
+                corner_radius=20,
                 command=lambda c=customer: self.select_suggestion(c)
             )
             btn.pack(fill="x", padx=5, pady=2)
@@ -1071,14 +1229,14 @@ class BillingFrame(BaseFrame):
         )
         main_scroll.pack(fill="both", expand=True, padx=5, pady=5)
 
-        content_frame = ctk.CTkFrame(main_scroll, fg_color="#1e1e3f", corner_radius=15)
+        content_frame = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         content_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         ctk.CTkLabel(
             content_frame,
             text="➕ Add New Customer",
             font=ctk.CTkFont(size=20, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(pady=(25, 30))
 
         form_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
@@ -1095,7 +1253,8 @@ class BillingFrame(BaseFrame):
             height=45,
             font=ctk.CTkFont(size=13),
             placeholder_text="Enter customer full name",
-            corner_radius=8
+            corner_radius=15,
+            border_width=1
         )
         name_entry.pack(fill="x", pady=(0, 20))
 
@@ -1110,7 +1269,8 @@ class BillingFrame(BaseFrame):
             height=45,
             font=ctk.CTkFont(size=13),
             placeholder_text="Enter 10-digit mobile number",
-            corner_radius=8
+            corner_radius=15,
+            border_width=1
         )
         mobile_entry.pack(fill="x", pady=(0, 25))
 
@@ -1154,9 +1314,9 @@ class BillingFrame(BaseFrame):
             command=close_dialog,
             width=130,
             height=45,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
-            corner_radius=8,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(side="left", padx=10)
 
@@ -1166,10 +1326,10 @@ class BillingFrame(BaseFrame):
             command=save_customer,
             width=160,
             height=45,
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc",
-            corner_radius=8,
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20,
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(side="left", padx=10)
 
@@ -1225,14 +1385,14 @@ class BillingFrame(BaseFrame):
             dialog,
             text=f"Edit: {item['name']}",
             font=ctk.CTkFont(size=14, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(pady=(20, 15))
 
         qty_frame = ctk.CTkFrame(dialog, fg_color="transparent")
         qty_frame.pack(pady=10)
 
         ctk.CTkLabel(qty_frame, text="New Quantity:", font=ctk.CTkFont(size=13)).pack(side="left", padx=10)
-        qty_entry = ctk.CTkEntry(qty_frame, width=100, height=35)
+        qty_entry = ctk.CTkEntry(qty_frame, width=100, height=35, corner_radius=15, border_width=1)
         qty_entry.insert(0, str(item['quantity']))
         qty_entry.pack(side="left", padx=10)
 
@@ -1266,8 +1426,9 @@ class BillingFrame(BaseFrame):
             command=close_dialog,
             width=100,
             height=35,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
 
         ctk.CTkButton(
@@ -1276,9 +1437,10 @@ class BillingFrame(BaseFrame):
             command=save_qty,
             width=100,
             height=35,
-            fg_color="#00ff88",
-            text_color="#1a1a2e",
-            hover_color="#00cc6a"
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
 
         qty_entry.focus()
@@ -1353,8 +1515,9 @@ class BillingFrame(BaseFrame):
             command=close_dialog,
             width=100,
             height=35,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
 
         ctk.CTkButton(
@@ -1364,7 +1527,8 @@ class BillingFrame(BaseFrame):
             width=100,
             height=35,
             fg_color="#ff4757",
-            hover_color="#ff3344"
+            hover_color="#ff3344",
+            corner_radius=20
         ).pack(side="left", padx=10)
 
     def on_payment_type_change(self):
@@ -1487,11 +1651,32 @@ class BillingFrame(BaseFrame):
                 return
             cash_given = float(cash_given_str)
 
-        # For bills, payment must be full (no advance payment)
-        # Bills are for normal sales, not bookings
+        # Calculate advance amount and balance due based on payment type
+        advance_amount = 0.0
+        balance_due = 0.0
+        
         if self.payment_type == "advance":
-            MessageDialog.show_error("Error", "Bills do not support advance payment. Use full payment or create a booking for advance payments.")
-            return
+            # Advance payment - validate advance amount
+            advance_str = self.advance_entry.get().strip()
+            if not advance_str or not self.validate_number(advance_str, True):
+                MessageDialog.show_error("Error", "Please enter valid advance payment amount")
+                return
+            
+            advance_amount = float(advance_str)
+            
+            if advance_amount <= 0:
+                MessageDialog.show_error("Error", "Advance payment must be greater than 0")
+                return
+            
+            if advance_amount > total:
+                MessageDialog.show_error("Error", "Advance payment cannot exceed total amount")
+                return
+            
+            balance_due = total - advance_amount
+        else:
+            # Full payment - no advance or balance
+            advance_amount = total
+            balance_due = 0.0
 
         bill_number = self.db_manager.generate_bill_number()
 
@@ -1512,7 +1697,9 @@ class BillingFrame(BaseFrame):
             self.auth_manager.get_user_id(),
             service_charge,
             cash_given,
-            guest_name
+            guest_name,
+            advance_amount,
+            balance_due
         )
 
         if not bill_id:

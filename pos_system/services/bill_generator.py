@@ -92,119 +92,242 @@ class BillGenerator:
             leading=10
         )
         
-        separator = "─" * 32
+        # === MINIMALIST LUXURY STYLES ===
+        # Left-aligned metadata style
+        left_meta_style = ParagraphStyle(
+            'LeftMeta',
+            fontSize=8,
+            textColor=colors.black,
+            fontName='Helvetica',
+            alignment=TA_LEFT,
+            spaceAfter=1.5*mm,
+            spaceBefore=0,
+            leading=11
+        )
         
-        # === HEADER SECTION WITH LOGO ===
+        # Right-aligned totals style
+        right_total_style = ParagraphStyle(
+            'RightTotal',
+            fontSize=8,
+            textColor=colors.black,
+            fontName='Helvetica',
+            alignment=TA_RIGHT,
+            spaceAfter=1*mm,
+            spaceBefore=0,
+            leading=11
+        )
+        
+        # Grand total bold style
+        grand_total_style = ParagraphStyle(
+            'GrandTotal',
+            fontSize=11,
+            textColor=colors.black,
+            fontName='Helvetica-Bold',
+            alignment=TA_RIGHT,
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=13
+        )
+        
+        # Elegant footer style
+        footer_elegant_style = ParagraphStyle(
+            'FooterElegant',
+            fontSize=8,
+            textColor=colors.black,
+            fontName='Times-Italic',
+            alignment=TA_CENTER,
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=10
+        )
+        
+        # Ultra-thin solid gray line (not dashed) - Fixed import
+        from reportlab.graphics.shapes import Drawing, Line as RLLine
+        
+        def create_thin_line():
+            drawing = Drawing(74*mm, 1*mm)
+            line = RLLine(0, 0.5*mm, 74*mm, 0.5*mm)
+            line.strokeColor = colors.HexColor('#CCCCCC')
+            line.strokeWidth = 0.5
+            drawing.add(line)
+            return drawing
+        
+        # === HEADER & BRANDING (CENTERED ONLY) ===
+        # Logo at top center
         logo_path = os.path.join('assets', 'logos', 'billLogo.png')
         if os.path.exists(logo_path):
             try:
-                # Logo width optimized for 80mm thermal receipt
-                logo = Image(logo_path, width=55*mm, height=20*mm)
+                logo = Image(logo_path, width=60*mm, height=22*mm)
                 logo.hAlign = 'CENTER'
                 story.append(logo)
-                story.append(Spacer(1, 1*mm))
+                story.append(Spacer(1, 2*mm))
             except:
-                # Fallback to text if logo fails
-                story.append(Paragraph("STUDIO SHINE ART", header_style))
-        else:
-            # Fallback to text if logo not found
-            story.append(Paragraph("STUDIO SHINE ART", header_style))
+                pass
         
-        story.append(Paragraph("No:52/1/1, Maravila Road", subheader_style))
-        story.append(Paragraph("Nattandiya", subheader_style))
-        story.append(Paragraph("<b>Reg No:</b> 26/3610", subheader_style))
-        story.append(Paragraph("Tel: 0767898604 / 0322051680", subheader_style))
-        story.append(Spacer(1, 1.5*mm))
-        story.append(Paragraph(separator, center_style))
-        story.append(Spacer(1, 2*mm))
+        # Centered studio identity
+        story.append(Paragraph("No: 52/1/1, Maravila Road, Nattandiya", subheader_style))
+        story.append(Paragraph("Reg No: 26/3610 | Tel: 0767898604 / 0322051680", subheader_style))
+        story.append(Spacer(1, 3*mm))
         
-        # === BILL INFO SECTION ===
-        bill_info = f"Bill No: {bill_data['bill_number']}"
-        story.append(Paragraph(bill_info, normal_style))
+        # Ultra-thin solid gray separator
+        story.append(create_thin_line())
+        story.append(Spacer(1, 3*mm))
         
+        # === BILL METADATA (PROFESSIONAL LEFT-ALIGN) ===
+        # Extract date and time
         date_str = bill_data['created_at']
-        story.append(Paragraph(f"Date: {date_str}", normal_style))
+        try:
+            if len(date_str) > 10:
+                dt_parts = date_str.split(' ')
+                bill_date = dt_parts[0] if len(dt_parts) > 0 else date_str
+                bill_time = dt_parts[1] if len(dt_parts) > 1 else ''
+            else:
+                bill_date = date_str
+                bill_time = ''
+        except:
+            bill_date = date_str
+            bill_time = ''
         
         cashier = bill_data.get('created_by_name', 'Staff')
-        story.append(Paragraph(f"Cashier: {cashier}", normal_style))
-        story.append(Spacer(1, 2*mm))
-        
-        # === CUSTOMER INFO ===
         customer_name = customer_data.get('full_name', 'Guest')
-        story.append(Paragraph(f"Customer: {customer_name}", normal_style))
+        
+        # All metadata left-aligned with adequate spacing
+        story.append(Paragraph(f"<b>Bill No:</b> {bill_data['bill_number']}", left_meta_style))
+        story.append(Paragraph(f"<b>Date/Time:</b> {bill_date} | {bill_time}", left_meta_style))
+        story.append(Paragraph(f"<b>Cashier:</b> {cashier}", left_meta_style))
+        story.append(Paragraph(f"<b>Customer:</b> {customer_name}", left_meta_style))
         
         mobile = customer_data.get('mobile_number', '')
         if mobile and mobile != 'Guest Customer':
-            story.append(Paragraph(f"Mobile: {mobile}", normal_style))
+            story.append(Paragraph(f"<b>Mobile:</b> {mobile}", left_meta_style))
+        
+        story.append(Spacer(1, 3*mm))
+        story.append(create_thin_line())
         story.append(Spacer(1, 3*mm))
         
-        # === ITEMIZED LIST (Monospace for alignment) ===
-        # Column headers
-        header_line = f"{'Item':<18}{'Amt':>8}"
-        story.append(Paragraph(header_line, mono_style))
-        story.append(Spacer(1, 1*mm))
+        # === THE ITEM TABLE (MODERN STANDARD) ===
+        # Table header style - subtle bold
+        table_header_style = ParagraphStyle(
+            'TableHeader',
+            fontSize=8,
+            textColor=colors.black,
+            fontName='Helvetica-Bold',
+            alignment=TA_LEFT,
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=10
+        )
         
-        # Items
+        # Build table data with proper alignment
+        table_data = []
+        
+        # Header row
+        header_row = [
+            Paragraph("<b>ITEM</b>", table_header_style),
+            Paragraph("<b>QTY</b>", ParagraphStyle('TableHeaderCenter', parent=table_header_style, alignment=TA_CENTER)),
+            Paragraph("<b>AMT</b>", ParagraphStyle('TableHeaderRight', parent=table_header_style, alignment=TA_RIGHT))
+        ]
+        table_data.append(header_row)
+        
+        # Item rows with proper alignment
         for item in items:
-            item_name = item['item_name'][:17]  # Truncate long names
+            item_name = item['item_name']
             qty = item['quantity']
-            price = item['unit_price']
             total = item['total_price']
             
-            # Item name line
-            story.append(Paragraph(item_name, mono_style))
-            # Qty x Price = Amount line
-            detail_line = f"  {qty} x Rs.{price:<7.2f} Rs.{total:>7.2f}"
-            story.append(Paragraph(detail_line, mono_style))
+            item_row = [
+                Paragraph(item_name, normal_style),
+                Paragraph(str(qty), ParagraphStyle('CenterAlign', parent=normal_style, alignment=TA_CENTER)),
+                Paragraph(f"Rs. {total:.2f}", ParagraphStyle('RightAlign', parent=normal_style, alignment=TA_RIGHT))
+            ]
+            table_data.append(item_row)
         
+        # Create table with clean styling
+        item_table = Table(table_data, colWidths=[42*mm, 15*mm, 17*mm])
+        item_table.setStyle(TableStyle([
+            # Header styling
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#F5F5F5')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+            ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 2*mm),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2*mm),
+            ('LEFTPADDING', (0, 0), (-1, -1), 1*mm),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 1*mm),
+            # Subtle line below header
+            ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.HexColor('#CCCCCC')),
+            # Professional spacing with whitespace (no lines between items)
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        story.append(item_table)
+        story.append(Spacer(1, 4*mm))
+        story.append(create_thin_line())
         story.append(Spacer(1, 3*mm))
         
-        # === TOTALS SECTION ===
+        # === FINANCIAL SUMMARY (RIGHT-ALIGNED BLOCK) ===
         subtotal = bill_data['subtotal']
         discount = bill_data.get('discount', 0) or 0
         service_charge = bill_data.get('service_charge', 0) or 0
         total = bill_data['total_amount']
         
-        story.append(Paragraph(f"{'Subtotal:':<16} Rs.{subtotal:>8.2f}", mono_style))
-        
-        if discount > 0:
-            story.append(Paragraph(f"{'Discount:':<16} Rs.{discount:>8.2f}", mono_style))
+        # Right-aligned financial block
+        story.append(Paragraph(f"Subtotal: Rs. {subtotal:.2f}", right_total_style))
         
         if service_charge > 0:
-            story.append(Paragraph(f"{'Service Charge:':<16} Rs.{service_charge:>8.2f}", mono_style))
+            story.append(Paragraph(f"Service Charges: Rs. {service_charge:.2f}", right_total_style))
         
-        story.append(Spacer(1, 1*mm))
+        if discount > 0:
+            story.append(Paragraph(f"Discount: Rs. {discount:.2f}", right_total_style))
         
-        # TOTAL - Bold style
-        total_style = ParagraphStyle(
-            'TotalBold',
-            fontSize=9,
-            textColor=colors.black,
-            fontName='Courier-Bold',
-            alignment=TA_LEFT,
-            spaceAfter=0,
-            spaceBefore=0,
-            leading=11
-        )
-        story.append(Paragraph(f"{'TOTAL:':<16} Rs.{total:>8.2f}", total_style))
+        story.append(Spacer(1, 2*mm))
         
-        # Cash handling
-        cash_given = bill_data.get('cash_given', 0) or 0
-        if cash_given > 0:
-            story.append(Paragraph(f"{'Paid:':<16} Rs.{cash_given:>8.2f}", mono_style))
-            balance = cash_given - total
-            if balance >= 0:
-                story.append(Paragraph(f"{'Change:':<16} Rs.{balance:>8.2f}", mono_style))
+        # Grand Total - larger and bold (focal point)
+        story.append(Paragraph(f"<b>TOTAL: Rs. {total:.2f}</b>", grand_total_style))
+        story.append(Spacer(1, 2*mm))
+        
+        # === PAYMENT BREAKDOWN ===
+        advance_amount = bill_data.get('advance_amount', 0) or 0
+        balance_due = bill_data.get('balance_due', 0) or 0
+        
+        if advance_amount > 0 and balance_due > 0:
+            # Advance payment
+            story.append(Paragraph(f"Advance Paid: Rs. {advance_amount:.2f}", right_total_style))
+            story.append(Paragraph(f"<b>Balance Due: Rs. {balance_due:.2f}</b>", grand_total_style))
+        else:
+            # Full payment - Cash and Change
+            cash_given = bill_data.get('cash_given', 0) or 0
+            if cash_given > 0:
+                story.append(Paragraph(f"Cash Received: Rs. {cash_given:.2f}", right_total_style))
+                change = cash_given - total
+                if change >= 0:
+                    story.append(Paragraph(f"Change: Rs. {change:.2f}", right_total_style))
         
         story.append(Spacer(1, 4*mm))
+        story.append(create_thin_line())
+        story.append(Spacer(1, 4*mm))
         
-        # === FOOTER ===
-        # story.append(Paragraph(f"Issued by: {cashier}", center_style))
-        # story.append(Spacer(1, 3*mm))
-        # story.append(Paragraph("Signature: .........................", center_style))
-        # story.append(Spacer(1, 3*mm))
-        story.append(Paragraph("Thank you! Come again.", center_style))
-        story.append(Spacer(1, 1*mm))
+        # === THE FOOTER (PROFESSIONAL SIGNATURE) ===
+        # Elegant tagline - centered with serif font
+        story.append(Paragraph("<i>Capturing your dreams, Creating the art.</i>", footer_elegant_style))
+        story.append(Spacer(1, 4*mm))
+        
+        # Developer credit - tiny subtle gray font
+        developer_style = ParagraphStyle(
+            'DeveloperCredit',
+            fontSize=5,
+            textColor=colors.HexColor('#999999'),
+            fontName='Helvetica',
+            alignment=TA_CENTER,
+            spaceAfter=0,
+            spaceBefore=0,
+            leading=6
+        )
+        story.append(Paragraph("System Developed by: Malinda Prabath | Email: malindaprabath876@gmail.com", developer_style))
+        story.append(Spacer(1, 2*mm))
         
         # Build PDF
         doc.build(story)

@@ -24,21 +24,21 @@ class CustomerManagementFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Input section
-        input_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
+        input_frame = ctk.CTkFrame(self, fg_color="#060606", corner_radius=20, border_width=2, border_color="#444444")
         input_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         # Full name
         name_label = ctk.CTkLabel(input_frame, text="Full Name:", font=ctk.CTkFont(size=13, weight="bold"))
         name_label.grid(row=0, column=0, padx=15, pady=10, sticky="w")
         
-        self.name_entry = ctk.CTkEntry(input_frame, width=250, height=35)
+        self.name_entry = ctk.CTkEntry(input_frame, width=250, height=35, corner_radius=20)
         self.name_entry.grid(row=0, column=1, padx=15, pady=10)
         
         # Mobile number
         mobile_label = ctk.CTkLabel(input_frame, text="Mobile Number:", font=ctk.CTkFont(size=13, weight="bold"))
         mobile_label.grid(row=1, column=0, padx=15, pady=10, sticky="w")
         
-        self.mobile_entry = ctk.CTkEntry(input_frame, width=250, height=35)
+        self.mobile_entry = ctk.CTkEntry(input_frame, width=250, height=35, corner_radius=20)
         self.mobile_entry.grid(row=1, column=1, padx=15, pady=10)
         
         # Buttons
@@ -51,7 +51,10 @@ class CustomerManagementFrame(BaseFrame):
             command=self.add_customer,
             width=120,
             height=35,
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=13, weight="bold"),
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         self.add_btn.pack(side="left", padx=5)
         
@@ -62,8 +65,9 @@ class CustomerManagementFrame(BaseFrame):
             width=130,
             height=35,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             state="disabled"
         )
         self.update_btn.pack(side="left", padx=5)
@@ -77,6 +81,7 @@ class CustomerManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold"),
             fg_color="#ff4757",
             hover_color="#ff3344",
+            corner_radius=20,
             state="disabled"
         )
         self.delete_btn.pack(side="left", padx=5)
@@ -87,19 +92,20 @@ class CustomerManagementFrame(BaseFrame):
             command=self.clear_form,
             width=120,
             height=35,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         clear_btn.pack(side="left", padx=5)
         
         # Search section
-        search_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
+        search_frame = ctk.CTkFrame(self, fg_color="#060606", corner_radius=20, border_width=2, border_color="#444444")
         search_frame.pack(fill="x", padx=20, pady=(0, 10))
         
         search_label = ctk.CTkLabel(search_frame, text="Search:", font=ctk.CTkFont(size=13, weight="bold"))
         search_label.pack(side="left", padx=15, pady=10)
         
-        self.search_entry = ctk.CTkEntry(search_frame, width=300, height=35)
+        self.search_entry = ctk.CTkEntry(search_frame, width=300, height=35, corner_radius=20)
         self.search_entry.pack(side="left", padx=10, pady=10)
         self.search_entry.bind("<KeyRelease>", lambda e: self.search_customers())
         
@@ -108,16 +114,19 @@ class CustomerManagementFrame(BaseFrame):
             text="Refresh",
             command=self.load_customers,
             width=120,
-            height=35
+            height=35,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         refresh_btn.pack(side="left", padx=10)
         
         # Table section
-        table_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
+        table_frame = ctk.CTkFrame(self, fg_color="#060606", corner_radius=20, border_width=2, border_color="#444444")
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Table header
-        table_header = ctk.CTkFrame(table_frame, fg_color="#252545", corner_radius=10, height=50)
+        table_header = ctk.CTkFrame(table_frame, fg_color="#1a1a2e", corner_radius=10, height=50)
         table_header.pack(fill="x", padx=10, pady=(10, 5))
         table_header.pack_propagate(False)
         
@@ -125,7 +134,7 @@ class CustomerManagementFrame(BaseFrame):
             table_header,
             text="📋 Customer Records",
             font=ctk.CTkFont(size=14, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", padx=15, pady=10)
         
         # Record count label
@@ -138,7 +147,7 @@ class CustomerManagementFrame(BaseFrame):
         self.record_count_label.pack(side="right", padx=15, pady=10)
         
         # Table container with modern styling
-        table_container = ctk.CTkFrame(table_frame, fg_color="#1a1a2e", corner_radius=10)
+        table_container = ctk.CTkFrame(table_frame, fg_color="#0d0d1a", corner_radius=10)
         table_container.pack(fill="both", expand=True, padx=10, pady=(0, 10))
         
         # Create Treeview
@@ -157,8 +166,8 @@ class CustomerManagementFrame(BaseFrame):
         self.tree.column("Created At", width=200)
         
         # Configure row tags for alternating colors
-        self.tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        self.tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        self.tree.tag_configure('oddrow', background='#0d0d1a', foreground='#e0e0e0')
+        self.tree.tag_configure('evenrow', background='#1a1a2e', foreground='#e0e0e0')
         
         # Scrollbar
         scrollbar = ttk.Scrollbar(table_container, orient="vertical", command=self.tree.yview)

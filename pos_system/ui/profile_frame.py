@@ -39,7 +39,7 @@ class ProfileFrame(ctk.CTkFrame):
         main_scroll.pack(fill="both", expand=True, padx=30, pady=10)
         
         # Profile Card - Full width
-        profile_card = ctk.CTkFrame(main_scroll, fg_color="#1e1e3f", corner_radius=15)
+        profile_card = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         profile_card.pack(fill="x", pady=10)
         
         # Avatar section
@@ -47,7 +47,7 @@ class ProfileFrame(ctk.CTkFrame):
         avatar_frame.pack(fill="x", padx=30, pady=30)
         
         # Profile picture container - circular avatar only
-        self.avatar_container = ctk.CTkFrame(avatar_frame, fg_color="#252545", width=120, height=120, corner_radius=60)
+        self.avatar_container = ctk.CTkFrame(avatar_frame, fg_color="#0d0d1a", width=120, height=120, corner_radius=60)
         self.avatar_container.pack()
         self.avatar_container.pack_propagate(False)
         
@@ -66,10 +66,10 @@ class ProfileFrame(ctk.CTkFrame):
             height=35,
             width=150,
             font=ctk.CTkFont(size=12, weight="bold"),
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc",
-            corner_radius=8,
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=self.upload_profile_picture
         )
         upload_btn.pack(pady=(15, 5))
@@ -100,12 +100,12 @@ class ProfileFrame(ctk.CTkFrame):
             avatar_frame,
             text="Role",
             font=ctk.CTkFont(size=14),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         )
         self.role_label.pack()
         
         # Profile details - full width card section
-        details_frame = ctk.CTkFrame(profile_card, fg_color="#252545", corner_radius=10)
+        details_frame = ctk.CTkFrame(profile_card, fg_color="#0d0d1a", corner_radius=10)
         details_frame.pack(fill="x", padx=30, pady=(0, 30))
         
         self.username_detail = self.create_detail_row(details_frame, "Username:", "")
@@ -114,7 +114,7 @@ class ProfileFrame(ctk.CTkFrame):
         self.last_login_detail = self.create_detail_row(details_frame, "Recent Login:", "")
         
         # Change Password Section - Full width
-        password_section = ctk.CTkFrame(main_scroll, fg_color="#1e1e3f", corner_radius=15)
+        password_section = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         password_section.pack(fill="x", pady=10)
         
         ctk.CTkLabel(
@@ -139,7 +139,8 @@ class ProfileFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13),
             show="●",
             placeholder_text="Enter current password",
-            corner_radius=8
+            corner_radius=15,
+            border_width=1
         )
         self.current_password.pack(fill="x", pady=(0, 15))
         
@@ -156,7 +157,8 @@ class ProfileFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13),
             show="●",
             placeholder_text="Enter new password (min 6 characters)",
-            corner_radius=8
+            corner_radius=15,
+            border_width=1
         )
         self.new_password.pack(fill="x", pady=(0, 15))
         
@@ -173,7 +175,8 @@ class ProfileFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13),
             show="●",
             placeholder_text="Confirm new password",
-            corner_radius=8
+            corner_radius=15,
+            border_width=1
         )
         self.confirm_password.pack(fill="x", pady=(0, 20))
         
@@ -193,15 +196,15 @@ class ProfileFrame(ctk.CTkFrame):
             height=50,
             width=200,
             font=ctk.CTkFont(size=14, weight="bold"),
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc",
-            corner_radius=10,
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=self.change_password
         ).pack(anchor="w")
         
         # Account Activity Section - Full width
-        activity_section = ctk.CTkFrame(main_scroll, fg_color="#1e1e3f", corner_radius=15)
+        activity_section = ctk.CTkFrame(main_scroll, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         activity_section.pack(fill="x", pady=10)
         
         ctk.CTkLabel(
@@ -243,7 +246,7 @@ class ProfileFrame(ctk.CTkFrame):
             row,
             text=value,
             font=ctk.CTkFont(size=13),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         )
         value_label.pack(side="left")
         

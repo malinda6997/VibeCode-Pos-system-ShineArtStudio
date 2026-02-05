@@ -365,3 +365,278 @@ class DashboardService:
         stats['today_frame_profit'] = self.get_today_frame_profit()
         stats['monthly_frame_profit'] = self.get_monthly_frame_profit()
         return stats
+    
+    # ==================== Expense Management ====================
+    
+    def add_manual_expense(self, description: str, amount: float, created_by: int, expense_date: str = None) -> bool:
+        """Add a manual expense entry"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            if expense_date is None:
+                expense_date = datetime.now().strftime('%Y-%m-%d')
+            
+            cursor.execute('''
+                INSERT INTO manual_expenses (description, amount, expense_date, created_by)
+                VALUES (?, ?, ?, ?)
+            ''', (description, amount, expense_date, created_by))
+            
+            conn.commit()
+            conn.close()
+            
+            # Update daily balance after adding expense
+            self.update_daily_balance(expense_date)
+            
+            return True
+        except sqlite3.Error as e:
+            print(f"Error adding manual expense: {e}")
+            return False
+    
+    def get_expenses_by_date(self, date: str) -> float:
+        """Get total expenses for a specific date"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT COALESCE(SUM(amount), 0) 
+                FROM manual_expenses 
+                WHERE expense_date = ?
+            ''', (date,))
+            
+            result = cursor.fetchone()[0]
+            conn.close()
+            return float(result)
+        except sqlite3.Error as e:
+            print(f"Error getting expenses by date: {e}")
+            return 0.0
+    
+    def get_expenses_by_range(self, start_date: str, end_date: str) -> float:
+        """Get total expenses for a date range"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT COALESCE(SUM(amount), 0) 
+                FROM manual_expenses 
+                WHERE expense_date BETWEEN ? AND ?
+            ''', (start_date, end_date))
+            
+            result = cursor.fetchone()[0]
+            conn.close()
+            return float(result)
+        except sqlite3.Error as e:
+            print(f"Error getting expenses by range: {e}")
+            return 0.0
+    
+    def get_expense_details_by_range(self, start_date: str, end_date: str) -> list:
+        """Get detailed expense records for a date range"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT me.id, me.description, me.amount, me.expense_date, 
+                       u.full_name as created_by_name, me.created_at
+                FROM manual_expenses me
+                JOIN users u ON me.created_by = u.id
+                WHERE me.expense_date BETWEEN ? AND ?
+                ORDER BY me.expense_date DESC, me.created_at DESC
+            ''', (start_date, end_date))
+            
+            expenses = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+            return expenses
+        except sqlite3.Error as e:
+            print(f"Error getting expense details: {e}")
+            return []
+    
+    def update_daily_balance(self, date: str) -> bool:
+        """Update or create daily balance record"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Calculate total income for the day
+            cursor.execute('''
+                SELECT COALESCE(SUM(total_amount), 0) 
+                FROM invoices 
+                WHERE DATE(created_at) = ?
+            ''', (date,))
+            total_income = float(cursor.fetchone()[0])
+            
+            # Calculate total expenses for the day
+            total_expenses = self.get_expenses_by_date(date)
+            
+            # Get previous day's closing balance for opening balance
+            prev_date = (datetime.strptime(date, '%Y-%m-%d') - timedelta(days=1)).strftime('%Y-%m-%d')
+            cursor.execute('''
+                SELECT closing_balance FROM daily_balances 
+                WHERE balance_date = ?
+            ''', (prev_date,))
+            prev_balance = cursor.fetchone()
+            opening_balance = float(prev_balance[0]) if prev_balance else 0.0
+            
+            # Calculate closing balance
+            closing_balance = opening_balance + total_income - total_expenses
+            
+            # Insert or update daily balance
+            cursor.execute('''
+                INSERT INTO daily_balances 
+                (balance_date, opening_balance, total_income, total_expenses, closing_balance, updated_at)
+                VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(balance_date) DO UPDATE SET
+                    total_income = excluded.total_income,
+                    total_expenses = excluded.total_expenses,
+                    closing_balance = excluded.closing_balance,
+                    updated_at = CURRENT_TIMESTAMP
+            ''', (date, opening_balance, total_income, total_expenses, closing_balance))
+            
+            conn.commit()
+            conn.close()
+            return True
+        except sqlite3.Error as e:
+            print(f"Error updating daily balance: {e}")
+            return False
+    
+    def get_opening_balance(self, date: str = None) -> float:
+        """Get opening balance for a specific date"""
+        try:
+            if date is None:
+                date = datetime.now().strftime('%Y-%m-%d')
+            
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT opening_balance FROM daily_balances 
+                WHERE balance_date = ?
+            ''', (date,))
+            
+            result = cursor.fetchone()
+            conn.close()
+            
+            if result:
+                return float(result[0])
+            else:
+                # If no record exists, calculate from previous day
+                prev_date = (datetime.strptime(date, '%Y-%m-%d') - timedelta(days=1)).strftime('%Y-%m-%d')
+                cursor = sqlite3.connect(self.db_path).cursor()
+                cursor.execute('''
+                    SELECT closing_balance FROM daily_balances 
+                    WHERE balance_date = ?
+                ''', (prev_date,))
+                prev = cursor.fetchone()
+                return float(prev[0]) if prev else 0.0
+        except sqlite3.Error as e:
+            print(f"Error getting opening balance: {e}")
+            return 0.0
+    
+    def get_weekly_expenses(self) -> float:
+        """Get total expenses for the week"""
+        try:
+            week_ago = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+            today = datetime.now().strftime('%Y-%m-%d')
+            return self.get_expenses_by_range(week_ago, today)
+        except Exception as e:
+            print(f"Error getting weekly expenses: {e}")
+            return 0.0
+    
+    def get_monthly_expenses(self) -> float:
+        """Get total expenses for the month"""
+        try:
+            first_day = datetime.now().replace(day=1).strftime('%Y-%m-%d')
+            today = datetime.now().strftime('%Y-%m-%d')
+            return self.get_expenses_by_range(first_day, today)
+        except Exception as e:
+            print(f"Error getting monthly expenses: {e}")
+            return 0.0
+    
+    # ==================== Specific Month/Week Filtering ====================
+    
+    def get_income_by_month(self, year: int, month: int) -> float:
+        """Get total income for a specific month and year"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Get first day of month
+            first_day = datetime(year, month, 1).strftime('%Y-%m-%d')
+            
+            # Get last day of month
+            from calendar import monthrange
+            _, last_day = monthrange(year, month)
+            last_day_str = datetime(year, month, last_day).strftime('%Y-%m-%d')
+            
+            cursor.execute('''
+                SELECT COALESCE(SUM(total_amount), 0) 
+                FROM invoices 
+                WHERE DATE(created_at) BETWEEN ? AND ?
+            ''', (first_day, last_day_str))
+            
+            result = cursor.fetchone()[0]
+            conn.close()
+            return float(result)
+        except sqlite3.Error as e:
+            print(f"Error getting income by month: {e}")
+            return 0.0
+    
+    def get_expenses_by_month(self, year: int, month: int) -> float:
+        """Get total expenses for a specific month and year"""
+        try:
+            from calendar import monthrange
+            
+            # Get first and last day of month
+            first_day = datetime(year, month, 1).strftime('%Y-%m-%d')
+            _, last_day = monthrange(year, month)
+            last_day_str = datetime(year, month, last_day).strftime('%Y-%m-%d')
+            
+            return self.get_expenses_by_range(first_day, last_day_str)
+        except Exception as e:
+            print(f"Error getting expenses by month: {e}")
+            return 0.0
+    
+    def get_income_by_range(self, start_date: str, end_date: str) -> float:
+        """Get total income for a date range"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT COALESCE(SUM(total_amount), 0) 
+                FROM invoices 
+                WHERE DATE(created_at) BETWEEN ? AND ?
+            ''', (start_date, end_date))
+            
+            result = cursor.fetchone()[0]
+            conn.close()
+            return float(result)
+        except sqlite3.Error as e:
+            print(f"Error getting income by range: {e}")
+            return 0.0
+    
+    def get_income_details_by_range(self, start_date: str, end_date: str) -> list:
+        """Get detailed invoice records for a date range"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT i.id, i.invoice_number, i.total_amount, i.balance_amount,
+                       i.created_at, c.full_name as customer_name
+                FROM invoices i
+                LEFT JOIN customers c ON i.customer_id = c.id
+                WHERE DATE(i.created_at) BETWEEN ? AND ?
+                ORDER BY i.created_at DESC
+            ''', (start_date, end_date))
+            
+            invoices = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+            return invoices
+        except sqlite3.Error as e:
+            print(f"Error getting income details: {e}")
+            return []

@@ -26,14 +26,14 @@ class ServiceManagementFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Input section
-        input_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
+        input_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         input_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         # Service name
         name_label = ctk.CTkLabel(input_frame, text="Service Name:", font=ctk.CTkFont(size=13, weight="bold"))
         name_label.grid(row=0, column=0, padx=15, pady=10, sticky="w")
         
-        self.name_entry = ctk.CTkEntry(input_frame, width=250, height=35)
+        self.name_entry = ctk.CTkEntry(input_frame, width=250, height=35, corner_radius=15, border_width=1)
         self.name_entry.grid(row=0, column=1, padx=15, pady=10)
         
         # Category dropdown
@@ -45,7 +45,8 @@ class ServiceManagementFrame(BaseFrame):
             width=200, 
             height=35,
             values=["Select Category"],
-            state="readonly"
+            state="readonly",
+            corner_radius=15
         )
         self.category_combo.grid(row=0, column=3, padx=15, pady=10)
         self.category_combo.set("Select Category")
@@ -54,7 +55,7 @@ class ServiceManagementFrame(BaseFrame):
         price_label = ctk.CTkLabel(input_frame, text="Price (LKR):", font=ctk.CTkFont(size=13, weight="bold"))
         price_label.grid(row=1, column=0, padx=15, pady=10, sticky="w")
         
-        self.price_entry = ctk.CTkEntry(input_frame, width=250, height=35)
+        self.price_entry = ctk.CTkEntry(input_frame, width=250, height=35, corner_radius=15, border_width=1)
         self.price_entry.grid(row=1, column=1, padx=15, pady=10)
         
         # Buttons
@@ -67,7 +68,10 @@ class ServiceManagementFrame(BaseFrame):
             command=self.add_service,
             width=120,
             height=35,
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=13, weight="bold"),
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         self.add_btn.pack(side="left", padx=5)
         
@@ -78,8 +82,9 @@ class ServiceManagementFrame(BaseFrame):
             width=120,
             height=35,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             state="disabled"
         )
         self.update_btn.pack(side="left", padx=5)
@@ -93,6 +98,7 @@ class ServiceManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold"),
             fg_color="#ff4757",
             hover_color="#ff3344",
+            corner_radius=20,
             state="disabled"
         )
         self.delete_btn.pack(side="left", padx=5)
@@ -103,8 +109,9 @@ class ServiceManagementFrame(BaseFrame):
             command=self.clear_form,
             width=120,
             height=35,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         clear_btn.pack(side="left", padx=5)
         
@@ -113,11 +120,11 @@ class ServiceManagementFrame(BaseFrame):
             self.delete_btn.configure(state="disabled")
         
         # Table section
-        table_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
+        table_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Table header
-        table_header = ctk.CTkFrame(table_frame, fg_color="#252545", corner_radius=10, height=50)
+        table_header = ctk.CTkFrame(table_frame, fg_color="#0d0d1a", corner_radius=10, height=50)
         table_header.pack(fill="x", padx=10, pady=(10, 5))
         table_header.pack_propagate(False)
         
@@ -125,7 +132,7 @@ class ServiceManagementFrame(BaseFrame):
             table_header,
             text="📋 Service Records",
             font=ctk.CTkFont(size=14, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", padx=15, pady=10)
         
         self.record_count_label = ctk.CTkLabel(
@@ -158,8 +165,8 @@ class ServiceManagementFrame(BaseFrame):
         self.tree.column("Created At", width=180)
         
         # Configure row tags for alternating colors
-        self.tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        self.tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        self.tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
+        self.tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         
         # Scrollbar
         scrollbar = ttk.Scrollbar(table_container, orient="vertical", command=self.tree.yview)

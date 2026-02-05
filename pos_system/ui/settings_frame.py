@@ -107,7 +107,8 @@ class SettingsFrame(ctk.CTkFrame):
             values=["LKR", "USD", "EUR", "GBP", "INR"],
             height=40,
             font=ctk.CTkFont(size=13),
-            state="readonly"
+            state="readonly",
+            corner_radius=15
         )
         self.currency_combo.pack(fill="x", pady=(0, 10))
         self.currency_combo.set("LKR")
@@ -132,7 +133,7 @@ class SettingsFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(side="left")
         
-        self.tax_entry = ctk.CTkEntry(tax_frame, width=100, height=40, font=ctk.CTkFont(size=13))
+        self.tax_entry = ctk.CTkEntry(tax_frame, width=100, height=40, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.tax_entry.pack(side="left", padx=15)
         self.tax_entry.insert(0, "0")
         
@@ -152,7 +153,8 @@ class SettingsFrame(ctk.CTkFrame):
             height=40,
             font=ctk.CTkFont(size=13),
             state="readonly",
-            command=self.change_theme
+            command=self.change_theme,
+            corner_radius=15
         )
         self.theme_combo.pack(fill="x", pady=(0, 10))
         self.theme_combo.set("Dark")
@@ -164,7 +166,7 @@ class SettingsFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", pady=(15, 5))
         
-        self.low_stock_entry = ctk.CTkEntry(appearance_section, height=40, font=ctk.CTkFont(size=13))
+        self.low_stock_entry = ctk.CTkEntry(appearance_section, height=40, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.low_stock_entry.pack(fill="x", pady=(0, 10))
         self.low_stock_entry.insert(0, "5")
         
@@ -179,9 +181,10 @@ class SettingsFrame(ctk.CTkFrame):
             text="📁 Backup Database",
             height=45,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc",
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=self.backup_database,
             width=200
         ).pack(side="left", padx=(0, 15))
@@ -194,6 +197,7 @@ class SettingsFrame(ctk.CTkFrame):
             fg_color="#ffd93d",
             text_color="#1a1a2e",
             hover_color="#e6c235",
+            corner_radius=20,
             command=self.restore_database,
             width=200
         ).pack(side="left")
@@ -208,9 +212,10 @@ class SettingsFrame(ctk.CTkFrame):
             height=50,
             width=200,
             font=ctk.CTkFont(size=15, weight="bold"),
-            fg_color="#00ff88",
-            text_color="#1a1a2e",
-            hover_color="#00cc6a",
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
+            corner_radius=20,
             command=self.save_settings
         ).pack(side="right")
         
@@ -223,12 +228,13 @@ class SettingsFrame(ctk.CTkFrame):
             fg_color="#ff6b6b",
             text_color="white",
             hover_color="#e55555",
+            corner_radius=20,
             command=self.reset_settings
         ).pack(side="right", padx=15)
     
     def create_section(self, parent, title: str) -> ctk.CTkFrame:
         """Create a settings section"""
-        section = ctk.CTkFrame(parent, fg_color="#1e1e3f", corner_radius=15)
+        section = ctk.CTkFrame(parent, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         section.pack(fill="x", pady=10)
         
         section_title = ctk.CTkLabel(
@@ -251,7 +257,7 @@ class SettingsFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", pady=(10, 5))
         
-        entry = ctk.CTkEntry(parent, height=40, font=ctk.CTkFont(size=13))
+        entry = ctk.CTkEntry(parent, height=40, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         entry.pack(fill="x", pady=(0, 10))
         if default:
             entry.insert(0, default)

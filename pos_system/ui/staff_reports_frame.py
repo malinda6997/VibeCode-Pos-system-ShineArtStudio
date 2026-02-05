@@ -69,11 +69,12 @@ class StaffReportsFrame(ctk.CTkFrame):
             height=35,
             font=ctk.CTkFont(size=12),
             dropdown_font=ctk.CTkFont(size=12),
-            fg_color="#252545",
+            fg_color="#0d0d1a",
             border_color="#333355",
-            button_color="#00d4ff",
-            button_hover_color="#00a8cc",
-            command=self.on_staff_selected
+            button_color="#8C00FF",
+            button_hover_color="#7300D6",
+            command=self.on_staff_selected,
+            corner_radius=15
         )
         self.staff_dropdown.pack(side="left", padx=(10, 30))
         
@@ -108,8 +109,9 @@ class StaffReportsFrame(ctk.CTkFrame):
             command=self.view_records,
             width=140,
             height=35,
-            fg_color="#00d4ff",
-            hover_color="#00a8cc",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             font=ctk.CTkFont(size=13, weight="bold")
         )
         view_btn.pack(side="left", padx=(0, 10))
@@ -123,7 +125,8 @@ class StaffReportsFrame(ctk.CTkFrame):
             height=35,
             fg_color="#2ecc71",
             hover_color="#27ae60",
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=13, weight="bold"),
+            corner_radius=20
         )
         self.download_btn.pack(side="left")
         
@@ -164,9 +167,9 @@ class StaffReportsFrame(ctk.CTkFrame):
         self.tab_view = ctk.CTkTabview(
             right_panel,
             fg_color="#1a1a2e",
-            segmented_button_fg_color="#252545",
-            segmented_button_selected_color="#00d4ff",
-            segmented_button_selected_hover_color="#00a8cc",
+            segmented_button_fg_color="#0d0d1a",
+            segmented_button_selected_color="#8C00FF",
+            segmented_button_selected_hover_color="#7300D6",
             segmented_button_unselected_color="#333355",
             segmented_button_unselected_hover_color="#444477"
         )
@@ -198,7 +201,7 @@ class StaffReportsFrame(ctk.CTkFrame):
         ]
         
         for icon, label, value, color in cards_data:
-            card = ctk.CTkFrame(self.summary_frame, fg_color="#252545", corner_radius=8)
+            card = ctk.CTkFrame(self.summary_frame, fg_color="#0d0d1a", corner_radius=8)
             card.pack(fill="x", pady=5)
             
             card_content = ctk.CTkFrame(card, fg_color="transparent")
@@ -238,7 +241,7 @@ class StaffReportsFrame(ctk.CTkFrame):
     def create_invoices_table(self):
         """Create invoices table"""
         # Table header
-        header_frame = ctk.CTkFrame(self.tab_invoices, fg_color="#252545", corner_radius=10, height=40)
+        header_frame = ctk.CTkFrame(self.tab_invoices, fg_color="#0d0d1a", corner_radius=10, height=40)
         header_frame.pack(fill="x", padx=10, pady=(10, 5))
         header_frame.pack_propagate(False)
         
@@ -246,7 +249,7 @@ class StaffReportsFrame(ctk.CTkFrame):
             header_frame,
             text="🧾 Invoice Records",
             font=ctk.CTkFont(size=12, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", padx=15, pady=8)
         
         # Table container
@@ -277,8 +280,8 @@ class StaffReportsFrame(ctk.CTkFrame):
         self.invoices_tree.column('time', width=80, anchor='center')
         
         # Configure row tags
-        self.invoices_tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        self.invoices_tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        self.invoices_tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
+        self.invoices_tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         
         scrollbar = ttk.Scrollbar(table_container, orient="vertical", command=self.invoices_tree.yview)
         self.invoices_tree.configure(yscrollcommand=scrollbar.set)
@@ -289,7 +292,7 @@ class StaffReportsFrame(ctk.CTkFrame):
     def create_bookings_table(self):
         """Create bookings table"""
         # Table header
-        header_frame = ctk.CTkFrame(self.tab_bookings, fg_color="#252545", corner_radius=10, height=40)
+        header_frame = ctk.CTkFrame(self.tab_bookings, fg_color="#0d0d1a", corner_radius=10, height=40)
         header_frame.pack(fill="x", padx=10, pady=(10, 5))
         header_frame.pack_propagate(False)
         
@@ -297,7 +300,7 @@ class StaffReportsFrame(ctk.CTkFrame):
             header_frame,
             text="📅 Booking Records",
             font=ctk.CTkFont(size=12, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", padx=15, pady=8)
         
         # Table container
@@ -328,8 +331,8 @@ class StaffReportsFrame(ctk.CTkFrame):
         self.bookings_tree.column('status', width=80, anchor='center')
         
         # Configure row tags
-        self.bookings_tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        self.bookings_tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        self.bookings_tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
+        self.bookings_tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         
         scrollbar = ttk.Scrollbar(table_container, orient="vertical", command=self.bookings_tree.yview)
         self.bookings_tree.configure(yscrollcommand=scrollbar.set)
@@ -340,7 +343,7 @@ class StaffReportsFrame(ctk.CTkFrame):
     def create_customers_table(self):
         """Create customers table"""
         # Table header
-        header_frame = ctk.CTkFrame(self.tab_customers, fg_color="#252545", corner_radius=10, height=40)
+        header_frame = ctk.CTkFrame(self.tab_customers, fg_color="#0d0d1a", corner_radius=10, height=40)
         header_frame.pack(fill="x", padx=10, pady=(10, 5))
         header_frame.pack_propagate(False)
         
@@ -348,7 +351,7 @@ class StaffReportsFrame(ctk.CTkFrame):
             header_frame,
             text="👥 Customer Records",
             font=ctk.CTkFont(size=12, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", padx=15, pady=8)
         
         # Table container
@@ -373,8 +376,8 @@ class StaffReportsFrame(ctk.CTkFrame):
         self.customers_tree.column('added_at', width=150, anchor='center')
         
         # Configure row tags
-        self.customers_tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        self.customers_tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        self.customers_tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
+        self.customers_tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         
         scrollbar = ttk.Scrollbar(table_container, orient="vertical", command=self.customers_tree.yview)
         self.customers_tree.configure(yscrollcommand=scrollbar.set)

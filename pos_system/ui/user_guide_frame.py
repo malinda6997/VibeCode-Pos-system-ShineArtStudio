@@ -63,7 +63,7 @@ class UserGuideFrame(ctk.CTkFrame):
         ]
         
         for i, (icon, text) in enumerate(features):
-            feat = ctk.CTkFrame(features_frame, fg_color="#252545", corner_radius=8)
+            feat = ctk.CTkFrame(features_frame, fg_color="#0d0d1a", corner_radius=8)
             feat.pack(side="left", padx=(0, 10), pady=5)
             ctk.CTkLabel(feat, text=f"  {icon} {text}  ", font=ctk.CTkFont(size=12)).pack(padx=10, pady=8)
         
@@ -72,7 +72,7 @@ class UserGuideFrame(ctk.CTkFrame):
             main,
             "🚀",
             "Quick Start Guide",
-            "#00d4ff",
+            "#8C00FF",
             [
                 ("Step 1: Login", "Enter your username and password. Default admin: admin / admin123"),
                 ("Step 2: Navigate", "Use the sidebar to access different sections of the app"),
@@ -199,10 +199,10 @@ class UserGuideFrame(ctk.CTkFrame):
             )
         
         # Tips Section
-        tips_card = ctk.CTkFrame(main, fg_color="#1e1e3f", corner_radius=15)
+        tips_card = ctk.CTkFrame(main, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         tips_card.pack(fill="x", pady=10)
         
-        tips_header = ctk.CTkFrame(tips_card, fg_color="#252545", corner_radius=10)
+        tips_header = ctk.CTkFrame(tips_card, fg_color="#0d0d1a", corner_radius=10)
         tips_header.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
@@ -227,7 +227,7 @@ class UserGuideFrame(ctk.CTkFrame):
         ]
         
         for tip in tips:
-            tip_row = ctk.CTkFrame(tips_content, fg_color="#252545", corner_radius=8)
+            tip_row = ctk.CTkFrame(tips_content, fg_color="#0d0d1a", corner_radius=8)
             tip_row.pack(fill="x", pady=3)
             ctk.CTkLabel(
                 tip_row,
@@ -250,11 +250,11 @@ class UserGuideFrame(ctk.CTkFrame):
     
     def create_guide_section(self, parent, icon, title, color, items):
         """Create a guide section with items"""
-        section = ctk.CTkFrame(parent, fg_color="#1e1e3f", corner_radius=15)
+        section = ctk.CTkFrame(parent, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         section.pack(fill="x", pady=10)
         
         # Header
-        header = ctk.CTkFrame(section, fg_color="#252545", corner_radius=10)
+        header = ctk.CTkFrame(section, fg_color="#0d0d1a", corner_radius=10)
         header.pack(fill="x", padx=15, pady=15)
         
         header_content = ctk.CTkFrame(header, fg_color="transparent")
@@ -284,7 +284,7 @@ class UserGuideFrame(ctk.CTkFrame):
         content.pack(fill="x", padx=15, pady=(0, 15))
         
         for item_title, item_desc in items:
-            item_frame = ctk.CTkFrame(content, fg_color="#252545", corner_radius=8)
+            item_frame = ctk.CTkFrame(content, fg_color="#0d0d1a", corner_radius=8)
             item_frame.pack(fill="x", pady=3)
             
             item_content = ctk.CTkFrame(item_frame, fg_color="transparent")

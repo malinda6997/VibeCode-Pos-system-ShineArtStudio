@@ -24,33 +24,33 @@ class FrameManagementFrame(BaseFrame):
         title_label.pack(pady=(10, 20))
         
         # Input section
-        input_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
+        input_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         input_frame.pack(fill="x", padx=20, pady=(0, 20))
         
         # Row 0: Frame name and Size
         name_label = ctk.CTkLabel(input_frame, text="Frame Name:", font=ctk.CTkFont(size=13, weight="bold"))
         name_label.grid(row=0, column=0, padx=15, pady=10, sticky="w")
         
-        self.name_entry = ctk.CTkEntry(input_frame, width=200, height=35)
+        self.name_entry = ctk.CTkEntry(input_frame, width=200, height=35, corner_radius=15, border_width=1)
         self.name_entry.grid(row=0, column=1, padx=15, pady=10)
         
         size_label = ctk.CTkLabel(input_frame, text="Size:", font=ctk.CTkFont(size=13, weight="bold"))
         size_label.grid(row=0, column=2, padx=15, pady=10, sticky="w")
         
-        self.size_entry = ctk.CTkEntry(input_frame, width=120, height=35)
+        self.size_entry = ctk.CTkEntry(input_frame, width=120, height=35, corner_radius=15, border_width=1)
         self.size_entry.grid(row=0, column=3, padx=15, pady=10)
         
         # Row 1: Buying Price and Selling Price (Admin only for buying)
         buying_label = ctk.CTkLabel(input_frame, text="Buying Price (LKR):", font=ctk.CTkFont(size=13, weight="bold"))
         buying_label.grid(row=1, column=0, padx=15, pady=10, sticky="w")
         
-        self.buying_price_entry = ctk.CTkEntry(input_frame, width=200, height=35)
+        self.buying_price_entry = ctk.CTkEntry(input_frame, width=200, height=35, corner_radius=15, border_width=1)
         self.buying_price_entry.grid(row=1, column=1, padx=15, pady=10)
         
         selling_label = ctk.CTkLabel(input_frame, text="Selling Price (LKR):", font=ctk.CTkFont(size=13, weight="bold"))
         selling_label.grid(row=1, column=2, padx=15, pady=10, sticky="w")
         
-        self.selling_price_entry = ctk.CTkEntry(input_frame, width=120, height=35)
+        self.selling_price_entry = ctk.CTkEntry(input_frame, width=120, height=35, corner_radius=15, border_width=1)
         self.selling_price_entry.grid(row=1, column=3, padx=15, pady=10)
         
         # Hide buying price for non-admin users
@@ -65,13 +65,13 @@ class FrameManagementFrame(BaseFrame):
         price_label = ctk.CTkLabel(input_frame, text="Display Price (LKR):", font=ctk.CTkFont(size=13, weight="bold"))
         price_label.grid(row=2, column=0, padx=15, pady=10, sticky="w")
         
-        self.price_entry = ctk.CTkEntry(input_frame, width=200, height=35)
+        self.price_entry = ctk.CTkEntry(input_frame, width=200, height=35, corner_radius=15, border_width=1)
         self.price_entry.grid(row=2, column=1, padx=15, pady=10)
         
         quantity_label = ctk.CTkLabel(input_frame, text="Quantity:", font=ctk.CTkFont(size=13, weight="bold"))
         quantity_label.grid(row=2, column=2, padx=15, pady=10, sticky="w")
         
-        self.quantity_entry = ctk.CTkEntry(input_frame, width=120, height=35)
+        self.quantity_entry = ctk.CTkEntry(input_frame, width=120, height=35, corner_radius=15, border_width=1)
         self.quantity_entry.grid(row=2, column=3, padx=15, pady=10)
         
         # Buttons
@@ -84,7 +84,10 @@ class FrameManagementFrame(BaseFrame):
             command=self.add_frame,
             width=120,
             height=35,
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=13, weight="bold"),
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         self.add_btn.pack(side="left", padx=5)
         
@@ -95,8 +98,9 @@ class FrameManagementFrame(BaseFrame):
             width=120,
             height=35,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             state="disabled"
         )
         self.update_btn.pack(side="left", padx=5)
@@ -110,6 +114,7 @@ class FrameManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold"),
             fg_color="#ff4757",
             hover_color="#ff3344",
+            corner_radius=20,
             state="disabled"
         )
         self.delete_btn.pack(side="left", padx=5)
@@ -120,8 +125,9 @@ class FrameManagementFrame(BaseFrame):
             command=self.clear_form,
             width=120,
             height=35,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         clear_btn.pack(side="left", padx=5)
         
@@ -130,11 +136,11 @@ class FrameManagementFrame(BaseFrame):
             self.delete_btn.configure(state="disabled")
         
         # Table section
-        table_frame = ctk.CTkFrame(self, fg_color="#1e1e3f", corner_radius=15)
+        table_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Table header
-        table_header = ctk.CTkFrame(table_frame, fg_color="#252545", corner_radius=10, height=50)
+        table_header = ctk.CTkFrame(table_frame, fg_color="#0d0d1a", corner_radius=10, height=50)
         table_header.pack(fill="x", padx=10, pady=(10, 5))
         table_header.pack_propagate(False)
         
@@ -142,7 +148,7 @@ class FrameManagementFrame(BaseFrame):
             table_header,
             text="🖼️ Frame Inventory",
             font=ctk.CTkFont(size=14, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", padx=15, pady=10)
         
         self.record_count_label = ctk.CTkLabel(
@@ -200,8 +206,8 @@ class FrameManagementFrame(BaseFrame):
             self.tree.column("Created At", width=180)
         
         # Configure row tags for alternating colors
-        self.tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        self.tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        self.tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
+        self.tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         self.tree.tag_configure('lowstock', background='#3a2020', foreground='#ff6b6b')
         
         # Scrollbar

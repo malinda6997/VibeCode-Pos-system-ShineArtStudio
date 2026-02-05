@@ -35,12 +35,12 @@ class BookingManagementFrame(BaseFrame):
         container.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         # Left panel - Form (Scrollable)
-        left_panel = ctk.CTkFrame(container, fg_color="#1e1e3f", corner_radius=15, width=450)
+        left_panel = ctk.CTkFrame(container, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15, width=450)
         left_panel.pack(side="left", fill="y", padx=(0, 10))
         left_panel.pack_propagate(False)
         
         # Scrollable form container
-        form_scroll = ctk.CTkScrollableFrame(left_panel, fg_color="#252545", corner_radius=10)
+        form_scroll = ctk.CTkScrollableFrame(left_panel, fg_color="#0d0d1a", corner_radius=10)
         form_scroll.pack(fill="both", expand=True, padx=15, pady=15)
         
         # Form title
@@ -57,7 +57,7 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.name_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.name_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.name_entry.pack(fill="x", padx=15, pady=(0, 10))
         
         # Mobile number
@@ -67,7 +67,7 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.mobile_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.mobile_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.mobile_entry.pack(fill="x", padx=15, pady=(0, 10))
         
         # Category selection
@@ -83,7 +83,8 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13),
             values=["Select Category"],
             command=self.on_category_change,
-            state="readonly"
+            state="readonly",
+            corner_radius=15
         )
         self.category_combo.pack(fill="x", padx=15, pady=(0, 10))
         self.category_combo.set("Select Category")
@@ -101,7 +102,8 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13),
             values=["Select Category First"],
             state="readonly",
-            command=self.on_service_change
+            command=self.on_service_change,
+            corner_radius=15
         )
         self.service_combo.pack(fill="x", padx=15, pady=(0, 10))
         self.service_combo.set("Select Category First")
@@ -119,7 +121,8 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13),
             state="readonly",
             fg_color="#2d2d5a",
-            text_color="#00ff88"
+            text_color="#00ff88",
+            corner_radius=15
         )
         self.full_amount_entry.pack(fill="x", padx=15, pady=(0, 10))
         
@@ -130,7 +133,7 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.advance_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.advance_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.advance_entry.pack(fill="x", padx=15, pady=(0, 10))
         self.advance_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
         self.advance_entry.pack(fill="x", padx=15, pady=(0, 10))
@@ -181,7 +184,7 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.location_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.location_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.location_entry.pack(fill="x", padx=15, pady=(0, 10))
         
         # Description
@@ -205,7 +208,8 @@ class BookingManagementFrame(BaseFrame):
             form_scroll,
             height=38,
             font=ctk.CTkFont(size=13),
-            values=["Pending", "Completed", "Cancelled"]
+            values=["Pending", "Completed", "Cancelled"],
+            corner_radius=15
         )
         self.status_combo.pack(fill="x", padx=15, pady=(0, 15))
         self.status_combo.set("Pending")
@@ -220,9 +224,10 @@ class BookingManagementFrame(BaseFrame):
             command=self.add_booking,
             height=38,
             font=ctk.CTkFont(size=12, weight="bold"),
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc"
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         self.add_btn.pack(side="left", expand=True, fill="x", padx=(0, 5))
         
@@ -232,8 +237,9 @@ class BookingManagementFrame(BaseFrame):
             command=self.update_booking,
             height=38,
             font=ctk.CTkFont(size=12, weight="bold"),
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20,
             state="disabled"
         )
         self.update_btn.pack(side="left", expand=True, fill="x", padx=(5, 0))
@@ -250,6 +256,7 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=12, weight="bold"),
             fg_color="#ff4757",
             hover_color="#ff3344",
+            corner_radius=20,
             state="disabled"
         )
         self.delete_btn.pack(side="left", expand=True, fill="x", padx=(0, 5))
@@ -260,21 +267,22 @@ class BookingManagementFrame(BaseFrame):
             command=self.clear_form,
             height=38,
             font=ctk.CTkFont(size=12, weight="bold"),
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         )
         clear_btn.pack(side="left", expand=True, fill="x", padx=(5, 0))
         
         # Right panel - Table
-        right_panel = ctk.CTkFrame(container, fg_color="#1e1e3f", corner_radius=15)
+        right_panel = ctk.CTkFrame(container, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         right_panel.pack(side="right", fill="both", expand=True, padx=(10, 0))
         
         # Search
-        search_frame = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=10)
+        search_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10)
         search_frame.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(search_frame, text="🔍 Search:", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left", padx=5)
-        self.search_entry = ctk.CTkEntry(search_frame, width=200, height=35)
+        self.search_entry = ctk.CTkEntry(search_frame, width=200, height=35, corner_radius=15, border_width=1)
         self.search_entry.pack(side="left", padx=5)
         self.search_entry.bind("<KeyRelease>", lambda e: self.search_bookings())
         
@@ -298,8 +306,9 @@ class BookingManagementFrame(BaseFrame):
             command=lambda: self.filter_by_status("All"),
             width=70,
             height=35,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=2)
         
         ctk.CTkButton(
@@ -310,7 +319,8 @@ class BookingManagementFrame(BaseFrame):
             height=35,
             fg_color="#ffa500",
             text_color="black",
-            hover_color="#ff8c00"
+            hover_color="#ff8c00",
+            corner_radius=20
         ).pack(side="left", padx=2)
         
         ctk.CTkButton(
@@ -319,9 +329,10 @@ class BookingManagementFrame(BaseFrame):
             command=lambda: self.filter_by_status("Completed"),
             width=90,
             height=35,
-            fg_color="#00ff88",
-            text_color="black",
-            hover_color="#00cc66"
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=2)
         
         ctk.CTkButton(
@@ -331,7 +342,8 @@ class BookingManagementFrame(BaseFrame):
             width=85,
             height=35,
             fg_color="#ff4757",
-            hover_color="#ff3344"
+            hover_color="#ff3344",
+            corner_radius=20
         ).pack(side="left", padx=2)
         
         # Status filter buttons
@@ -345,8 +357,9 @@ class BookingManagementFrame(BaseFrame):
             command=lambda: self.filter_by_status("All"),
             width=80,
             height=35,
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=2)
         
         ctk.CTkButton(
@@ -357,7 +370,8 @@ class BookingManagementFrame(BaseFrame):
             height=35,
             fg_color="#ffa500",
             hover_color="#ff8c00",
-            text_color="#1a1a2e"
+            text_color="#1a1a2e",
+            corner_radius=20
         ).pack(side="left", padx=2)
         
         ctk.CTkButton(
@@ -366,9 +380,10 @@ class BookingManagementFrame(BaseFrame):
             command=lambda: self.filter_by_status("Completed"),
             width=90,
             height=35,
-            fg_color="#00ff88",
-            hover_color="#00dd77",
-            text_color="#1a1a2e"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            text_color="#ffffff",
+            corner_radius=20
         ).pack(side="left", padx=2)
         
         ctk.CTkButton(
@@ -378,11 +393,12 @@ class BookingManagementFrame(BaseFrame):
             width=90,
             height=35,
             fg_color="#ff4444",
-            hover_color="#cc0000"
+            hover_color="#cc0000",
+            corner_radius=20
         ).pack(side="left", padx=2)
         
         # Table header
-        table_header = ctk.CTkFrame(right_panel, fg_color="#252545", corner_radius=10, height=45)
+        table_header = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10, height=45)
         table_header.pack(fill="x", padx=15, pady=(0, 5))
         table_header.pack_propagate(False)
         
@@ -390,7 +406,7 @@ class BookingManagementFrame(BaseFrame):
             table_header,
             text="📅 Booking Records",
             font=ctk.CTkFont(size=13, weight="bold"),
-            text_color="#00d4ff"
+            text_color="#8C00FF"
         ).pack(side="left", padx=15, pady=10)
         
         self.record_count_label = ctk.CTkLabel(
@@ -427,8 +443,8 @@ class BookingManagementFrame(BaseFrame):
         self.tree.column("Status", width=80, anchor="center")
         
         # Configure row tags
-        self.tree.tag_configure('oddrow', background='#1e1e3f', foreground='#e0e0e0')
-        self.tree.tag_configure('evenrow', background='#252545', foreground='#e0e0e0')
+        self.tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
+        self.tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         self.tree.tag_configure('pending', background='#3a2e1e', foreground='#ffd93d')
         self.tree.tag_configure('completed', background='#1e3a2f', foreground='#00ff88')
         self.tree.tag_configure('cancelled', background='#3a1e1e', foreground='#ff6b6b')
@@ -597,7 +613,7 @@ class BookingManagementFrame(BaseFrame):
         popup.geometry(f"600x580+{x}+{y}")
         
         # Main container
-        main_frame = ctk.CTkFrame(popup, fg_color="#1e1e3f", corner_radius=15)
+        main_frame = ctk.CTkFrame(popup, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         main_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
         # Success icon and message
@@ -615,7 +631,7 @@ class BookingManagementFrame(BaseFrame):
         ).pack(pady=(0, 15))
         
         # Booking summary
-        summary_frame = ctk.CTkFrame(main_frame, fg_color="#252545", corner_radius=10)
+        summary_frame = ctk.CTkFrame(main_frame, fg_color="#0d0d1a", corner_radius=10)
         summary_frame.pack(fill="x", padx=25, pady=10)
         
         # Parse category and service
@@ -731,9 +747,10 @@ class BookingManagementFrame(BaseFrame):
             width=180,
             height=45,
             font=ctk.CTkFont(size=14, weight="bold"),
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc"
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
         
         # Cancel button
@@ -744,8 +761,9 @@ class BookingManagementFrame(BaseFrame):
             width=120,
             height=45,
             font=ctk.CTkFont(size=14, weight="bold"),
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=10)
         
         # Handle window close
@@ -771,7 +789,7 @@ class BookingManagementFrame(BaseFrame):
         preview.geometry(f"650x600+{x}+{y}")
         
         # Main container
-        main_frame = ctk.CTkFrame(preview, fg_color="#1e1e3f", corner_radius=15)
+        main_frame = ctk.CTkFrame(preview, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         main_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
         # Header
@@ -789,7 +807,7 @@ class BookingManagementFrame(BaseFrame):
         ).pack(pady=(0, 15))
         
         # Info frame
-        info_frame = ctk.CTkFrame(main_frame, fg_color="#252545", corner_radius=10)
+        info_frame = ctk.CTkFrame(main_frame, fg_color="#0d0d1a", corner_radius=10)
         info_frame.pack(fill="x", padx=25, pady=10)
         
         ctk.CTkLabel(
@@ -872,9 +890,10 @@ class BookingManagementFrame(BaseFrame):
             width=130,
             height=45,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#00d4ff",
-            text_color="#1a1a2e",
-            hover_color="#00a8cc"
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=8)
         
         # Print button
@@ -885,9 +904,10 @@ class BookingManagementFrame(BaseFrame):
             width=130,
             height=45,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#00ff88",
-            text_color="#1a1a2e",
-            hover_color="#00cc6a"
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=8)
         
         # Close button
@@ -898,8 +918,9 @@ class BookingManagementFrame(BaseFrame):
             width=100,
             height=45,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#2d2d5a",
-            hover_color="#3d3d7a"
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=8)
         
         # Handle window close

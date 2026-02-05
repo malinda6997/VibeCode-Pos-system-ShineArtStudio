@@ -206,12 +206,24 @@ class DatabaseSchema:
                 service_charge REAL DEFAULT 0,
                 total_amount REAL NOT NULL,
                 cash_given REAL DEFAULT 0,
+                advance_amount REAL DEFAULT 0,
+                balance_due REAL DEFAULT 0,
                 created_by INTEGER NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (customer_id) REFERENCES customers (id),
                 FOREIGN KEY (created_by) REFERENCES users (id)
             )
         ''')
+        
+        # Add advance_amount and balance_due columns if they don't exist (migration)
+        try:
+            self.cursor.execute('ALTER TABLE bills ADD COLUMN advance_amount REAL DEFAULT 0')
+        except:
+            pass
+        try:
+            self.cursor.execute('ALTER TABLE bills ADD COLUMN balance_due REAL DEFAULT 0')
+        except:
+            pass
         
         # Bill items table
         self.cursor.execute('''
@@ -268,6 +280,33 @@ class DatabaseSchema:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+        ''')
+        
+        # Manual Expenses table for miscellaneous expenses
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS manual_expenses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                description TEXT NOT NULL,
+                amount REAL NOT NULL,
+                expense_date DATE NOT NULL,
+                created_by INTEGER NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (created_by) REFERENCES users (id)
+            )
+        ''')
+        
+        # Daily Balance table to track opening/closing balances
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS daily_balances (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                balance_date DATE UNIQUE NOT NULL,
+                opening_balance REAL DEFAULT 0,
+                total_income REAL DEFAULT 0,
+                total_expenses REAL DEFAULT 0,
+                closing_balance REAL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
         
