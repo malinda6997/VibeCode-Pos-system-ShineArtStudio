@@ -33,7 +33,7 @@ class ServiceManagementFrame(BaseFrame):
         name_label = ctk.CTkLabel(input_frame, text="Service Name:", font=ctk.CTkFont(size=13, weight="bold"))
         name_label.grid(row=0, column=0, padx=15, pady=10, sticky="w")
         
-        self.name_entry = ctk.CTkEntry(input_frame, width=250, height=35)
+        self.name_entry = ctk.CTkEntry(input_frame, width=250, height=35, corner_radius=15, border_width=1)
         self.name_entry.grid(row=0, column=1, padx=15, pady=10)
         
         # Category dropdown
@@ -45,7 +45,8 @@ class ServiceManagementFrame(BaseFrame):
             width=200, 
             height=35,
             values=["Select Category"],
-            state="readonly"
+            state="readonly",
+            corner_radius=15
         )
         self.category_combo.grid(row=0, column=3, padx=15, pady=10)
         self.category_combo.set("Select Category")
@@ -54,7 +55,7 @@ class ServiceManagementFrame(BaseFrame):
         price_label = ctk.CTkLabel(input_frame, text="Price (LKR):", font=ctk.CTkFont(size=13, weight="bold"))
         price_label.grid(row=1, column=0, padx=15, pady=10, sticky="w")
         
-        self.price_entry = ctk.CTkEntry(input_frame, width=250, height=35)
+        self.price_entry = ctk.CTkEntry(input_frame, width=250, height=35, corner_radius=15, border_width=1)
         self.price_entry.grid(row=1, column=1, padx=15, pady=10)
         
         # Buttons

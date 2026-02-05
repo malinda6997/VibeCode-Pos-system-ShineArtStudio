@@ -54,7 +54,9 @@ class CategoryManagementFrame(BaseFrame):
             width=300, 
             height=40,
             font=ctk.CTkFont(size=13),
-            placeholder_text="Enter category name"
+            placeholder_text="Enter category name",
+            corner_radius=15,
+            border_width=1
         )
         self.name_entry.pack(padx=20, pady=(0, 15))
         
@@ -70,7 +72,9 @@ class CategoryManagementFrame(BaseFrame):
             width=300, 
             height=40,
             font=ctk.CTkFont(size=13),
-            placeholder_text="Enter service cost (LKR) - Leave empty if none"
+            placeholder_text="Enter service cost (LKR) - Leave empty if none",
+            corner_radius=15,
+            border_width=1
         )
         self.service_cost_entry.pack(padx=20, pady=(0, 5))
         
@@ -166,7 +170,7 @@ class CategoryManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(side="left", padx=10, pady=10)
         
-        self.search_entry = ctk.CTkEntry(search_frame, width=250, height=35)
+        self.search_entry = ctk.CTkEntry(search_frame, width=250, height=35, corner_radius=15, border_width=1)
         self.search_entry.pack(side="left", padx=5, pady=10)
         self.search_entry.bind("<KeyRelease>", lambda e: self.search_categories())
         

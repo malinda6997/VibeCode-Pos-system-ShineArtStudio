@@ -107,7 +107,8 @@ class SettingsFrame(ctk.CTkFrame):
             values=["LKR", "USD", "EUR", "GBP", "INR"],
             height=40,
             font=ctk.CTkFont(size=13),
-            state="readonly"
+            state="readonly",
+            corner_radius=15
         )
         self.currency_combo.pack(fill="x", pady=(0, 10))
         self.currency_combo.set("LKR")
@@ -132,7 +133,7 @@ class SettingsFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(side="left")
         
-        self.tax_entry = ctk.CTkEntry(tax_frame, width=100, height=40, font=ctk.CTkFont(size=13))
+        self.tax_entry = ctk.CTkEntry(tax_frame, width=100, height=40, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.tax_entry.pack(side="left", padx=15)
         self.tax_entry.insert(0, "0")
         
@@ -152,7 +153,8 @@ class SettingsFrame(ctk.CTkFrame):
             height=40,
             font=ctk.CTkFont(size=13),
             state="readonly",
-            command=self.change_theme
+            command=self.change_theme,
+            corner_radius=15
         )
         self.theme_combo.pack(fill="x", pady=(0, 10))
         self.theme_combo.set("Dark")
@@ -164,7 +166,7 @@ class SettingsFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", pady=(15, 5))
         
-        self.low_stock_entry = ctk.CTkEntry(appearance_section, height=40, font=ctk.CTkFont(size=13))
+        self.low_stock_entry = ctk.CTkEntry(appearance_section, height=40, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.low_stock_entry.pack(fill="x", pady=(0, 10))
         self.low_stock_entry.insert(0, "5")
         
@@ -255,7 +257,7 @@ class SettingsFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", pady=(10, 5))
         
-        entry = ctk.CTkEntry(parent, height=40, font=ctk.CTkFont(size=13))
+        entry = ctk.CTkEntry(parent, height=40, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         entry.pack(fill="x", pady=(0, 10))
         if default:
             entry.insert(0, default)

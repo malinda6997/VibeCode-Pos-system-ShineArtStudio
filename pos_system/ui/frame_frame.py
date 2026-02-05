@@ -31,26 +31,26 @@ class FrameManagementFrame(BaseFrame):
         name_label = ctk.CTkLabel(input_frame, text="Frame Name:", font=ctk.CTkFont(size=13, weight="bold"))
         name_label.grid(row=0, column=0, padx=15, pady=10, sticky="w")
         
-        self.name_entry = ctk.CTkEntry(input_frame, width=200, height=35)
+        self.name_entry = ctk.CTkEntry(input_frame, width=200, height=35, corner_radius=15, border_width=1)
         self.name_entry.grid(row=0, column=1, padx=15, pady=10)
         
         size_label = ctk.CTkLabel(input_frame, text="Size:", font=ctk.CTkFont(size=13, weight="bold"))
         size_label.grid(row=0, column=2, padx=15, pady=10, sticky="w")
         
-        self.size_entry = ctk.CTkEntry(input_frame, width=120, height=35)
+        self.size_entry = ctk.CTkEntry(input_frame, width=120, height=35, corner_radius=15, border_width=1)
         self.size_entry.grid(row=0, column=3, padx=15, pady=10)
         
         # Row 1: Buying Price and Selling Price (Admin only for buying)
         buying_label = ctk.CTkLabel(input_frame, text="Buying Price (LKR):", font=ctk.CTkFont(size=13, weight="bold"))
         buying_label.grid(row=1, column=0, padx=15, pady=10, sticky="w")
         
-        self.buying_price_entry = ctk.CTkEntry(input_frame, width=200, height=35)
+        self.buying_price_entry = ctk.CTkEntry(input_frame, width=200, height=35, corner_radius=15, border_width=1)
         self.buying_price_entry.grid(row=1, column=1, padx=15, pady=10)
         
         selling_label = ctk.CTkLabel(input_frame, text="Selling Price (LKR):", font=ctk.CTkFont(size=13, weight="bold"))
         selling_label.grid(row=1, column=2, padx=15, pady=10, sticky="w")
         
-        self.selling_price_entry = ctk.CTkEntry(input_frame, width=120, height=35)
+        self.selling_price_entry = ctk.CTkEntry(input_frame, width=120, height=35, corner_radius=15, border_width=1)
         self.selling_price_entry.grid(row=1, column=3, padx=15, pady=10)
         
         # Hide buying price for non-admin users
@@ -65,13 +65,13 @@ class FrameManagementFrame(BaseFrame):
         price_label = ctk.CTkLabel(input_frame, text="Display Price (LKR):", font=ctk.CTkFont(size=13, weight="bold"))
         price_label.grid(row=2, column=0, padx=15, pady=10, sticky="w")
         
-        self.price_entry = ctk.CTkEntry(input_frame, width=200, height=35)
+        self.price_entry = ctk.CTkEntry(input_frame, width=200, height=35, corner_radius=15, border_width=1)
         self.price_entry.grid(row=2, column=1, padx=15, pady=10)
         
         quantity_label = ctk.CTkLabel(input_frame, text="Quantity:", font=ctk.CTkFont(size=13, weight="bold"))
         quantity_label.grid(row=2, column=2, padx=15, pady=10, sticky="w")
         
-        self.quantity_entry = ctk.CTkEntry(input_frame, width=120, height=35)
+        self.quantity_entry = ctk.CTkEntry(input_frame, width=120, height=35, corner_radius=15, border_width=1)
         self.quantity_entry.grid(row=2, column=3, padx=15, pady=10)
         
         # Buttons

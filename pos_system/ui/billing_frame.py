@@ -88,7 +88,7 @@ class BillingFrame(BaseFrame):
         self.search_container.pack(fill="x", padx=15, pady=5)
 
         ctk.CTkLabel(self.search_container, text="Mobile Number:").pack(side="left", padx=5)
-        self.mobile_search = ctk.CTkEntry(self.search_container, width=150, height=30)
+        self.mobile_search = ctk.CTkEntry(self.search_container, width=150, height=30, corner_radius=15, border_width=1)
         self.mobile_search.pack(side="left", padx=5)
         self.mobile_search.bind("<KeyRelease>", self.on_mobile_search_change)
 
@@ -120,7 +120,7 @@ class BillingFrame(BaseFrame):
         self.guest_name_container = ctk.CTkFrame(customer_frame, fg_color="transparent")
 
         ctk.CTkLabel(self.guest_name_container, text="Customer Name:").pack(side="left", padx=5)
-        self.guest_name_entry = ctk.CTkEntry(self.guest_name_container, width=250, height=30, placeholder_text="Enter guest customer name")
+        self.guest_name_entry = ctk.CTkEntry(self.guest_name_container, width=250, height=30, placeholder_text="Enter guest customer name", corner_radius=15, border_width=1)
         self.guest_name_entry.pack(side="left", padx=5)
 
         ctk.CTkButton(
@@ -465,7 +465,8 @@ class BillingFrame(BaseFrame):
             height=35,
             font=ctk.CTkFont(size=14, weight="bold"),
             border_color="#8C00FF",
-            border_width=2
+            border_width=2,
+            corner_radius=15
         )
         self.discount_entry.insert(0, "0")
         self.discount_entry.pack(side="right", padx=15, pady=10)
@@ -534,7 +535,7 @@ class BillingFrame(BaseFrame):
         self.advance_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
         # Don't pack initially - will be shown only for Frames
         ctk.CTkLabel(self.advance_frame, text="Advance Amount:", font=ctk.CTkFont(size=13)).pack(side="left")
-        self.advance_entry = ctk.CTkEntry(self.advance_frame, width=120, height=35, state="disabled")
+        self.advance_entry = ctk.CTkEntry(self.advance_frame, width=120, height=35, state="disabled", corner_radius=15, border_width=1)
         self.advance_entry.insert(0, "0")
         self.advance_entry.pack(side="right")
         self.advance_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
@@ -544,7 +545,7 @@ class BillingFrame(BaseFrame):
         paid_frame.pack(fill="x", padx=20, pady=10)
         self.paid_label_widget = ctk.CTkLabel(paid_frame, text="Cash Received:", font=ctk.CTkFont(size=13))
         self.paid_label_widget.pack(side="left")
-        self.paid_entry = ctk.CTkEntry(paid_frame, width=120, height=35, placeholder_text="For receipt")
+        self.paid_entry = ctk.CTkEntry(paid_frame, width=120, height=35, placeholder_text="For receipt", corner_radius=15, border_width=1)
         self.paid_entry.pack(side="right")
         # Cash received does not affect calculations, only for receipt printing
 
@@ -974,7 +975,8 @@ class BillingFrame(BaseFrame):
                     font=ctk.CTkFont(size=15, weight="bold"),
                     border_color="#8C00FF",
                     border_width=2,
-                    justify="center"
+                    justify="center",
+                    corner_radius=15
                 )
                 qty_entry.insert(0, "1")  # Default to 1
                 qty_entry.pack(pady=(0, 8))
@@ -1251,7 +1253,8 @@ class BillingFrame(BaseFrame):
             height=45,
             font=ctk.CTkFont(size=13),
             placeholder_text="Enter customer full name",
-            corner_radius=8
+            corner_radius=15,
+            border_width=1
         )
         name_entry.pack(fill="x", pady=(0, 20))
 
@@ -1266,7 +1269,8 @@ class BillingFrame(BaseFrame):
             height=45,
             font=ctk.CTkFont(size=13),
             placeholder_text="Enter 10-digit mobile number",
-            corner_radius=8
+            corner_radius=15,
+            border_width=1
         )
         mobile_entry.pack(fill="x", pady=(0, 25))
 
@@ -1388,7 +1392,7 @@ class BillingFrame(BaseFrame):
         qty_frame.pack(pady=10)
 
         ctk.CTkLabel(qty_frame, text="New Quantity:", font=ctk.CTkFont(size=13)).pack(side="left", padx=10)
-        qty_entry = ctk.CTkEntry(qty_frame, width=100, height=35)
+        qty_entry = ctk.CTkEntry(qty_frame, width=100, height=35, corner_radius=15, border_width=1)
         qty_entry.insert(0, str(item['quantity']))
         qty_entry.pack(side="left", padx=10)
 

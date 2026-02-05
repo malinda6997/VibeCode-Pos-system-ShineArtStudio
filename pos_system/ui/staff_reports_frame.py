@@ -73,7 +73,8 @@ class StaffReportsFrame(ctk.CTkFrame):
             border_color="#333355",
             button_color="#8C00FF",
             button_hover_color="#7300D6",
-            command=self.on_staff_selected
+            command=self.on_staff_selected,
+            corner_radius=15
         )
         self.staff_dropdown.pack(side="left", padx=(10, 30))
         

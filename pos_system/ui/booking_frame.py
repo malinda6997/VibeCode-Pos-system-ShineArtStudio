@@ -57,7 +57,7 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.name_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.name_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.name_entry.pack(fill="x", padx=15, pady=(0, 10))
         
         # Mobile number
@@ -67,7 +67,7 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.mobile_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.mobile_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.mobile_entry.pack(fill="x", padx=15, pady=(0, 10))
         
         # Category selection
@@ -83,7 +83,8 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13),
             values=["Select Category"],
             command=self.on_category_change,
-            state="readonly"
+            state="readonly",
+            corner_radius=15
         )
         self.category_combo.pack(fill="x", padx=15, pady=(0, 10))
         self.category_combo.set("Select Category")
@@ -101,7 +102,8 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13),
             values=["Select Category First"],
             state="readonly",
-            command=self.on_service_change
+            command=self.on_service_change,
+            corner_radius=15
         )
         self.service_combo.pack(fill="x", padx=15, pady=(0, 10))
         self.service_combo.set("Select Category First")
@@ -119,7 +121,8 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13),
             state="readonly",
             fg_color="#2d2d5a",
-            text_color="#00ff88"
+            text_color="#00ff88",
+            corner_radius=15
         )
         self.full_amount_entry.pack(fill="x", padx=15, pady=(0, 10))
         
@@ -130,7 +133,7 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.advance_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.advance_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.advance_entry.pack(fill="x", padx=15, pady=(0, 10))
         self.advance_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
         self.advance_entry.pack(fill="x", padx=15, pady=(0, 10))
@@ -181,7 +184,7 @@ class BookingManagementFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.location_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13))
+        self.location_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.location_entry.pack(fill="x", padx=15, pady=(0, 10))
         
         # Description
@@ -205,7 +208,8 @@ class BookingManagementFrame(BaseFrame):
             form_scroll,
             height=38,
             font=ctk.CTkFont(size=13),
-            values=["Pending", "Completed", "Cancelled"]
+            values=["Pending", "Completed", "Cancelled"],
+            corner_radius=15
         )
         self.status_combo.pack(fill="x", padx=15, pady=(0, 15))
         self.status_combo.set("Pending")
@@ -278,7 +282,7 @@ class BookingManagementFrame(BaseFrame):
         search_frame.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(search_frame, text="🔍 Search:", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left", padx=5)
-        self.search_entry = ctk.CTkEntry(search_frame, width=200, height=35)
+        self.search_entry = ctk.CTkEntry(search_frame, width=200, height=35, corner_radius=15, border_width=1)
         self.search_entry.pack(side="left", padx=5)
         self.search_entry.bind("<KeyRelease>", lambda e: self.search_bookings())
         

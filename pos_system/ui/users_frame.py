@@ -88,22 +88,22 @@ class UsersManagementFrame(ctk.CTkFrame):
         
         # Full Name
         ctk.CTkLabel(form, text="Full Name:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
-        self.fullname_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13))
+        self.fullname_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.fullname_entry.pack(fill="x", pady=(0, 5))
         
         # Username
         ctk.CTkLabel(form, text="Username:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
-        self.username_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13))
+        self.username_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.username_entry.pack(fill="x", pady=(0, 5))
         
         # Password
         ctk.CTkLabel(form, text="Password:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
-        self.password_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13), show="●")
+        self.password_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13), show="●", corner_radius=15, border_width=1)
         self.password_entry.pack(fill="x", pady=(0, 5))
         
         # Confirm Password
         ctk.CTkLabel(form, text="Confirm Password:", font=ctk.CTkFont(size=13, weight="bold")).pack(anchor="w", pady=(5, 3))
-        self.confirm_password_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13), show="●")
+        self.confirm_password_entry = ctk.CTkEntry(form, height=38, font=ctk.CTkFont(size=13), show="●", corner_radius=15, border_width=1)
         self.confirm_password_entry.pack(fill="x", pady=(0, 5))
         
         # Role
@@ -113,7 +113,8 @@ class UsersManagementFrame(ctk.CTkFrame):
             values=["Admin", "Staff"],
             height=38,
             font=ctk.CTkFont(size=13),
-            state="readonly"
+            state="readonly",
+            corner_radius=15
         )
         self.role_combo.pack(fill="x", pady=(0, 5))
         self.role_combo.set("Staff")
@@ -125,7 +126,8 @@ class UsersManagementFrame(ctk.CTkFrame):
             values=["Active", "Disabled"],
             height=38,
             font=ctk.CTkFont(size=13),
-            state="readonly"
+            state="readonly",
+            corner_radius=15
         )
         self.status_combo.pack(fill="x", pady=(0, 10))
         self.status_combo.set("Active")

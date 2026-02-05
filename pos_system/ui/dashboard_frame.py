@@ -307,7 +307,8 @@ class DashboardFrame(ctk.CTkFrame):
                 height=40,
                 font=ctk.CTkFont(size=12),
                 border_color="#8C00FF",
-                border_width=2
+                border_width=2,
+                corner_radius=15
             )
             self.expense_desc_entry.pack(side="left", padx=5)
             
@@ -326,7 +327,8 @@ class DashboardFrame(ctk.CTkFrame):
                 height=40,
                 font=ctk.CTkFont(size=12),
                 border_color="#8C00FF",
-                border_width=2
+                border_width=2,
+                corner_radius=15
             )
             self.expense_amount_entry.pack(side="left", padx=5)
             

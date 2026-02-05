@@ -139,7 +139,8 @@ class ProfileFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13),
             show="●",
             placeholder_text="Enter current password",
-            corner_radius=8
+            corner_radius=15,
+            border_width=1
         )
         self.current_password.pack(fill="x", pady=(0, 15))
         
@@ -156,7 +157,8 @@ class ProfileFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13),
             show="●",
             placeholder_text="Enter new password (min 6 characters)",
-            corner_radius=8
+            corner_radius=15,
+            border_width=1
         )
         self.new_password.pack(fill="x", pady=(0, 15))
         
@@ -173,7 +175,8 @@ class ProfileFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=13),
             show="●",
             placeholder_text="Confirm new password",
-            corner_radius=8
+            corner_radius=15,
+            border_width=1
         )
         self.confirm_password.pack(fill="x", pady=(0, 20))
         

@@ -34,7 +34,7 @@ class InvoiceHistoryFrame(BaseFrame):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(side="left", padx=15, pady=15)
         
-        self.search_entry = ctk.CTkEntry(controls_frame, width=300, height=35)
+        self.search_entry = ctk.CTkEntry(controls_frame, width=300, height=35, corner_radius=15, border_width=1)
         self.search_entry.pack(side="left", padx=10, pady=15)
         self.search_entry.bind("<KeyRelease>", lambda e: self.search_invoices())
         
