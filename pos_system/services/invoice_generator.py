@@ -106,9 +106,8 @@ class InvoiceGenerator:
         # === COMPANY & CLIENT INFO SECTION ===
         # Left: Company details
         company_info = Table([
-            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
-            [Paragraph("<b>Reg No:</b> 26/3610", ParagraphStyle('Reg', fontSize=10, textColor=colors.HexColor('#444444')))],
-            [Paragraph("No:52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
+            [Paragraph("<b>Studio Shine Art</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
+            [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
             [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
         company_info.setStyle(TableStyle([
@@ -426,9 +425,8 @@ class InvoiceGenerator:
         
         # === COMPANY & CLIENT INFO ===
         company_info = Table([
-            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
-            [Paragraph("<b>Reg No:</b> 26/3610", ParagraphStyle('Reg', fontSize=10, textColor=colors.HexColor('#444444')))],
-            [Paragraph("No:52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
+            [Paragraph("<b>Studio Shine Art</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
+            [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
             [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
         company_info.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'), ('BOTTOMPADDING', (0, 0), (-1, -1), 2)]))
@@ -496,14 +494,11 @@ class InvoiceGenerator:
             # Right-align price columns
             ('ALIGN', (2, 1), (3, -1), 'RIGHT'),
             ('ALIGN', (1, 1), (1, -1), 'CENTER'),
+            # All data rows: white background only (no gray zebra striping)
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ]
         
-        # Add zebra striping - alternating light gray rows for better readability
-        for i in range(1, len(table_data)):
-            if i % 2 == 0:  # Even rows get light gray background
-                table_style.append(('BACKGROUND', (0, i), (-1, i), colors.HexColor('#f5f5f5')))
-            else:  # Odd rows stay white
-                table_style.append(('BACKGROUND', (0, i), (-1, i), colors.white))
+        # NO zebra striping - removed for high-contrast thermal printing
         
         items_table.setStyle(TableStyle(table_style))
         story.append(items_table)
@@ -719,14 +714,11 @@ class InvoiceGenerator:
             # Right-align price columns
             ('ALIGN', (2, 1), (3, -1), 'RIGHT'),
             ('ALIGN', (1, 1), (1, -1), 'CENTER'),
+            # All data rows: white background only (no gray zebra striping)
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ]
         
-        # Add zebra striping - alternating light gray rows for better readability
-        for i in range(1, len(table_data)):
-            if i % 2 == 0:  # Even rows get light gray background
-                table_style.append(('BACKGROUND', (0, i), (-1, i), colors.HexColor('#f5f5f5')))
-            else:  # Odd rows stay white
-                table_style.append(('BACKGROUND', (0, i), (-1, i), colors.white))
+        # NO zebra striping - removed for high-contrast thermal printing
         
         items_table.setStyle(TableStyle(table_style))
         story.append(items_table)

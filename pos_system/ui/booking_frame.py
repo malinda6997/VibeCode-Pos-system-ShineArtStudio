@@ -15,6 +15,7 @@ class BookingManagementFrame(BaseFrame):
         self.categories_map = {}  # name -> id mapping
         self.services_map = {}  # name -> service data
         self.invoice_generator = InvoiceGenerator()
+        self.current_filter = "Pending"  # Default filter to Pending
         self.create_widgets()
         self.load_categories()
         self.load_bookings()
@@ -70,26 +71,30 @@ class BookingManagementFrame(BaseFrame):
         self.mobile_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
         self.mobile_entry.pack(fill="x", padx=15, pady=(0, 10))
         
-        # Category selection
+        # Category selection - LOCKED TO "Booking" (Read-only)
         ctk.CTkLabel(
             form_scroll,
             text="Category:",
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(anchor="w", padx=15, pady=(10, 5))
         
-        self.category_combo = ctk.CTkComboBox(
+        # Static read-only entry showing "Booking"
+        self.category_entry = ctk.CTkEntry(
             form_scroll,
             height=38,
-            font=ctk.CTkFont(size=13),
-            values=["Select Category"],
-            command=self.on_category_change,
+            font=ctk.CTkFont(size=13, weight="bold"),
             state="readonly",
+            fg_color="#1a1a2e",
+            text_color="#8C00FF",
             corner_radius=15
         )
-        self.category_combo.pack(fill="x", padx=15, pady=(0, 10))
-        self.category_combo.set("Select Category")
+        self.category_entry.pack(fill="x", padx=15, pady=(0, 10))
+        # Set default value to "Booking"
+        self.category_entry.configure(state="normal")
+        self.category_entry.insert(0, "Booking")
+        self.category_entry.configure(state="readonly")
         
-        # Service selection (filtered by category)
+        # Service selection (all services available)
         ctk.CTkLabel(
             form_scroll,
             text="Service:",
@@ -100,13 +105,13 @@ class BookingManagementFrame(BaseFrame):
             form_scroll,
             height=38,
             font=ctk.CTkFont(size=13),
-            values=["Select Category First"],
+            values=["Loading..."],
             state="readonly",
             command=self.on_service_change,
             corner_radius=15
         )
         self.service_combo.pack(fill="x", padx=15, pady=(0, 10))
-        self.service_combo.set("Select Category First")
+        self.service_combo.set("Select Service")
         
         # Full amount
         ctk.CTkLabel(
@@ -120,8 +125,8 @@ class BookingManagementFrame(BaseFrame):
             height=38, 
             font=ctk.CTkFont(size=13),
             state="readonly",
-            fg_color="#2d2d5a",
-            text_color="#00ff88",
+            fg_color="#1a1a2e",
+            text_color="#8C00FF",
             corner_radius=15
         )
         self.full_amount_entry.pack(fill="x", padx=15, pady=(0, 10))
@@ -134,8 +139,6 @@ class BookingManagementFrame(BaseFrame):
         ).pack(anchor="w", padx=15, pady=(10, 5))
         
         self.advance_entry = ctk.CTkEntry(form_scroll, height=38, font=ctk.CTkFont(size=13), corner_radius=15, border_width=1)
-        self.advance_entry.pack(fill="x", padx=15, pady=(0, 10))
-        self.advance_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
         self.advance_entry.pack(fill="x", padx=15, pady=(0, 10))
         self.advance_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
         
@@ -153,7 +156,7 @@ class BookingManagementFrame(BaseFrame):
             balance_frame,
             text="LKR 0.00",
             font=ctk.CTkFont(size=13, weight="bold"),
-            text_color="#ffd93d"
+            text_color="#8C00FF"
         )
         self.balance_label.pack(side="right")
         
@@ -277,125 +280,37 @@ class BookingManagementFrame(BaseFrame):
         right_panel = ctk.CTkFrame(container, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         right_panel.pack(side="right", fill="both", expand=True, padx=(10, 0))
         
-        # Search
+        # Search and Filters - SIMPLIFIED LAYOUT (No Status Filters)
         search_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10)
         search_frame.pack(fill="x", padx=15, pady=15)
         
-        ctk.CTkLabel(search_frame, text="🔍 Search:", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left", padx=5)
-        self.search_entry = ctk.CTkEntry(search_frame, width=200, height=35, corner_radius=15, border_width=1)
+        # Search controls
+        search_container = ctk.CTkFrame(search_frame, fg_color="transparent")
+        search_container.pack(fill="x", padx=10, pady=10)
+        
+        ctk.CTkLabel(search_container, text="🔍 Search:", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left", padx=(0, 5))
+        self.search_entry = ctk.CTkEntry(search_container, width=250, height=35, corner_radius=20, border_width=1)
         self.search_entry.pack(side="left", padx=5)
         self.search_entry.bind("<KeyRelease>", lambda e: self.search_bookings())
         
         ctk.CTkButton(
-            search_frame,
+            search_container,
             text="Refresh",
             command=self.load_bookings,
             width=100,
-            height=35
+            height=35,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
         ).pack(side="left", padx=5)
         
-        # Status filter buttons
-        self.filter_status = ctk.StringVar(value="All")
-        
-        ctk.CTkLabel(search_frame, text="|", font=ctk.CTkFont(size=13)).pack(side="left", padx=5)
-        ctk.CTkLabel(search_frame, text="Status:", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left", padx=5)
-        
-        ctk.CTkButton(
-            search_frame,
-            text="All",
-            command=lambda: self.filter_by_status("All"),
-            width=70,
-            height=35,
-            fg_color="#8C00FF",
-            hover_color="#7300D6",
-            corner_radius=20
-        ).pack(side="left", padx=2)
-        
-        ctk.CTkButton(
-            search_frame,
-            text="Pending",
-            command=lambda: self.filter_by_status("Pending"),
-            width=80,
-            height=35,
-            fg_color="#ffa500",
-            text_color="black",
-            hover_color="#ff8c00",
-            corner_radius=20
-        ).pack(side="left", padx=2)
-        
-        ctk.CTkButton(
-            search_frame,
-            text="Completed",
-            command=lambda: self.filter_by_status("Completed"),
-            width=90,
-            height=35,
-            fg_color="#8C00FF",
-            text_color="#ffffff",
-            hover_color="#7300D6",
-            corner_radius=20
-        ).pack(side="left", padx=2)
-        
-        ctk.CTkButton(
-            search_frame,
-            text="Cancelled",
-            command=lambda: self.filter_by_status("Cancelled"),
-            width=85,
-            height=35,
-            fg_color="#ff4757",
-            hover_color="#ff3344",
-            corner_radius=20
-        ).pack(side="left", padx=2)
-        
-        # Status filter buttons
-        ctk.CTkLabel(search_frame, text="Status:", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left", padx=(15, 5))
-        
-        self.filter_status = ctk.StringVar(value="All")
-        
-        ctk.CTkButton(
-            search_frame,
-            text="All",
-            command=lambda: self.filter_by_status("All"),
-            width=80,
-            height=35,
-            fg_color="#8C00FF",
-            hover_color="#7300D6",
-            corner_radius=20
-        ).pack(side="left", padx=2)
-        
-        ctk.CTkButton(
-            search_frame,
-            text="Pending",
-            command=lambda: self.filter_by_status("Pending"),
-            width=80,
-            height=35,
-            fg_color="#ffa500",
-            hover_color="#ff8c00",
-            text_color="#1a1a2e",
-            corner_radius=20
-        ).pack(side="left", padx=2)
-        
-        ctk.CTkButton(
-            search_frame,
-            text="Completed",
-            command=lambda: self.filter_by_status("Completed"),
-            width=90,
-            height=35,
-            fg_color="#8C00FF",
-            hover_color="#7300D6",
-            text_color="#ffffff",
-            corner_radius=20
-        ).pack(side="left", padx=2)
-        
-        ctk.CTkButton(
-            search_frame,
-            text="Cancelled",
-            command=lambda: self.filter_by_status("Cancelled"),
-            width=90,
-            height=35,
-            fg_color="#ff4444",
-            hover_color="#cc0000",
-            corner_radius=20
-        ).pack(side="left", padx=2)
+        # Info label showing filter status
+        ctk.CTkLabel(
+            search_container,
+            text="📑 Showing: Active Bookings Only",
+            font=ctk.CTkFont(size=11),
+            text_color="#888888"
+        ).pack(side="right", padx=10)
         
         # Table header
         table_header = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10, height=45)
@@ -421,32 +336,29 @@ class BookingManagementFrame(BaseFrame):
         table_frame = ctk.CTkFrame(right_panel, fg_color="#1a1a2e", corner_radius=10)
         table_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
         
-        columns = ("ID", "Customer", "Mobile", "Category", "Service", "Amount", "Date", "Status")
+        # Updated column structure (NO Status column): Customer, Mobile, Service, Full Amount, Advance, Date
+        columns = ("Customer", "Mobile", "Service", "FullAmount", "Advance", "Date")
         self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=20)
         
-        self.tree.heading("ID", text="🔢 ID")
-        self.tree.heading("Customer", text="👤 Customer")
-        self.tree.heading("Mobile", text="📱 Mobile")
-        self.tree.heading("Category", text="📁 Category")
+        self.tree.heading("Customer", text="👤 Customer Name")
+        self.tree.heading("Mobile", text="📱 Mobile Number")
         self.tree.heading("Service", text="🛠️ Service")
-        self.tree.heading("Amount", text="💰 Amount")
+        self.tree.heading("FullAmount", text="💰 Full Amount (LKR)")
+        self.tree.heading("Advance", text="💵 Advance Amount (LKR)")
         self.tree.heading("Date", text="📅 Date")
-        self.tree.heading("Status", text="📊 Status")
         
-        self.tree.column("ID", width=50, anchor="center")
-        self.tree.column("Customer", width=100)
-        self.tree.column("Mobile", width=90, anchor="center")
-        self.tree.column("Category", width=100)
-        self.tree.column("Service", width=100)
-        self.tree.column("Amount", width=80, anchor="e")
-        self.tree.column("Date", width=90, anchor="center")
-        self.tree.column("Status", width=80, anchor="center")
+        self.tree.column("Customer", width=140)
+        self.tree.column("Mobile", width=120, anchor="center")
+        self.tree.column("Service", width=160)
+        self.tree.column("FullAmount", width=150, anchor="e")
+        self.tree.column("Advance", width=150, anchor="e")
+        self.tree.column("Date", width=120, anchor="center")
         
-        # Configure row tags
+        # Configure row tags (with updated colors)
         self.tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
         self.tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
-        self.tree.tag_configure('pending', background='#3a2e1e', foreground='#ffd93d')
-        self.tree.tag_configure('completed', background='#1e3a2f', foreground='#00ff88')
+        self.tree.tag_configure('pending', background='#3a2e1e', foreground='#ffa500')
+        self.tree.tag_configure('completed', background='#1e3a2f', foreground='#8C00FF')
         self.tree.tag_configure('cancelled', background='#3a1e1e', foreground='#ff6b6b')
         
         scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree.yview)
@@ -458,45 +370,64 @@ class BookingManagementFrame(BaseFrame):
         self.tree.bind("<<TreeviewSelect>>", self.on_select)
     
     def load_categories(self):
-        """Load categories for dropdown"""
+        """Load ONLY services from the 'Booking' category"""
+        booking_services = []
         categories = self.db_manager.get_all_categories()
-        self.categories_map = {cat['category_name']: cat['id'] for cat in categories}
-        category_names = ["Select Category"] + list(self.categories_map.keys())
-        self.category_combo.configure(values=category_names)
-    
-    def on_category_change(self, selected_category):
-        """Load services when category changes"""
-        if selected_category == "Select Category":
-            self.service_combo.configure(values=["Select Category First"])
-            self.service_combo.set("Select Category First")
-            self.services_map = {}
-            # Clear the amount
-            self.full_amount_entry.configure(state="normal")
-            self.full_amount_entry.delete(0, "end")
-            self.full_amount_entry.configure(state="readonly")
-            self.calculate_balance()
-            return
         
-        category_id = self.categories_map.get(selected_category)
-        if category_id:
-            services = self.db_manager.get_services_by_category(category_id)
-            self.services_map = {s['service_name']: s for s in services}
-            service_names = ["Select Service"] + list(self.services_map.keys())
+        # Find the Booking category
+        booking_category = None
+        for cat in categories:
+            # Check for category named 'Booking' (case-insensitive)
+            if cat['category_name'].lower() == 'booking':
+                booking_category = cat
+                break
+        
+        if booking_category:
+            services = self.db_manager.get_services_by_category(booking_category['id'])
+            for service in services:
+                # Create display name without 'Booking - ' prefix
+                # Just use the service name directly
+                display_name = service['service_name']
+                
+                booking_services.append({
+                    'display_name': display_name,
+                    'service_data': service,
+                    'category_name': booking_category['category_name'],
+                    'full_name': f"{booking_category['category_name']} - {service['service_name']}"  # Keep full name for database
+                })
+        
+        # Update service combo with booking services only
+        if booking_services:
+            service_names = [s['display_name'] for s in booking_services]
             self.service_combo.configure(values=service_names)
             self.service_combo.set("Select Service")
-            # Clear the amount when category changes
-            self.full_amount_entry.configure(state="normal")
-            self.full_amount_entry.delete(0, "end")
-            self.full_amount_entry.configure(state="readonly")
-            self.calculate_balance()
+            # Store service map for lookups
+            self.services_map = {s['display_name']: s for s in booking_services}
         else:
-            self.service_combo.configure(values=["No Services"])
-            self.service_combo.set("No Services")
-            self.services_map = {}
+            self.service_combo.configure(values=["No Booking Services Available"])
+            self.service_combo.set("No Booking Services Available")
+    
+    def format_service_name(self, service_name):
+        """Format service name: remove 'Booking - ' prefix and 'Photoshoot'/'Photography' suffix"""
+        if not service_name:
+            return service_name
+        
+        # Remove 'Booking - ' prefix
+        if service_name.startswith('Booking - '):
+            service_name = service_name[10:]  # len('Booking - ') = 10
+        
+        # Remove 'Photoshoot' or 'Photography' suffix (case-insensitive)
+        service_name = service_name.strip()
+        if service_name.lower().endswith(' photoshoot'):
+            service_name = service_name[:-11].strip()  # len(' photoshoot') = 11
+        elif service_name.lower().endswith(' photography'):
+            service_name = service_name[:-12].strip()  # len(' photography') = 12
+        
+        return service_name
     
     def on_service_change(self, selected_service):
         """Auto-fill amount when service is selected"""
-        if selected_service in ["Select Service", "Select Category First", "No Services"]:
+        if selected_service in ["Select Service", "Loading...", "No Booking Services Available"]:
             # Clear the amount
             self.full_amount_entry.configure(state="normal")
             self.full_amount_entry.delete(0, "end")
@@ -505,32 +436,39 @@ class BookingManagementFrame(BaseFrame):
             return
         
         # Get service details and auto-fill price
-        service_data = self.services_map.get(selected_service)
-        if service_data and 'price' in service_data:
-            price = service_data['price']
-            self.full_amount_entry.configure(state="normal")
-            self.full_amount_entry.delete(0, "end")
-            self.full_amount_entry.insert(0, f"{float(price):.2f}")
-            self.full_amount_entry.configure(state="readonly")
-            self.calculate_balance()
+        service_info = self.services_map.get(selected_service)
+        if service_info and 'service_data' in service_info:
+            service_data = service_info['service_data']
+            if 'price' in service_data:
+                price = service_data['price']
+                self.full_amount_entry.configure(state="normal")
+                self.full_amount_entry.delete(0, "end")
+                self.full_amount_entry.insert(0, f"{float(price):.2f}")
+                self.full_amount_entry.configure(state="readonly")
+                self.calculate_balance()
     
     def calculate_balance(self):
-        """Calculate and display balance"""
+        """Calculate remaining balance with real-time color coding"""
         full = self.full_amount_entry.get().strip()
         advance = self.advance_entry.get().strip()
         
         if full and self.validate_number(full, True) and advance and self.validate_number(advance, True):
             balance = float(full) - float(advance)
             self.balance_label.configure(text=f"LKR {balance:.2f}")
+            # Color coding: red if balance remaining, purple if fully paid
+            if balance > 0:
+                self.balance_label.configure(text_color="#ff6b6b")  # Red
+            else:
+                self.balance_label.configure(text_color="#8C00FF")  # Purple
         else:
             self.balance_label.configure(text="LKR 0.00")
+            self.balance_label.configure(text_color="#8C00FF")
     
     def add_booking(self):
         """Add new booking"""
         name = self.name_entry.get().strip()
         mobile = self.mobile_entry.get().strip()
-        category = self.category_combo.get()
-        service = self.service_combo.get()
+        service = self.service_combo.get()  # Now includes category
         full_amount = self.full_amount_entry.get().strip()
         advance = self.advance_entry.get().strip()
         date = self.date_entry.get_date().strftime('%Y-%m-%d')
@@ -545,11 +483,7 @@ class BookingManagementFrame(BaseFrame):
             MessageDialog.show_error("Error", "Please enter valid mobile number (10 digits)")
             return
         
-        if category == "Select Category":
-            MessageDialog.show_error("Error", "Please select a category")
-            return
-        
-        if service in ["Select Service", "Select Category First", "No Services"]:
+        if service in ["Select Service", "Loading...", "No Booking Services Available"]:
             MessageDialog.show_error("Error", "Please select a service")
             return
         
@@ -561,8 +495,13 @@ class BookingManagementFrame(BaseFrame):
             MessageDialog.show_error("Error", "Please enter valid advance payment")
             return
         
-        # Combine category and service for photoshoot_category field
-        photoshoot_category = f"{category} - {service}"
+        # Get the full service name for database (includes 'Booking - ' prefix)
+        service_info = self.services_map.get(service)
+        if service_info and 'full_name' in service_info:
+            photoshoot_category = service_info['full_name']  # Use full name with category
+        else:
+            # Fallback: add 'Booking - ' prefix if not found
+            photoshoot_category = f"Booking - {service}"
         
         booking_id = self.db_manager.create_booking(
             name, mobile, photoshoot_category,
@@ -586,9 +525,12 @@ class BookingManagementFrame(BaseFrame):
                 'status': 'Pending'
             }
             
-            # Show success message and invoice popup
+            # Show success message, refresh table, and show invoice popup
+            MessageDialog.show_success("Success", "Booking added successfully!")
             self.clear_form()
-            self.load_bookings()
+            self.load_bookings()  # Refresh table immediately
+            # Set focus back to search entry to prevent input lock
+            self.after(100, lambda: self.search_entry.focus_set())
             self.show_booking_invoice_popup(booking_data)
         else:
             MessageDialog.show_error("Error", "Failed to add booking")
@@ -934,8 +876,7 @@ class BookingManagementFrame(BaseFrame):
         
         name = self.name_entry.get().strip()
         mobile = self.mobile_entry.get().strip()
-        category = self.category_combo.get()
-        service = self.service_combo.get()
+        service = self.service_combo.get()  # Already contains category
         full_amount = self.full_amount_entry.get().strip()
         advance = self.advance_entry.get().strip()
         date = self.date_entry.get_date().strftime('%Y-%m-%d')
@@ -951,11 +892,7 @@ class BookingManagementFrame(BaseFrame):
             MessageDialog.show_error("Error", "Mobile must be 10 digits")
             return
         
-        if category == "Select Category":
-            MessageDialog.show_error("Error", "Please select a category")
-            return
-        
-        if service in ["Select Service", "Select Category First", "No Services"]:
+        if service in ["Select Service", "Loading...", "No Booking Services Available"]:
             MessageDialog.show_error("Error", "Please select a service")
             return
         
@@ -963,8 +900,17 @@ class BookingManagementFrame(BaseFrame):
             MessageDialog.show_error("Error", "Please enter amounts")
             return
         
-        # Combine category and service for photoshoot_category field
-        photoshoot_category = f"{category} - {service}"
+        if not self.validate_number(full_amount, True) or not self.validate_number(advance, True):
+            MessageDialog.show_error("Error", "Please enter valid amounts")
+            return
+        
+        # Get the full service name for database (includes 'Booking - ' prefix)
+        service_info = self.services_map.get(service)
+        if service_info and 'full_name' in service_info:
+            photoshoot_category = service_info['full_name']  # Use full name with category
+        else:
+            # Fallback: add 'Booking - ' prefix if not found
+            photoshoot_category = f"Booking - {service}"
         
         success = self.db_manager.update_booking(
             self.selected_booking_id, name, mobile, photoshoot_category,
@@ -976,6 +922,8 @@ class BookingManagementFrame(BaseFrame):
             MessageDialog.show_success("Success", "Booking updated successfully")
             self.clear_form()
             self.load_bookings()
+            # Set focus back to search entry to prevent input lock
+            self.after(100, lambda: self.search_entry.focus_set())
         else:
             MessageDialog.show_error("Error", "Failed to update booking")
     
@@ -998,6 +946,8 @@ class BookingManagementFrame(BaseFrame):
             MessageDialog.show_success("Success", "Booking deleted successfully")
             self.clear_form()
             self.load_bookings()
+            # Set focus back to search entry to prevent input lock
+            self.after(100, lambda: self.search_entry.focus_set())
         else:
             MessageDialog.show_error("Error", "Failed to delete booking")
     
@@ -1005,10 +955,8 @@ class BookingManagementFrame(BaseFrame):
         """Clear form fields"""
         self.name_entry.delete(0, 'end')
         self.mobile_entry.delete(0, 'end')
-        self.category_combo.set("Select Category")
-        self.service_combo.configure(values=["Select Category First"])
-        self.service_combo.set("Select Category First")
-        self.services_map = {}
+        # Category is locked to "Booking" - no need to reset
+        self.service_combo.set("Select Service")
         # Clear read-only full_amount_entry
         self.full_amount_entry.configure(state="normal")
         self.full_amount_entry.delete(0, 'end')
@@ -1018,19 +966,27 @@ class BookingManagementFrame(BaseFrame):
         self.description_text.delete("1.0", "end")
         self.status_combo.set("Pending")
         self.balance_label.configure(text="LKR 0.00")
+        self.balance_label.configure(text_color="#8C00FF")
         self.selected_booking_id = None
         self.add_btn.configure(state="normal")
         self.update_btn.configure(state="disabled")
         self.delete_btn.configure(state="disabled")
-        # Reload categories in case new ones were added
+        # Reload services in case new ones were added
         self.load_categories()
     
     def load_bookings(self):
-        """Load all bookings"""
+        """Load bookings based on current filter (default: Pending only)"""
         for item in self.tree.get_children():
             self.tree.delete(item)
         
-        bookings = self.db_manager.get_all_bookings()
+        # Get all bookings and filter by current status
+        all_bookings = self.db_manager.get_all_bookings()
+        
+        # Filter bookings based on current_filter
+        if self.current_filter != "All":
+            bookings = [b for b in all_bookings if b['status'] == self.current_filter]
+        else:
+            bookings = all_bookings
         
         for i, booking in enumerate(bookings):
             status = booking['status']
@@ -1043,32 +999,24 @@ class BookingManagementFrame(BaseFrame):
             else:
                 tag = 'evenrow' if i % 2 == 0 else 'oddrow'
             
-            # Split photoshoot_category into category and service
-            photoshoot_cat = booking['photoshoot_category']
-            if ' - ' in photoshoot_cat:
-                parts = photoshoot_cat.split(' - ', 1)
-                category = parts[0]
-                service = parts[1] if len(parts) > 1 else ''
-            else:
-                category = photoshoot_cat
-                service = ''
+            # Format service name: strip prefixes/suffixes
+            service_display = self.format_service_name(booking['photoshoot_category'])
             
+            # New column structure (NO Status): Customer, Mobile, Service, Full Amount, Advance, Date
             self.tree.insert("", "end", values=(
-                booking['id'],
                 booking['customer_name'],
                 booking['mobile_number'],
-                category,
-                service,
+                service_display,
                 f"{booking['full_amount']:.2f}",
-                booking['booking_date'],
-                booking['status']
-            ), tags=(tag,))
+                f"{booking['advance_payment']:.2f}",
+                booking['booking_date']
+            ), tags=(tag,), iid=str(booking['id']))
         
         # Update record count
         self.record_count_label.configure(text=f"{len(bookings)} records")
     
     def search_bookings(self):
-        """Search bookings"""
+        """Search bookings (respects current filter)"""
         search_term = self.search_entry.get().strip()
         
         for item in self.tree.get_children():
@@ -1078,7 +1026,13 @@ class BookingManagementFrame(BaseFrame):
             self.load_bookings()
             return
         
-        bookings = self.db_manager.search_bookings(search_term)
+        all_bookings = self.db_manager.search_bookings(search_term)
+        
+        # Apply current filter to search results
+        if self.current_filter != "All":
+            bookings = [b for b in all_bookings if b['status'] == self.current_filter]
+        else:
+            bookings = all_bookings
         
         for i, booking in enumerate(bookings):
             status = booking['status']
@@ -1091,43 +1045,38 @@ class BookingManagementFrame(BaseFrame):
             else:
                 tag = 'evenrow' if i % 2 == 0 else 'oddrow'
             
-            # Split photoshoot_category into category and service
-            photoshoot_cat = booking['photoshoot_category']
-            if ' - ' in photoshoot_cat:
-                parts = photoshoot_cat.split(' - ', 1)
-                category = parts[0]
-                service = parts[1] if len(parts) > 1 else ''
-            else:
-                category = photoshoot_cat
-                service = ''
+            # Format service name: strip prefixes/suffixes
+            service_display = self.format_service_name(booking['photoshoot_category'])
             
+            # New column structure (NO Status): Customer, Mobile, Service, Full Amount, Advance, Date
             self.tree.insert("", "end", values=(
-                booking['id'],
                 booking['customer_name'],
                 booking['mobile_number'],
-                category,
-                service,
+                service_display,
                 f"{booking['full_amount']:.2f}",
-                booking['booking_date'],
-                booking['status']
-            ), tags=(tag,))
+                f"{booking['advance_payment']:.2f}",
+                booking['booking_date']
+            ), tags=(tag,), iid=str(booking['id']))
         
         # Update record count
         self.record_count_label.configure(text=f"{len(bookings)} records")
     
     def filter_by_status(self, status):
         """Filter bookings by status"""
+        self.current_filter = status
         self.filter_status.set(status)
         
         for item in self.tree.get_children():
             self.tree.delete(item)
         
         # Get all bookings
-        bookings = self.db_manager.get_all_bookings()
+        all_bookings = self.db_manager.get_all_bookings()
         
         # Filter by status
         if status != "All":
-            bookings = [b for b in bookings if b['status'] == status]
+            bookings = [b for b in all_bookings if b['status'] == status]
+        else:
+            bookings = all_bookings
         
         for i, booking in enumerate(bookings):
             booking_status = booking['status']
@@ -1140,26 +1089,18 @@ class BookingManagementFrame(BaseFrame):
             else:
                 tag = 'evenrow' if i % 2 == 0 else 'oddrow'
             
-            # Split photoshoot_category into category and service
-            photoshoot_cat = booking['photoshoot_category']
-            if ' - ' in photoshoot_cat:
-                parts = photoshoot_cat.split(' - ', 1)
-                category = parts[0]
-                service = parts[1] if len(parts) > 1 else ''
-            else:
-                category = photoshoot_cat
-                service = ''
+            # Format service name: strip prefixes/suffixes
+            service_display = self.format_service_name(booking['photoshoot_category'])
             
+            # New column structure (NO Status): Customer, Mobile, Service, Full Amount, Advance, Date
             self.tree.insert("", "end", values=(
-                booking['id'],
                 booking['customer_name'],
                 booking['mobile_number'],
-                category,
-                service,
+                service_display,
                 f"{booking['full_amount']:.2f}",
-                booking['booking_date'],
-                booking['status']
-            ), tags=(tag,))
+                f"{booking['advance_payment']:.2f}",
+                booking['booking_date']
+            ), tags=(tag,), iid=str(booking['id']))
         
         # Update record count
         self.record_count_label.configure(text=f"{len(bookings)} records")
@@ -1170,10 +1111,8 @@ class BookingManagementFrame(BaseFrame):
         if not selection:
             return
         
-        item = self.tree.item(selection[0])
-        values = item['values']
-        
-        self.selected_booking_id = values[0]
+        # Get booking ID from iid (item ID) instead of values since we removed ID column
+        self.selected_booking_id = int(selection[0])
         
         # Load full booking details
         booking = self.db_manager.get_booking_by_id(self.selected_booking_id)
@@ -1185,29 +1124,15 @@ class BookingManagementFrame(BaseFrame):
             self.mobile_entry.delete(0, 'end')
             self.mobile_entry.insert(0, booking['mobile_number'])
             
-            # Split photoshoot_category into category and service
+            # Service field shows full photoshoot_category (already contains category)
             photoshoot_cat = booking['photoshoot_category']
-            if ' - ' in photoshoot_cat:
-                parts = photoshoot_cat.split(' - ', 1)
-                category_name = parts[0]
-                service_name = parts[1] if len(parts) > 1 else ''
-            else:
-                category_name = photoshoot_cat
-                service_name = ''
             
-            # Set category and trigger service load
-            if category_name in self.categories_map:
-                self.category_combo.set(category_name)
-                self.on_category_change(category_name)
-                # Set service if available
-                if service_name and service_name in self.services_map:
-                    self.service_combo.set(service_name)
-                else:
-                    self.service_combo.set("Select Service")
+            # Set service directly if it exists in the services map
+            if photoshoot_cat in self.services_map:
+                self.service_combo.set(photoshoot_cat)
             else:
-                self.category_combo.set("Select Category")
-                self.service_combo.configure(values=["Select Category First"])
-                self.service_combo.set("Select Category First")
+                # Service might not be in map, still display it
+                self.service_combo.set(photoshoot_cat)
             
             self.full_amount_entry.configure(state="normal")
             self.full_amount_entry.delete(0, 'end')

@@ -208,6 +208,8 @@ class CustomerManagementFrame(BaseFrame):
             MessageDialog.show_success("Success", "Customer added successfully")
             self.clear_form()
             self.load_customers()
+            # Set focus back to search entry to prevent input lock
+            self.after(100, lambda: self.search_entry.focus_set())
         else:
             MessageDialog.show_error("Error", "Failed to add customer")
     
@@ -243,7 +245,9 @@ class CustomerManagementFrame(BaseFrame):
         if success:
             MessageDialog.show_success("Success", "Customer updated successfully")
             self.clear_form()
-            self.load_customers()
+            self.load_customers()            # Set focus back to search entry to prevent input lock
+            self.after(100, lambda: self.search_entry.focus_set())            # Set focus back to search entry to prevent input lock
+            self.after(100, lambda: self.search_entry.focus_set())
         else:
             MessageDialog.show_error("Error", "Failed to update customer")
     

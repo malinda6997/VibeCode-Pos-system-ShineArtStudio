@@ -210,8 +210,8 @@ class ServiceManagementFrame(BaseFrame):
         if service_id:
             MessageDialog.show_success("Success", "Service added successfully")
             self.clear_form()
-            self.load_services()
-        else:
+            self.load_services()            # Set focus back to first input to prevent input lock
+            self.after(100, lambda: self.name_entry.focus_set())        else:
             MessageDialog.show_error("Error", "Failed to add service")
     
     def update_service(self):
@@ -243,8 +243,8 @@ class ServiceManagementFrame(BaseFrame):
         if success:
             MessageDialog.show_success("Success", "Service updated successfully")
             self.clear_form()
-            self.load_services()
-        else:
+            self.load_services()            # Set focus back to first input to prevent input lock
+            self.after(100, lambda: self.name_entry.focus_set())        else:
             MessageDialog.show_error("Error", "Failed to update service")
     
     def delete_service(self):
@@ -265,8 +265,8 @@ class ServiceManagementFrame(BaseFrame):
         if success:
             MessageDialog.show_success("Success", "Service deleted successfully")
             self.clear_form()
-            self.load_services()
-        else:
+            self.load_services()            # Set focus back to first input to prevent input lock
+            self.after(100, lambda: self.name_entry.focus_set())        else:
             MessageDialog.show_error("Error", "Failed to delete service")
     
     def clear_form(self):

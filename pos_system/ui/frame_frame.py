@@ -269,6 +269,8 @@ class FrameManagementFrame(BaseFrame):
             MessageDialog.show_success("Success", "Photo frame added successfully")
             self.clear_form()
             self.load_frames()
+            # Set focus back to first input to prevent input lock
+            self.after(100, lambda: self.name_entry.focus_set())
         else:
             MessageDialog.show_error("Error", "Failed to add photo frame")
     
@@ -326,6 +328,8 @@ class FrameManagementFrame(BaseFrame):
             MessageDialog.show_success("Success", "Photo frame updated successfully")
             self.clear_form()
             self.load_frames()
+            # Set focus back to first input to prevent input lock
+            self.after(100, lambda: self.name_entry.focus_set())
         else:
             MessageDialog.show_error("Error", "Failed to update photo frame")
     
@@ -348,6 +352,8 @@ class FrameManagementFrame(BaseFrame):
             MessageDialog.show_success("Success", "Photo frame deleted successfully")
             self.clear_form()
             self.load_frames()
+            # Set focus back to first input to prevent input lock
+            self.after(100, lambda: self.name_entry.focus_set())
         else:
             MessageDialog.show_error("Error", "Failed to delete photo frame")
     
