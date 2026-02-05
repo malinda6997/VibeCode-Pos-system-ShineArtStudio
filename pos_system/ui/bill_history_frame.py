@@ -1042,7 +1042,7 @@ Mobile: {bill.get('mobile_number', 'Guest Customer')}"""
         
         story = []
         
-        # Define styles
+        # Define styles with pure black on white - no gray
         header_style = ParagraphStyle(
             'Header',
             fontSize=11,
@@ -1059,6 +1059,7 @@ Mobile: {bill.get('mobile_number', 'Guest Customer')}"""
             fontSize=8,
             textColor=colors.black,
             alignment=TA_CENTER,
+            fontName='Helvetica',
             spaceAfter=0,
             spaceBefore=0,
             leading=10
@@ -1090,35 +1091,33 @@ Mobile: {bill.get('mobile_number', 'Guest Customer')}"""
             'GrandTotal',
             fontSize=10,
             textColor=colors.black,
-            alignment=TA_RIGHT,
+            alignment=TA_CENTER,
             fontName='Helvetica-Bold',
             spaceAfter=2,
             spaceBefore=0,
             leading=12
         )
         
-        footer_elegant_style = ParagraphStyle(
-            'FooterElegant',
-            fontSize=8,
-            textColor=colors.HexColor('#666666'),
-            fontName='Times-Italic',
+        footer_style = ParagraphStyle(
+            'Footer',
+            fontSize=7,
+            textColor=colors.black,
+            fontName='Helvetica',
             alignment=TA_CENTER,
             spaceAfter=0,
             spaceBefore=0,
-            leading=10
+            leading=9
         )
         
-        def create_thin_line():
+        def create_solid_line():
+            """Create a solid black line divider"""
             from reportlab.platypus import Table as ReportLabTable
-            line_data = [['─' * 60]]
+            line_data = [['']]
             line_table = ReportLabTable(line_data, colWidths=[74*mm])
             line_table.setStyle(TableStyle([
-                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 0), (-1, -1), 8),
-                ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#CCCCCC')),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+                ('LINEABOVE', (0, 0), (-1, 0), 0.5, colors.black),
                 ('TOPPADDING', (0, 0), (-1, -1), 0),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
             ]))
             return line_table
         
@@ -1126,26 +1125,23 @@ Mobile: {bill.get('mobile_number', 'Guest Customer')}"""
         logo_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'logos', 'billLogo.png')
         if os.path.exists(logo_path):
             try:
-                logo = Image(logo_path, width=60*mm, height=20*mm)
+                logo = Image(logo_path, width=50*mm, height=15*mm)
                 logo.hAlign = 'CENTER'
                 story.append(logo)
-                story.append(Spacer(1, 3*mm))
-            except:
-                # Fallback to text if logo fails
-                story.append(Paragraph("<b>Shine Art Studio</b>", header_style))
                 story.append(Spacer(1, 2*mm))
-        else:
-            # Fallback if logo doesn't exist
-            story.append(Paragraph("<b>Shine Art Studio</b>", header_style))
-            story.append(Spacer(1, 2*mm))
+            except:
+                pass
         
-        story.append(Paragraph("No.12, Main Street, Colombo 07", subheader_style))
-        story.append(Paragraph("Tel: +94 77 123 4567", subheader_style))
-        story.append(Spacer(1, 4*mm))
-        story.append(create_thin_line())
+        # Official Studio Details
+        story.append(Paragraph("<b>Shine Art Studio</b>", header_style))
+        story.append(Paragraph("No: 52/1/1, Maravila Road, Nattandiya", subheader_style))
+        story.append(Paragraph("Reg No: 26/3610", subheader_style))
+        story.append(Paragraph("Tel: 0767898604 / 0322051680", subheader_style))
+        story.append(Spacer(1, 3*mm))
+        story.append(create_solid_line())
         story.append(Spacer(1, 3*mm))
         
-        # === SETTLEMENT REFERENCE ===
+        # === SETTLEMENT RECEIPT TITLE ===
         story.append(Paragraph("<b>BALANCE SETTLEMENT RECEIPT</b>", header_style))
         story.append(Spacer(1, 3*mm))
         
@@ -1156,40 +1152,47 @@ Mobile: {bill.get('mobile_number', 'Guest Customer')}"""
         else:
             advance_date_display = original_date
         
-        story.append(Paragraph(f"<b>Settlement Receipt for Bill No:</b> {settlement_data['bill_number']}", left_meta_style))
+        # Bill and Customer Details (Left-Aligned)
+        story.append(Paragraph(f"<b>Bill No:</b> {settlement_data['bill_number']}", left_meta_style))
         story.append(Paragraph(f"<b>Original Advance Date:</b> {advance_date_display}", left_meta_style))
         story.append(Spacer(1, 2*mm))
         
-        # Customer details
-        story.append(Paragraph(f"Customer: {customer['full_name']}", left_meta_style))
-        story.append(Paragraph(f"Mobile: {customer['mobile_number']}", left_meta_style))
+        story.append(Paragraph(f"<b>Customer:</b> {customer['full_name']}", left_meta_style))
+        story.append(Paragraph(f"<b>Mobile:</b> {customer['mobile_number']}", left_meta_style))
         story.append(Spacer(1, 2*mm))
         
-        # Settlement date
-        story.append(Paragraph(f"Settlement Date: {settlement_data['settlement_date']}", left_meta_style))
-        story.append(Spacer(1, 4*mm))
-        story.append(create_thin_line())
+        story.append(Paragraph(f"<b>Settlement Date:</b> {settlement_data['settlement_date']}", left_meta_style))
+        story.append(Spacer(1, 3*mm))
+        story.append(create_solid_line())
         story.append(Spacer(1, 3*mm))
         
-        # === FINANCIAL BREAKDOWN ===
-        story.append(Paragraph("<b>Financial Breakdown</b>", left_meta_style))
+        # === PAYMENT HISTORY ===
+        story.append(Paragraph("<b>Payment History</b>", header_style))
         story.append(Spacer(1, 2*mm))
         
-        # Show: Total - Original Advance = Final Settlement
-        story.append(Paragraph(f"Total Amount:", left_meta_style))
-        story.append(Paragraph(f"Rs. {settlement_data['total_amount']:.2f}", right_total_style))
-        story.append(Spacer(1, 1*mm))
+        # Create financial breakdown table for proper alignment
+        financial_data = [
+            ['Original Total Amount:', f'Rs. {settlement_data["total_amount"]:.2f}'],
+            [f'Advance Paid ({advance_date_display}):', f'Rs. {settlement_data["advance_paid"]:.2f}'],
+            ['Remaining Balance:', f'Rs. {settlement_data["balance_settled"]:.2f}']
+        ]
         
-        story.append(Paragraph(f"Original Advance (Paid on {advance_date_display}):", left_meta_style))
-        story.append(Paragraph(f"- Rs. {settlement_data['advance_paid']:.2f}", right_total_style))
-        story.append(Spacer(1, 2*mm))
-        story.append(create_thin_line())
-        story.append(Spacer(1, 2*mm))
+        financial_table = Table(financial_data, colWidths=[45*mm, 29*mm])
+        financial_table.setStyle(TableStyle([
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ]))
         
-        story.append(Paragraph("<b>Final Settlement Amount:</b>", left_meta_style))
-        story.append(Paragraph(f"<b>Rs. {settlement_data['balance_settled']:.2f}</b>", grand_total_style))
-        story.append(Spacer(1, 4*mm))
-        story.append(create_thin_line())
+        story.append(financial_table)
+        story.append(Spacer(1, 3*mm))
+        story.append(create_solid_line())
         story.append(Spacer(1, 3*mm))
         
         # === ITEMS TABLE ===
@@ -1200,7 +1203,7 @@ Mobile: {bill.get('mobile_number', 'Guest Customer')}"""
         item_data = [['Item', 'Qty', 'Amount']]
         for item in items:
             item_data.append([
-                Paragraph(item['item_name'], left_meta_style),
+                item['item_name'],
                 str(item['quantity']),
                 f"Rs. {item['total_price']:.2f}"
             ])
@@ -1208,63 +1211,67 @@ Mobile: {bill.get('mobile_number', 'Guest Customer')}"""
         col_widths = [42*mm, 12*mm, 20*mm]
         item_table = Table(item_data, colWidths=col_widths)
         item_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#F0F0F0')),
             ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
             ('ALIGN', (0, 0), (0, -1), 'LEFT'),
             ('ALIGN', (1, 0), (1, -1), 'CENTER'),
             ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
             ('FONTSIZE', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 2*mm),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 2*mm),
-            ('LEFTPADDING', (0, 0), (-1, -1), 1*mm),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 1*mm),
-            ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.HexColor('#CCCCCC')),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('LEFTPADDING', (0, 0), (-1, -1), 1),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 1),
+            ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.black),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ]))
         
         story.append(item_table)
-        story.append(Spacer(1, 4*mm))
-        story.append(create_thin_line())
+        story.append(Spacer(1, 3*mm))
+        story.append(create_solid_line())
         story.append(Spacer(1, 3*mm))
         
-        # === FINAL SETTLEMENT TOTALS ===
-        story.append(Paragraph("<b>Final Settlement</b>", left_meta_style))
+        # === FINAL SETTLEMENT SUMMARY ===
+        story.append(Paragraph("<b>Settlement Summary</b>", header_style))
         story.append(Spacer(1, 2*mm))
         
-        story.append(Paragraph(f"Total Bill Amount: Rs. {settlement_data['total_amount']:.2f}", right_total_style))
-        story.append(Paragraph(f"Previously Paid: Rs. {settlement_data['advance_paid']:.2f}", right_total_style))
-        story.append(Paragraph(f"Balance Settled: Rs. {settlement_data['balance_settled']:.2f}", right_total_style))
-        story.append(Spacer(1, 2*mm))
+        # Cash and change details
+        settlement_summary_data = [
+            ['Cash Received:', f'Rs. {settlement_data["cash_received"]:.2f}'],
+            ['Balance Settled:', f'Rs. {settlement_data["balance_settled"]:.2f}']
+        ]
         
-        # Cash and change
-        story.append(Paragraph(f"Cash Received: Rs. {settlement_data['cash_received']:.2f}", right_total_style))
         if settlement_data['change_given'] > 0:
-            story.append(Paragraph(f"Change Returned: Rs. {settlement_data['change_given']:.2f}", right_total_style))
+            settlement_summary_data.append(['Change Returned:', f'Rs. {settlement_data["change_given"]:.2f}'])
         
-        story.append(Spacer(1, 2*mm))
+        settlement_table = Table(settlement_summary_data, colWidths=[45*mm, 29*mm])
+        settlement_table.setStyle(TableStyle([
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ]))
+        
+        story.append(settlement_table)
+        story.append(Spacer(1, 3*mm))
+        
+        # STATUS: FULLY PAID
         story.append(Paragraph("<b>STATUS: FULLY PAID</b>", grand_total_style))
-        story.append(Spacer(1, 4*mm))
-        story.append(create_thin_line())
-        story.append(Spacer(1, 4*mm))
+        story.append(Spacer(1, 3*mm))
+        story.append(create_solid_line())
+        story.append(Spacer(1, 3*mm))
         
-        # === FOOTER ===
-        story.append(Paragraph("<i>Thank you for settling your balance!</i>", footer_elegant_style))
-        story.append(Paragraph("<i>Capturing your dreams, Creating the art.</i>", footer_elegant_style))
-        story.append(Spacer(1, 4*mm))
+        # === PROFESSIONAL FOOTER ===
+        story.append(Paragraph("Capturing your dreams, Creating the art.", footer_style))
+        story.append(Spacer(1, 3*mm))
         
         # Developer credit
-        developer_style = ParagraphStyle(
-            'DeveloperCredit',
-            fontSize=5,
-            textColor=colors.HexColor('#999999'),
-            fontName='Helvetica',
-            alignment=TA_CENTER,
-            spaceAfter=0,
-            spaceBefore=0,
-            leading=6
-        )
-        story.append(Paragraph("System Developed by: Malinda Prabath | Email: malindaprabath876@gmail.com", developer_style))
+        story.append(Paragraph("System Developed by: Malinda Prabath | Email: malindaprabath876@gmail.com", footer_style))
         story.append(Spacer(1, 2*mm))
         
         # Build PDF
