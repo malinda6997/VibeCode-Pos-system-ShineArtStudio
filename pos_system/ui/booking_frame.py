@@ -368,6 +368,8 @@ class BookingManagementFrame(BaseFrame):
         scrollbar.pack(side="right", fill="y", pady=5, padx=(0, 5))
         
         self.tree.bind("<<TreeviewSelect>>", self.on_select)
+        # Double-click to open settlement dialog for pending bookings
+        self.tree.bind("<Double-Button-1>", self.on_booking_double_click)
     
     def load_categories(self):
         """Load ONLY services from the 'Booking' category"""
@@ -1158,3 +1160,293 @@ class BookingManagementFrame(BaseFrame):
             self.update_btn.configure(state="normal")
             if self.is_admin():
                 self.delete_btn.configure(state="normal")
+    
+    def on_booking_double_click(self, event):
+        """Handle double-click on booking - open settlement dialog for pending bookings"""
+        selection = self.tree.selection()
+        if not selection:
+            return
+        
+        booking_id = int(selection[0])
+        booking = self.db_manager.get_booking_by_id(booking_id)
+        
+        if not booking:
+            return
+        
+        # Only open settlement for pending bookings with balance due
+        if booking['status'].lower() == 'pending':
+            balance_due = float(booking['full_amount']) - float(booking['advance_payment'])
+            if balance_due > 0:
+                self.show_settlement_dialog(booking)
+            else:
+                MessageDialog.show_info("No Balance", "This booking has no remaining balance to settle.")
+        elif booking['status'].lower() == 'completed':
+            MessageDialog.show_info("Already Completed", "This booking has already been completed.")
+        elif booking['status'].lower() == 'cancelled':
+            MessageDialog.show_info("Cancelled", "This booking has been cancelled.")
+    
+    def show_settlement_dialog(self, booking):
+        """Show settlement dialog for pending booking with balance"""
+        # Create modal dialog
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("Balance Settlement")
+        dialog.geometry("700x800")
+        dialog.resizable(False, False)
+        dialog.configure(fg_color="#1a1a2e")
+        
+        # Make modal
+        dialog.transient(self.winfo_toplevel())
+        dialog.grab_set()
+        
+        # Center on screen
+        dialog.update_idletasks()
+        x = (dialog.winfo_screenwidth() // 2) - (700 // 2)
+        y = (dialog.winfo_screenheight() // 2) - (800 // 2)
+        dialog.geometry(f"700x800+{x}+{y}")
+        
+        def close_dialog():
+            dialog.grab_release()
+            dialog.destroy()
+            # Restore focus to prevent input lock
+            self.after(100, lambda: self.search_entry.focus_set())
+        
+        dialog.protocol("WM_DELETE_WINDOW", close_dialog)
+        
+        # Scrollable frame
+        scroll_frame = ctk.CTkScrollableFrame(dialog, fg_color="#1a1a2e")
+        scroll_frame.pack(fill="both", expand=True, padx=15, pady=15)
+        
+        # Title
+        ctk.CTkLabel(
+            scroll_frame,
+            text="💵 Balance Settlement",
+            font=ctk.CTkFont(size=24, weight="bold"),
+            text_color="#8C00FF"
+        ).pack(pady=(0, 20))
+        
+        # Original booking info section
+        info_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
+        info_frame.pack(fill="x", pady=(0, 20), padx=10)
+        
+        ctk.CTkLabel(
+            info_frame,
+            text="Original Booking Details",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#8C00FF"
+        ).pack(pady=(15, 10))
+        
+        # Booking info grid
+        info_grid = ctk.CTkFrame(info_frame, fg_color="transparent")
+        info_grid.pack(fill="x", padx=20, pady=(0, 15))
+        
+        full_amount = float(booking['full_amount'])
+        advance_paid = float(booking['advance_payment'])
+        balance_due = full_amount - advance_paid
+        
+        # Format service name
+        service_display = self.format_service_name(booking['photoshoot_category'])
+        
+        info_data = [
+            ("Customer Name:", booking['customer_name']),
+            ("Mobile Number:", booking['mobile_number']),
+            ("Service:", service_display),
+            ("Booking Date:", booking['booking_date']),
+            ("Location:", booking['location'] or 'N/A'),
+        ]
+        
+        for idx, (label, value) in enumerate(info_data):
+            ctk.CTkLabel(
+                info_grid,
+                text=label,
+                font=ctk.CTkFont(size=12, weight="bold"),
+                anchor="w"
+            ).grid(row=idx, column=0, sticky="w", pady=5, padx=(0, 10))
+            
+            ctk.CTkLabel(
+                info_grid,
+                text=str(value),
+                font=ctk.CTkFont(size=12),
+                anchor="w"
+            ).grid(row=idx, column=1, sticky="w", pady=5)
+        
+        # Financial summary section
+        financial_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
+        financial_frame.pack(fill="x", pady=(0, 20), padx=10)
+        
+        ctk.CTkLabel(
+            financial_frame,
+            text="Financial Summary",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#8C00FF"
+        ).pack(pady=(15, 10))
+        
+        # Financial grid
+        financial_grid = ctk.CTkFrame(financial_frame, fg_color="transparent")
+        financial_grid.pack(fill="x", padx=20, pady=(0, 15))
+        
+        financial_items = [
+            ("Full Amount:", f"Rs. {full_amount:,.2f}", "#ffffff"),
+            ("Advance Paid:", f"Rs. {advance_paid:,.2f}", "#00ff88"),
+            ("Balance Due:", f"Rs. {balance_due:,.2f}", "#ff4757"),
+        ]
+        
+        for idx, (label, value, color) in enumerate(financial_items):
+            ctk.CTkLabel(
+                financial_grid,
+                text=label,
+                font=ctk.CTkFont(size=14, weight="bold"),
+                anchor="w"
+            ).grid(row=idx, column=0, sticky="w", pady=8, padx=(0, 20))
+            
+            ctk.CTkLabel(
+                financial_grid,
+                text=value,
+                font=ctk.CTkFont(size=14, weight="bold"),
+                text_color=color,
+                anchor="e"
+            ).grid(row=idx, column=1, sticky="e", pady=8)
+        
+        financial_grid.columnconfigure(1, weight=1)
+        
+        # Payment input section
+        payment_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
+        payment_frame.pack(fill="x", pady=(0, 20), padx=10)
+        
+        ctk.CTkLabel(
+            payment_frame,
+            text="Final Payment",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#8C00FF"
+        ).pack(pady=(15, 10))
+        
+        payment_grid = ctk.CTkFrame(payment_frame, fg_color="transparent")
+        payment_grid.pack(fill="x", padx=20, pady=(0, 15))
+        
+        # Cash received input
+        ctk.CTkLabel(
+            payment_grid,
+            text="Cash Received:",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).grid(row=0, column=0, sticky="w", pady=10, padx=(0, 10))
+        
+        cash_entry = ctk.CTkEntry(
+            payment_grid,
+            width=200,
+            height=40,
+            font=ctk.CTkFont(size=14),
+            corner_radius=10,
+            border_width=2,
+            border_color="#8C00FF"
+        )
+        cash_entry.grid(row=0, column=1, sticky="ew", pady=10)
+        cash_entry.insert(0, f"{balance_due:.2f}")
+        cash_entry.focus()
+        
+        # Change display
+        change_label = ctk.CTkLabel(
+            payment_grid,
+            text="Change: Rs. 0.00",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color="#00ff88"
+        )
+        change_label.grid(row=1, column=0, columnspan=2, pady=10)
+        
+        payment_grid.columnconfigure(1, weight=1)
+        
+        def calculate_change(*args):
+            try:
+                cash_received = float(cash_entry.get() or 0)
+                change = cash_received - balance_due
+                if change >= 0:
+                    change_label.configure(text=f"Change: Rs. {change:,.2f}", text_color="#00ff88")
+                else:
+                    change_label.configure(text=f"Insufficient: Rs. {abs(change):,.2f}", text_color="#ff4757")
+            except:
+                change_label.configure(text="Change: Rs. 0.00", text_color="#00ff88")
+        
+        cash_entry.bind("<KeyRelease>", calculate_change)
+        
+        # Action buttons
+        btn_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+        btn_frame.pack(pady=20)
+        
+        def process_settlement():
+            try:
+                cash_received = float(cash_entry.get() or 0)
+            except:
+                MessageDialog.show_error("Error", "Please enter a valid cash amount")
+                return
+            
+            if cash_received < balance_due:
+                MessageDialog.show_error("Error", f"Cash received (Rs. {cash_received:,.2f}) is less than balance due (Rs. {balance_due:,.2f})")
+                return
+            
+            # Update booking status to Completed
+            success = self.db_manager.update_booking(
+                booking['id'],
+                booking['customer_name'],
+                booking['mobile_number'],
+                booking['photoshoot_category'],
+                full_amount,
+                full_amount,  # Set advance to full amount (fully paid)
+                booking['booking_date'],
+                booking['location'],
+                booking['description'],
+                'Completed'
+            )
+            
+            if not success:
+                MessageDialog.show_error("Error", "Failed to update booking status")
+                return
+            
+            # Generate settlement invoice
+            settlement_data = {
+                'booking_id': booking['id'],
+                'customer_name': booking['customer_name'],
+                'mobile_number': booking['mobile_number'],
+                'photoshoot_category': booking['photoshoot_category'],
+                'original_booking_date': booking['booking_date'],
+                'settlement_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'full_amount': full_amount,
+                'original_advance': advance_paid,
+                'final_payment': balance_due,
+                'cash_received': cash_received,
+                'change_given': cash_received - balance_due,
+                'location': booking['location'],
+                'description': booking['description'],
+                'created_by_name': self.auth_manager.get_username()
+            }
+            
+            pdf_path = self.invoice_generator.generate_booking_settlement_invoice(settlement_data)
+            
+            MessageDialog.show_success("Success", "Balance settled successfully!\nSettlement receipt generated.")
+            close_dialog()
+            self.load_bookings()  # Refresh to show updated status
+            
+            # Open the settlement receipt
+            self.invoice_generator.open_bill(pdf_path)
+        
+        ctk.CTkButton(
+            btn_frame,
+            text="Cancel",
+            command=close_dialog,
+            width=150,
+            height=45,
+            fg_color="#555555",
+            hover_color="#444444",
+            corner_radius=20,
+            font=ctk.CTkFont(size=14, weight="bold")
+        ).pack(side="left", padx=10)
+        
+        ctk.CTkButton(
+            btn_frame,
+            text="✔ Process Settlement",
+            command=process_settlement,
+            width=220,
+            height=45,
+            fg_color="#00ff88",
+            text_color="#1a1a2e",
+            hover_color="#00dd77",
+            corner_radius=20,
+            font=ctk.CTkFont(size=14, weight="bold")
+        ).pack(side="left", padx=10)
