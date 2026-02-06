@@ -4,6 +4,9 @@ from ui.components import BaseFrame, MessageDialog
 from services.bill_generator import BillGenerator
 from datetime import datetime
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils import resource_path
 
 
 class BillHistoryFrame(BaseFrame):
@@ -1122,7 +1125,7 @@ Mobile: {bill.get('mobile_number', 'Guest Customer')}"""
             return line_table
         
         # === HEADER WITH LOGO ===
-        logo_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'logos', 'billLogo.png')
+        logo_path = resource_path(os.path.join('assets', 'logos', 'billLogo.png'))
         if os.path.exists(logo_path):
             try:
                 logo = Image(logo_path, width=50*mm, height=15*mm)

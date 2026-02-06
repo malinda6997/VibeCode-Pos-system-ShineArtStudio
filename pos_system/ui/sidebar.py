@@ -2,6 +2,9 @@ import customtkinter as ctk
 from typing import Callable, Dict, List, Tuple
 from PIL import Image, ImageDraw, ImageOps
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils import resource_path
 
 
 class Sidebar(ctk.CTkFrame):
@@ -39,7 +42,7 @@ class Sidebar(ctk.CTkFrame):
         
         # Load and display studio logo image
         try:
-            logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "logos", "studio-logo.png")
+            logo_path = resource_path(os.path.join("assets", "logos", "studio-logo.png"))
             if os.path.exists(logo_path):
                 logo_img = Image.open(logo_path)
                 # Calculate proportional width for text-based logo (expanded)

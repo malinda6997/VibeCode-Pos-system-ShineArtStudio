@@ -11,6 +11,9 @@ def generate_booking_settlement_invoice(self, settlement_data):
     from reportlab.lib import colors
     from datetime import datetime
     import os
+    import sys
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils import resource_path
     
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     booking_id = settlement_data['booking_id']
@@ -34,7 +37,7 @@ def generate_booking_settlement_invoice(self, settlement_data):
     page_width = A4[0] - 30*mm
     
     # === HEADER: Wide Logo Left, INVOICE + Meta Right ===
-    logo_path = os.path.join('assets', 'logos', 'invoiceLogo.png')
+    logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
     if os.path.exists(logo_path):
         try:
             logo = Image(logo_path, width=70*mm, height=28*mm)

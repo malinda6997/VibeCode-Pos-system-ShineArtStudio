@@ -9,6 +9,9 @@ from reportlab.pdfbase.ttfonts import TTFont
 from datetime import datetime, timedelta
 import os
 import sqlite3
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils import resource_path
 
 # Register Unicode font for Sinhala text support
 try:
@@ -116,7 +119,7 @@ class FinancialReportGenerator:
         
         # ==================== ENHANCED HEADER ====================
         # Logo - Centered and High Resolution
-        logo_path = os.path.join('assets', 'logos', 'invoiceLogo.png')
+        logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
         if os.path.exists(logo_path):
             try:
                 # Centered logo with better dimensions

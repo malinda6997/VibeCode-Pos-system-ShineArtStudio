@@ -9,6 +9,10 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.graphics.shapes import Drawing, Line as RLLine
 from datetime import datetime
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils import resource_path
+import os
 
 
 class BillGenerator:
@@ -145,7 +149,7 @@ class BillGenerator:
         
         # === OFFICIAL BRANDING & HEADER (CENTERED) ===
         # Logo at top center - Pure B&W rendering
-        logo_path = os.path.join('assets', 'logos', 'billLogo.png')
+        logo_path = resource_path(os.path.join('assets', 'logos', 'billLogo.png'))
         if os.path.exists(logo_path):
             try:
                 logo = Image(logo_path, width=60*mm, height=22*mm)

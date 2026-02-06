@@ -8,6 +8,9 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from datetime import datetime
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils import resource_path
 
 # Register Unicode font for Sinhala text support
 try:
@@ -62,7 +65,7 @@ class InvoiceGenerator:
         page_width = A4[0] - 30*mm  # Available width after margins
         
         # === HEADER SECTION: Wide Logo Left, INVOICE + Meta Right ===
-        logo_path = os.path.join('assets', 'logos', 'invoiceLogo.png')
+        logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
         if os.path.exists(logo_path):
             try:
                 # Wide landscape-style logo
@@ -310,8 +313,8 @@ class InvoiceGenerator:
         contact_text_style = ParagraphStyle('ContactText', fontSize=10, alignment=TA_LEFT, textColor=colors.HexColor('#555555'), leading=13)
         
         # Social media and contact info with icons
-        email_icon_path = os.path.join('assets', 'icons', 'email.png')
-        fb_icon_path = os.path.join('assets', 'icons', 'facebook.png')
+        email_icon_path = resource_path(os.path.join('assets', 'icons', 'email.png'))
+        fb_icon_path = resource_path(os.path.join('assets', 'icons', 'facebook.png'))
         
         # Email with icon
         if os.path.exists(email_icon_path):
@@ -399,7 +402,7 @@ class InvoiceGenerator:
         page_width = A4[0] - 30*mm
         
         # === HEADER: Wide Logo Left, INVOICE + Meta Right ===
-        logo_path = os.path.join('assets', 'logos', 'invoiceLogo.png')
+        logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
         if os.path.exists(logo_path):
             try:
                 # Wide landscape-style logo
@@ -550,8 +553,8 @@ class InvoiceGenerator:
         # === CONTACT INFO WITH ICONS (CENTER-ALIGNED) ===
         contact_text_style = ParagraphStyle('ContactText', fontSize=10, alignment=TA_LEFT, textColor=colors.HexColor('#555555'), leading=13)
         
-        email_icon_path = os.path.join('assets', 'icons', 'email.png')
-        fb_icon_path = os.path.join('assets', 'icons', 'facebook.png')
+        email_icon_path = resource_path(os.path.join('assets', 'icons', 'email.png'))
+        fb_icon_path = resource_path(os.path.join('assets', 'icons', 'facebook.png'))
         
         # Email with icon
         if os.path.exists(email_icon_path):
@@ -626,7 +629,7 @@ class InvoiceGenerator:
         page_width = A4[0] - 30*mm
         
         # === HEADER: Wide Logo Left, INVOICE + Meta Right ===
-        logo_path = os.path.join('assets', 'logos', 'invoiceLogo.png')
+        logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
         if os.path.exists(logo_path):
             try:
                 # Wide landscape-style logo
@@ -769,8 +772,8 @@ class InvoiceGenerator:
         dev_style = ParagraphStyle('Dev', fontSize=8, alignment=TA_CENTER, textColor=colors.HexColor('#cccccc'))
         
         # Social media and contact info with icons
-        email_icon_path = os.path.join('assets', 'icons', 'email.png')
-        fb_icon_path = os.path.join('assets', 'icons', 'facebook.png')
+        email_icon_path = resource_path(os.path.join('assets', 'icons', 'email.png'))
+        fb_icon_path = resource_path(os.path.join('assets', 'icons', 'facebook.png'))
         
         # Email with icon
         if os.path.exists(email_icon_path):
@@ -954,8 +957,8 @@ class InvoiceGenerator:
         story.append(Spacer(1, 3*mm))
         
         # Social media and contact info with icons
-        email_icon_path = os.path.join('assets', 'icons', 'email.png')
-        fb_icon_path = os.path.join('assets', 'icons', 'facebook.png')
+        email_icon_path = resource_path(os.path.join('assets', 'icons', 'email.png'))
+        fb_icon_path = resource_path(os.path.join('assets', 'icons', 'facebook.png'))
         
         # Email with icon
         if os.path.exists(email_icon_path):
@@ -1044,7 +1047,7 @@ class InvoiceGenerator:
         page_width = A4[0] - 30*mm
         
         # === HEADER: Wide Logo Left, INVOICE + Meta Right ===
-        logo_path = os.path.join('assets', 'logos', 'invoiceLogo.png')
+        logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
         if os.path.exists(logo_path):
             try:
                 logo = Image(logo_path, width=70*mm, height=28*mm)
