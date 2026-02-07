@@ -107,9 +107,8 @@ class InvoiceGenerator:
         story.append(Spacer(1, 5*mm))
         
         # === COMPANY & CLIENT INFO SECTION ===
-        # Left: Company details
+        # Left: Company contact details (no duplicate name as logo contains it)
         company_info = Table([
-            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
             [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
             [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
@@ -428,7 +427,6 @@ class InvoiceGenerator:
         
         # === COMPANY & CLIENT INFO ===
         company_info = Table([
-            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
             [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
             [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
@@ -843,8 +841,8 @@ class InvoiceGenerator:
         story.append(Spacer(1, 5*mm))
         
         # === COMPANY & CLIENT INFO ===
+        # No duplicate studio name - it's in the logo
         company_info = Table([
-            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
             [Paragraph("<b>Reg No:</b> 26/3610", ParagraphStyle('Reg', fontSize=10, textColor=colors.HexColor('#444444')))],
             [Paragraph("No:52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
             [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
@@ -1015,13 +1013,12 @@ class InvoiceGenerator:
         return filepath
     
     def generate_booking_settlement_invoice(self, settlement_data):
-        """Generate thermal-style settlement receipt for booking (80mm width, high contrast)"""
+        """Generate A4 professional settlement invoice for booking"""
         from reportlab.lib.units import mm
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
         from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
         from reportlab.lib import colors
-        from reportlab.graphics.shapes import Drawing, Line as RLLine
         from datetime import datetime
         import os
         
@@ -1031,21 +1028,20 @@ class InvoiceGenerator:
         filename = f"SETTLE_BK_{booking_id}.pdf"
         filepath = os.path.join(self.invoice_folder, filename)
         
-        # Thermal receipt size: 80mm width (standard thermal printer)
-        page_width = 80 * mm
-        page_height = 250 * mm  # Dynamic, will expand as needed
-        
+        # A4 size like other invoices
         doc = SimpleDocTemplate(
             filepath, 
-            pagesize=(page_width, page_height),
-            leftMargin=3*mm,
-            rightMargin=3*mm,
-            topMargin=3*mm,
-            bottomMargin=3*mm
+            pagesize=A4,
+            leftMargin=15*mm,
+            rightMargin=15*mm,
+            topMargin=12*mm,
+            bottomMargin=12*mm
         )
         
         story = []
-        content_width = 74*mm  # Usable width
+        from reportlab.lib.styles import getSampleStyleSheet
+        styles = getSampleStyleSheet()
+        page_width = A4[0] - 30*mm  # Available width after margins
         
         # === HEADER: Wide Logo Left, INVOICE + Meta Right ===
         logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
@@ -1072,20 +1068,8 @@ class InvoiceGenerator:
         story.append(header_table)
         story.append(Spacer(1, 5*mm))
         
-        # === CLIENT INFO ONLY (Company info already in header logo) ===
-        bill_to_info = Table([
-            [Paragraph("<b>Bill To:</b>", ParagraphStyle('BillTo', fontSize=12, fontName='Helvetica-Bold'))],
-            [Paragraph(f"Customer: {settlement_data['customer_name']}", ParagraphStyle('Cust', fontSize=11))],
-            [Paragraph(f"Mobile: {settlement_data['mobile_number']}", ParagraphStyle('Mob', fontSize=11))],
-            [Paragraph(f"Booking ID: {settlement_data['booking_id']}", ParagraphStyle('BookID', fontSize=11, textColor=colors.HexColor('#555555')))],
-        ], colWidths=[content_width])
-        bill_to_info.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'), ('BOTTOMPADDING', (0, 0), (-1, -1), 2)]))
-        
-        story.append(bill_to_info)
-        story.append(Spacer(1, 8*mm))
-        
         # === SETTLEMENT DETAILS TABLE ===
-        header_style = ParagraphStyle('Header', fontSize=11, leading=13, textColor=colors.black, fontName='Helvetica-Bold')
+        header_style = ParagraphStyle('Header', fontSize=11, leading=13, textColor=colors.white, fontName='Helvetica-Bold')
         desc_style = ParagraphStyle('Desc', fontSize=11, leading=13)
         right_style = ParagraphStyle('Right', fontSize=11, alignment=TA_RIGHT)
         
@@ -1102,7 +1086,7 @@ class InvoiceGenerator:
         final_payment = float(settlement_data['final_payment'])
         
         table_data = [
-            [Paragraph("Description", header_style), Paragraph("Amount", ParagraphStyle('HRight', fontSize=11, alignment=TA_RIGHT, textColor=colors.black, fontName='Helvetica-Bold'))],
+            [Paragraph("Description", header_style), Paragraph("Amount", ParagraphStyle('HRight', fontSize=11, alignment=TA_RIGHT, textColor=colors.white, fontName='Helvetica-Bold'))],
             [Paragraph(service_name, desc_style), Paragraph(f"Rs. {full_amount:,.2f}", right_style)],
         ]
         
@@ -1110,8 +1094,8 @@ class InvoiceGenerator:
         items_table = Table(table_data, colWidths=col_widths)
         
         table_style = [
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#CCCCCC')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.black),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
             ('TOPPADDING', (0, 0), (-1, 0), 10),
@@ -1165,9 +1149,19 @@ class InvoiceGenerator:
         story.append(summary_container)
         story.append(Spacer(1, 10*mm))
         
-        # === STATUS LABEL ===
-        status_style = ParagraphStyle('Status', fontSize=12, fontName='Helvetica-Bold', alignment=TA_CENTER, textColor=colors.HexColor('#27ae60'))
-        story.append(Paragraph("✓ <b>FULLY PAID - BOOKING COMPLETED</b>", status_style))
+        # === DYNAMIC STATUS LABEL ===
+        # Calculate final balance after settlement
+        balance_after = full_amount - (original_advance + final_payment)
+        
+        if balance_after <= 0:
+            status_text = "✓ <b>[STATUS: FULLY PAID]</b>"
+            status_color = colors.HexColor('#27ae60')  # Green
+        else:
+            status_text = "⚠ <b>[STATUS: ADVANCE PAYMENT]</b>"
+            status_color = colors.HexColor('#FFA500')  # Orange
+        
+        status_style = ParagraphStyle('Status', fontSize=12, fontName='Helvetica-Bold', alignment=TA_CENTER, textColor=status_color)
+        story.append(Paragraph(status_text, status_style))
         story.append(Spacer(1, 8*mm))
         
         # === TERMS & CONDITIONS ===
@@ -1182,7 +1176,7 @@ class InvoiceGenerator:
         
         # === FOOTER ===
         footer_style = ParagraphStyle('Footer', fontSize=9, alignment=TA_CENTER, textColor=colors.HexColor('#333333'))
-        story.append(Paragraph("STUDIO SHINE ART | No: 52/1/1, Maravila Road, Nattandiya | 0767898604 / 0322051680", footer_style))
+        story.append(Paragraph("No: 52/1/1, Maravila Road, Nattandiya | Tel: 0767898604 / 0322051680", footer_style))
         story.append(Spacer(1, 2*mm))
         
         dev_style = ParagraphStyle('Dev', fontSize=8, alignment=TA_CENTER, textColor=colors.HexColor('#888888'))

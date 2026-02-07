@@ -148,22 +148,18 @@ class BillGenerator:
             return drawing
         
         # === OFFICIAL BRANDING & HEADER (CENTERED) ===
-        # Logo at top center - Pure B&W rendering
+        # Logo at top center - Pure B&W rendering (logo contains studio name)
         logo_path = resource_path(os.path.join('assets', 'logos', 'billLogo.png'))
         if os.path.exists(logo_path):
             try:
                 logo = Image(logo_path, width=60*mm, height=22*mm)
                 logo.hAlign = 'CENTER'
                 story.append(logo)
-                story.append(Spacer(1, 2*mm))
+                story.append(Spacer(1, 3*mm))
             except Exception as e:
                 print(f"Logo error: {e}")
         
-        # Studio Name - BOLD
-        story.append(Paragraph("<b>STUDIO SHINE ART</b>", studio_name_style))
-        story.append(Spacer(1, 1*mm))
-        
-        # Centered studio identity
+        # Centered studio identity (removed duplicate studio name as it's in logo)
         story.append(Paragraph("No: 52/1/1, Maravila Road, Nattandiya", subheader_style))
         story.append(Paragraph("Reg No: 26/3610 | Tel: 0767898604 / 0322051680", subheader_style))
         story.append(Spacer(1, 3*mm))
