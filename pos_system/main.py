@@ -25,6 +25,7 @@ from ui.profile_frame import ProfileFrame
 from ui.category_frame import CategoryManagementFrame
 from ui.permissions_frame import PermissionsFrame
 from ui.staff_reports_frame import StaffReportsFrame
+from ui.expenses_frame import ExpensesManagementFrame
 from services.user_service import UserService
 
 
@@ -277,6 +278,7 @@ class MainApplication(ctk.CTk):
             "users": "can_access_users",
             "permissions": "can_access_permissions",
             "staff_reports": "can_access_staff_reports",
+            "expenses": "can_access_expenses",
             "settings": "can_access_settings",
             "profile": "can_access_profile",
             "support": "can_access_support",
@@ -308,6 +310,7 @@ class MainApplication(ctk.CTk):
             "users": UsersManagementFrame,
             "permissions": PermissionsFrame,
             "staff_reports": StaffReportsFrame,
+            "expenses": ExpensesManagementFrame,
             "settings": SettingsFrame,
             "profile": ProfileFrame,
             "support": SupportFrame,

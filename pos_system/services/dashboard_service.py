@@ -393,17 +393,31 @@ class DashboardService:
             print(f"Error adding manual expense: {e}")
             return False
     
-    def get_expenses_by_date(self, date: str) -> float:
-        """Get total expenses for a specific date"""
+    def get_expenses_by_date(self, date: str, user_id: int = None, is_admin: bool = True) -> float:
+        """Get total expenses for a specific date
+        
+        Args:
+            date: Date to get expenses for
+            user_id: User ID to filter by (for staff users)
+            is_admin: Whether the user is admin (if False and user_id provided, filters by created_by)
+        """
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            cursor.execute('''
-                SELECT COALESCE(SUM(amount), 0) 
-                FROM manual_expenses 
-                WHERE expense_date = ?
-            ''', (date,))
+            # If user is staff (not admin) and user_id is provided, filter by created_by
+            if not is_admin and user_id is not None:
+                cursor.execute('''
+                    SELECT COALESCE(SUM(amount), 0) 
+                    FROM manual_expenses 
+                    WHERE expense_date = ? AND created_by = ?
+                ''', (date, user_id))
+            else:
+                cursor.execute('''
+                    SELECT COALESCE(SUM(amount), 0) 
+                    FROM manual_expenses 
+                    WHERE expense_date = ?
+                ''', (date,))
             
             result = cursor.fetchone()[0]
             conn.close()
@@ -412,17 +426,32 @@ class DashboardService:
             print(f"Error getting expenses by date: {e}")
             return 0.0
     
-    def get_expenses_by_range(self, start_date: str, end_date: str) -> float:
-        """Get total expenses for a date range"""
+    def get_expenses_by_range(self, start_date: str, end_date: str, user_id: int = None, is_admin: bool = True) -> float:
+        """Get total expenses for a date range
+        
+        Args:
+            start_date: Start date of range
+            end_date: End date of range
+            user_id: User ID to filter by (for staff users)
+            is_admin: Whether the user is admin (if False and user_id provided, filters by created_by)
+        """
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            cursor.execute('''
-                SELECT COALESCE(SUM(amount), 0) 
-                FROM manual_expenses 
-                WHERE expense_date BETWEEN ? AND ?
-            ''', (start_date, end_date))
+            # If user is staff (not admin) and user_id is provided, filter by created_by
+            if not is_admin and user_id is not None:
+                cursor.execute('''
+                    SELECT COALESCE(SUM(amount), 0) 
+                    FROM manual_expenses 
+                    WHERE expense_date BETWEEN ? AND ? AND created_by = ?
+                ''', (start_date, end_date, user_id))
+            else:
+                cursor.execute('''
+                    SELECT COALESCE(SUM(amount), 0) 
+                    FROM manual_expenses 
+                    WHERE expense_date BETWEEN ? AND ?
+                ''', (start_date, end_date))
             
             result = cursor.fetchone()[0]
             conn.close()
@@ -431,21 +460,39 @@ class DashboardService:
             print(f"Error getting expenses by range: {e}")
             return 0.0
     
-    def get_expense_details_by_range(self, start_date: str, end_date: str) -> list:
-        """Get detailed expense records for a date range"""
+    def get_expense_details_by_range(self, start_date: str, end_date: str, user_id: int = None, is_admin: bool = True) -> list:
+        """Get detailed expense records for a date range
+        
+        Args:
+            start_date: Start date of range
+            end_date: End date of range
+            user_id: User ID to filter by (for staff users)
+            is_admin: Whether the user is admin (if False and user_id provided, filters by created_by)
+        """
         try:
             conn = sqlite3.connect(self.db_path)
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             
-            cursor.execute('''
-                SELECT me.id, me.description, me.amount, me.expense_date, 
-                       u.full_name as created_by_name, me.created_at
-                FROM manual_expenses me
-                JOIN users u ON me.created_by = u.id
-                WHERE me.expense_date BETWEEN ? AND ?
-                ORDER BY me.expense_date DESC, me.created_at DESC
-            ''', (start_date, end_date))
+            # If user is staff (not admin) and user_id is provided, filter by created_by
+            if not is_admin and user_id is not None:
+                cursor.execute('''
+                    SELECT me.id, me.description, me.amount, me.expense_date, 
+                           u.full_name as created_by_name, me.created_at
+                    FROM manual_expenses me
+                    JOIN users u ON me.created_by = u.id
+                    WHERE me.expense_date BETWEEN ? AND ? AND me.created_by = ?
+                    ORDER BY me.expense_date DESC, me.created_at DESC
+                ''', (start_date, end_date, user_id))
+            else:
+                cursor.execute('''
+                    SELECT me.id, me.description, me.amount, me.expense_date, 
+                           u.full_name as created_by_name, me.created_at
+                    FROM manual_expenses me
+                    JOIN users u ON me.created_by = u.id
+                    WHERE me.expense_date BETWEEN ? AND ?
+                    ORDER BY me.expense_date DESC, me.created_at DESC
+                ''', (start_date, end_date))
             
             expenses = [dict(row) for row in cursor.fetchall()]
             conn.close()
@@ -584,8 +631,15 @@ class DashboardService:
             print(f"Error getting income by month: {e}")
             return 0.0
     
-    def get_expenses_by_month(self, year: int, month: int) -> float:
-        """Get total expenses for a specific month and year"""
+    def get_expenses_by_month(self, year: int, month: int, user_id: int = None, is_admin: bool = True) -> float:
+        """Get total expenses for a specific month and year
+        
+        Args:
+            year: Year
+            month: Month (1-12)
+            user_id: User ID to filter by (for staff users)
+            is_admin: Whether the user is admin (if False and user_id provided, filters by created_by)
+        """
         try:
             from calendar import monthrange
             
@@ -594,7 +648,7 @@ class DashboardService:
             _, last_day = monthrange(year, month)
             last_day_str = datetime(year, month, last_day).strftime('%Y-%m-%d')
             
-            return self.get_expenses_by_range(first_day, last_day_str)
+            return self.get_expenses_by_range(first_day, last_day_str, user_id, is_admin)
         except Exception as e:
             print(f"Error getting expenses by month: {e}")
             return 0.0

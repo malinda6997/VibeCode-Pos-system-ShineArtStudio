@@ -899,8 +899,13 @@ class DashboardFrame(ctk.CTkFrame):
         """Load dashboard statistics"""
         today = datetime.now().strftime('%Y-%m-%d')
         
+        # Get current user info for expense filtering
+        user = self.auth_manager.get_current_user()
+        user_id = user['id']
+        is_admin = self.is_admin()
+        
         # Load appropriate stats based on user role
-        if self.is_admin():
+        if is_admin:
             stats = self.dashboard_service.get_admin_dashboard_stats()
             
             # Update balance summary based on filter mode
@@ -909,7 +914,7 @@ class DashboardFrame(ctk.CTkFrame):
             # Get income and expenses based on filter
             if self.filter_mode == "daily":
                 total_income = stats['today_sales']
-                total_expenses = self.dashboard_service.get_expenses_by_date(today)
+                total_expenses = self.dashboard_service.get_expenses_by_date(today, user_id, is_admin)
             elif self.filter_mode == "weekly":
                 # Get specific week range
                 start_date, end_date = self.get_week_range(self.selected_year, self.selected_month, self.selected_week)
@@ -919,12 +924,14 @@ class DashboardFrame(ctk.CTkFrame):
                 )
                 total_expenses = self.dashboard_service.get_expenses_by_range(
                     start_date.strftime('%Y-%m-%d'),
-                    end_date.strftime('%Y-%m-%d')
+                    end_date.strftime('%Y-%m-%d'),
+                    user_id,
+                    is_admin
                 )
             elif self.filter_mode == "monthly":
                 # Get specific month data
                 total_income = self.dashboard_service.get_income_by_month(self.selected_year, self.selected_month)
-                total_expenses = self.dashboard_service.get_expenses_by_month(self.selected_year, self.selected_month)
+                total_expenses = self.dashboard_service.get_expenses_by_month(self.selected_year, self.selected_month, user_id, is_admin)
             else:
                 total_income = 0.0
                 total_expenses = 0.0

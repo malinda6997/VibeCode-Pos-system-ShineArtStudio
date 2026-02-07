@@ -277,7 +277,7 @@ class DatabaseSchema:
                 can_access_invoices INTEGER DEFAULT 1,
                 can_access_support INTEGER DEFAULT 1,
                 can_access_user_guide INTEGER DEFAULT 1,
-                can_manage_expenses INTEGER DEFAULT 0,
+                can_manage_expenses INTEGER DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users (id)
@@ -286,9 +286,19 @@ class DatabaseSchema:
         
         # Add can_manage_expenses column if not exists (for existing databases)
         try:
-            self.cursor.execute('ALTER TABLE user_permissions ADD COLUMN can_manage_expenses INTEGER DEFAULT 0')
+            self.cursor.execute('ALTER TABLE user_permissions ADD COLUMN can_manage_expenses INTEGER DEFAULT 1')
         except sqlite3.OperationalError:
             pass  # Column already exists
+        
+        # Enable expense management for all existing staff users
+        try:
+            self.cursor.execute('''
+                UPDATE user_permissions 
+                SET can_manage_expenses = 1 
+                WHERE user_id IN (SELECT id FROM users WHERE role = 'Staff')
+            ''')
+        except sqlite3.OperationalError:
+            pass  # Update failed, permissions might not exist yet
         
         # Manual Expenses table for miscellaneous expenses
         self.cursor.execute('''
