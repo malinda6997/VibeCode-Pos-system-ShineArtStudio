@@ -280,7 +280,7 @@ class BookingManagementFrame(BaseFrame):
         right_panel = ctk.CTkFrame(container, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         right_panel.pack(side="right", fill="both", expand=True, padx=(10, 0))
         
-        # Search and Filters - SIMPLIFIED LAYOUT (No Status Filters)
+        # Search and Filters with Status Filter Buttons
         search_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10)
         search_frame.pack(fill="x", padx=15, pady=15)
         
@@ -304,13 +304,44 @@ class BookingManagementFrame(BaseFrame):
             corner_radius=20
         ).pack(side="left", padx=5)
         
-        # Info label showing filter status
+        # Status Filter Buttons
+        filter_container = ctk.CTkFrame(search_frame, fg_color="transparent")
+        filter_container.pack(fill="x", padx=10, pady=(5, 10))
+        
         ctk.CTkLabel(
-            search_container,
-            text="📑 Showing: Active Bookings Only",
-            font=ctk.CTkFont(size=11),
-            text_color="#888888"
-        ).pack(side="right", padx=10)
+            filter_container,
+            text="📊 Filter:",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(side="left", padx=(0, 10))
+        
+        # Filter buttons
+        filter_btn_frame = ctk.CTkFrame(filter_container, fg_color="transparent")
+        filter_btn_frame.pack(side="left")
+        
+        # Store filter buttons for styling
+        self.filter_buttons = {}
+        
+        filters = [
+            ("All", "All", "#666666"),
+            ("Pending", "Pending", "#FFA500"),
+            ("Completed", "Completed", "#00ff88"),
+            ("Cancelled", "Cancelled", "#ff4757")
+        ]
+        
+        for status, label, color in filters:
+            btn = ctk.CTkButton(
+                filter_btn_frame,
+                text=label,
+                command=lambda s=status: self.filter_by_status(s),
+                width=90,
+                height=32,
+                fg_color=color if status == "Pending" else "#333333",
+                hover_color=color,
+                corner_radius=15,
+                font=ctk.CTkFont(size=11, weight="bold")
+            )
+            btn.pack(side="left", padx=3)
+            self.filter_buttons[status] = btn
         
         # Table header
         table_header = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10, height=45)
@@ -870,6 +901,327 @@ class BookingManagementFrame(BaseFrame):
         # Handle window close
         preview.protocol("WM_DELETE_WINDOW", close_preview)
     
+    def show_settlement_action_popup(self, filepath, settlement_data):
+        """Show Print Preview & Print dialog for settlement invoice with Direct Print as default action"""
+        # Create print-focused popup
+        popup = ctk.CTkToplevel(self)
+        popup.title("Print Settlement Invoice")
+        popup.geometry("550x480")
+        popup.resizable(False, False)
+        popup.configure(fg_color="#1a1a2e")
+        
+        # Make modal
+        popup.transient(self.winfo_toplevel())
+        popup.grab_set()
+        
+        # Center on screen
+        popup.update_idletasks()
+        x = (popup.winfo_screenwidth() // 2) - 275
+        y = (popup.winfo_screenheight() // 2) - 240
+        popup.geometry(f"550x480+{x}+{y}")
+        
+        # Main container
+        main_frame = ctk.CTkFrame(popup, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
+        main_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        # Printer icon
+        ctk.CTkLabel(
+            main_frame,
+            text="🖨️",
+            font=ctk.CTkFont(size=50)
+        ).pack(pady=(20, 10))
+        
+        # Title
+        ctk.CTkLabel(
+            main_frame,
+            text="Settlement Invoice Ready",
+            font=ctk.CTkFont(size=20, weight="bold"),
+            text_color="#8C00FF"
+        ).pack(pady=(0, 5))
+        
+        # Subtitle
+        ctk.CTkLabel(
+            main_frame,
+            text="Choose a print option below:",
+            font=ctk.CTkFont(size=13),
+            text_color="#cccccc"
+        ).pack(pady=(0, 15))
+        
+        # Determine payment status
+        full_amount = float(settlement_data['full_amount'])
+        original_advance = float(settlement_data['original_advance'])
+        final_payment = float(settlement_data['final_payment'])
+        total_paid = original_advance + final_payment
+        
+        if total_paid >= full_amount:
+            status_text = "✓ FULLY PAID"
+            status_color = "#00ff88"
+        else:
+            status_text = "⚠ ADVANCE PAYMENT"
+            status_color = "#FFA500"
+        
+        # Status badge
+        status_badge = ctk.CTkFrame(main_frame, fg_color="#0d0d1a", corner_radius=15)
+        status_badge.pack(pady=10)
+        
+        ctk.CTkLabel(
+            status_badge,
+            text=status_text,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color=status_color
+        ).pack(padx=20, pady=8)
+        
+        # Info frame (compact)
+        info_frame = ctk.CTkFrame(main_frame, fg_color="#0d0d1a", corner_radius=10)
+        info_frame.pack(fill="x", padx=30, pady=15)
+        
+        # Settlement details (key info only)
+        details = [
+            ("Customer:", settlement_data['customer_name']),
+            ("Final Payment:", f"Rs. {final_payment:,.2f}"),
+            ("Total Paid:", f"Rs. {total_paid:,.2f}"),
+        ]
+        
+        for label, value in details:
+            row_frame = ctk.CTkFrame(info_frame, fg_color="transparent")
+            row_frame.pack(fill="x", padx=15, pady=4)
+            
+            ctk.CTkLabel(
+                row_frame,
+                text=label,
+                font=ctk.CTkFont(size=12),
+                text_color="#888888",
+                anchor="w"
+            ).pack(side="left")
+            
+            ctk.CTkLabel(
+                row_frame,
+                text=value,
+                font=ctk.CTkFont(size=12, weight="bold"),
+                text_color="#ffffff",
+                anchor="e"
+            ).pack(side="right")
+        
+        # Spacer
+        ctk.CTkLabel(info_frame, text="", height=5).pack()
+        
+        # Separator
+        sep = ctk.CTkFrame(main_frame, height=2, fg_color="#333333")
+        sep.pack(fill="x", padx=40, pady=15)
+        
+        # Print action buttons frame
+        btn_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        btn_frame.pack(pady=10)
+        
+        def direct_print():
+            """Direct Print to thermal printer without opening external viewers"""
+            try:
+                self.invoice_generator.print_invoice(filepath)
+                Toast.success(self, "✓ Invoice sent to printer!")
+                popup.destroy()
+            except Exception as e:
+                Toast.error(self, f"Print error: {str(e)}")
+        
+        def preview_print():
+            """Open PDF for preview before printing"""
+            self.invoice_generator.open_bill(filepath)
+            Toast.success(self, "Invoice preview opened!")
+        
+        def close_popup():
+            """Close popup"""
+            popup.destroy()
+            Toast.success(self, "Settlement completed!")
+        
+        # DIRECT PRINT button (primary action - green)
+        ctk.CTkButton(
+            btn_frame,
+            text="🖨️ Direct Print (Thermal)",
+            command=direct_print,
+            width=200,
+            height=55,
+            font=ctk.CTkFont(size=15, weight="bold"),
+            fg_color="#00ff88",
+            text_color="#000000",
+            hover_color="#00cc70",
+            corner_radius=20
+        ).pack(side="left", padx=8)
+        
+        # Preview & Print button (secondary action - purple)
+        ctk.CTkButton(
+            btn_frame,
+            text="👁️ Preview PDF",
+            command=preview_print,
+            width=180,
+            height=55,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20
+        ).pack(side="left", padx=8)
+        
+        # Close button (bottom)
+        ctk.CTkButton(
+            main_frame,
+            text="✗ Close",
+            command=close_popup,
+            width=150,
+            height=40,
+            font=ctk.CTkFont(size=12),
+            fg_color="#555555",
+            text_color="white",
+            hover_color="#444444",
+            corner_radius=20
+        ).pack(pady=(10, 20))
+        
+        # Handle window close
+        popup.protocol("WM_DELETE_WINDOW", close_popup)
+    
+    def show_settlement_preview_popup(self, filepath, cash_entry):
+        """Show settlement receipt preview with Download/Print options"""
+        # Create preview popup
+        preview = ctk.CTkToplevel(self)
+        preview.title("Settlement Receipt")
+        preview.geometry("650x600")
+        preview.resizable(False, False)
+        preview.configure(fg_color="#1a1a2e")
+        
+        # Make modal
+        preview.transient(self.winfo_toplevel())
+        preview.grab_set()
+        
+        # Center on screen
+        preview.update_idletasks()
+        x = (preview.winfo_screenwidth() // 2) - 325
+        y = (preview.winfo_screenheight() // 2) - 300
+        preview.geometry(f"650x600+{x}+{y}")
+        
+        # Main container
+        main_frame = ctk.CTkFrame(preview, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
+        main_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        # Header
+        ctk.CTkLabel(
+            main_frame,
+            text="✅",
+            font=ctk.CTkFont(size=40)
+        ).pack(pady=(20, 5))
+        
+        ctk.CTkLabel(
+            main_frame,
+            text="Settlement Completed!",
+            font=ctk.CTkFont(size=20, weight="bold"),
+            text_color="#00ff88"
+        ).pack(pady=(0, 10))
+        
+        ctk.CTkLabel(
+            main_frame,
+            text="Balance Fully Paid • Booking Completed",
+            font=ctk.CTkFont(size=13),
+            text_color="#888888"
+        ).pack(pady=(0, 20))
+        
+        # Info frame
+        info_frame = ctk.CTkFrame(main_frame, fg_color="#0d0d1a", corner_radius=10)
+        info_frame.pack(fill="x", padx=25, pady=10)
+        
+        # File info
+        import os
+        filename = os.path.basename(filepath)
+        ctk.CTkLabel(
+            info_frame,
+            text=f"📄 Settlement Receipt",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color="#00ff88"
+        ).pack(pady=(15, 5))
+        
+        ctk.CTkLabel(
+            info_frame,
+            text=f"File: {filename}",
+            font=ctk.CTkFont(size=11),
+            text_color="#888888"
+        ).pack(pady=(0, 15))
+        
+        # Separator
+        sep = ctk.CTkFrame(main_frame, height=2, fg_color="#333333")
+        sep.pack(fill="x", padx=40, pady=20)
+        
+        # Instructions
+        ctk.CTkLabel(
+            main_frame,
+            text="What would you like to do next?",
+            font=ctk.CTkFont(size=13),
+            text_color="#cccccc"
+        ).pack(pady=(10, 20))
+        
+        # Buttons frame
+        btn_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        btn_frame.pack(pady=20)
+        
+        def download_receipt():
+            """Open receipt for download/save"""
+            self.invoice_generator.open_bill(filepath)
+            Toast.success(self, "Receipt opened!")
+        
+        def print_receipt():
+            """Send receipt to printer"""
+            try:
+                self.invoice_generator.print_invoice(filepath)
+                Toast.success(self, "Receipt sent to printer!")
+            except Exception as e:
+                Toast.error(self, f"Print error: {str(e)}")
+        
+        def close_and_reset():
+            """Close preview and reset input"""
+            cash_entry.delete(0, 'end')  # Reset cash input
+            preview.destroy()
+            Toast.success(self, "Settlement process completed!")
+        
+        # Download button
+        ctk.CTkButton(
+            btn_frame,
+            text="💾 Download",
+            command=download_receipt,
+            width=140,
+            height=50,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20
+        ).pack(side="left", padx=8)
+        
+        # Print button
+        ctk.CTkButton(
+            btn_frame,
+            text="🖨️ Print Now",
+            command=print_receipt,
+            width=140,
+            height=50,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
+            corner_radius=20
+        ).pack(side="left", padx=8)
+        
+        # Close button
+        ctk.CTkButton(
+            btn_frame,
+            text="✓ Done",
+            command=close_and_reset,
+            width=120,
+            height=50,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            fg_color="#00ff88",
+            text_color="#1a1a2e",
+            hover_color="#00dd77",
+            corner_radius=20
+        ).pack(side="left", padx=8)
+        
+        # Handle window close
+        preview.protocol("WM_DELETE_WINDOW", close_and_reset)
+    
     def update_booking(self):
         """Update selected booking"""
         if not self.selected_booking_id:
@@ -1066,46 +1418,25 @@ class BookingManagementFrame(BaseFrame):
     def filter_by_status(self, status):
         """Filter bookings by status"""
         self.current_filter = status
-        self.filter_status.set(status)
         
-        for item in self.tree.get_children():
-            self.tree.delete(item)
+        # Update button colors to show active filter
+        filter_colors = {
+            "All": "#666666",
+            "Pending": "#FFA500",
+            "Completed": "#00ff88",
+            "Cancelled": "#ff4757"
+        }
         
-        # Get all bookings
-        all_bookings = self.db_manager.get_all_bookings()
-        
-        # Filter by status
-        if status != "All":
-            bookings = [b for b in all_bookings if b['status'] == status]
-        else:
-            bookings = all_bookings
-        
-        for i, booking in enumerate(bookings):
-            booking_status = booking['status']
-            if booking_status == 'Completed':
-                tag = 'completed'
-            elif booking_status == 'Cancelled':
-                tag = 'cancelled'
-            elif booking_status == 'Pending':
-                tag = 'pending'
+        for filter_name, btn in self.filter_buttons.items():
+            if filter_name == status:
+                # Active filter - use its color
+                btn.configure(fg_color=filter_colors[filter_name])
             else:
-                tag = 'evenrow' if i % 2 == 0 else 'oddrow'
-            
-            # Format service name: strip prefixes/suffixes
-            service_display = self.format_service_name(booking['photoshoot_category'])
-            
-            # New column structure (NO Status): Customer, Mobile, Service, Full Amount, Advance, Date
-            self.tree.insert("", "end", values=(
-                booking['customer_name'],
-                booking['mobile_number'],
-                service_display,
-                f"{booking['full_amount']:.2f}",
-                f"{booking['advance_payment']:.2f}",
-                booking['booking_date']
-            ), tags=(tag,), iid=str(booking['id']))
+                # Inactive filter - use gray
+                btn.configure(fg_color="#333333")
         
-        # Update record count
-        self.record_count_label.configure(text=f"{len(bookings)} records")
+        # Reload bookings with new filter
+        self.load_bookings()
     
     def on_select(self, event):
         """Handle row selection"""
@@ -1186,11 +1517,11 @@ class BookingManagementFrame(BaseFrame):
             MessageDialog.show_info("Cancelled", "This booking has been cancelled.")
     
     def show_settlement_dialog(self, booking):
-        """Show settlement dialog for pending booking with balance"""
+        """Show advanced balance settlement popup matching Bills History UI (Screenshot 404)"""
         # Create modal dialog
         dialog = ctk.CTkToplevel(self)
         dialog.title("Balance Settlement")
-        dialog.geometry("700x800")
+        dialog.geometry("600x700")
         dialog.resizable(False, False)
         dialog.configure(fg_color="#1a1a2e")
         
@@ -1200,44 +1531,41 @@ class BookingManagementFrame(BaseFrame):
         
         # Center on screen
         dialog.update_idletasks()
-        x = (dialog.winfo_screenwidth() // 2) - (700 // 2)
-        y = (dialog.winfo_screenheight() // 2) - (800 // 2)
-        dialog.geometry(f"700x800+{x}+{y}")
+        x = (dialog.winfo_screenwidth() // 2) - 300
+        y = (dialog.winfo_screenheight() // 2) - 350
+        dialog.geometry(f"600x700+{x}+{y}")
         
         def close_dialog():
-            dialog.grab_release()
+            try:
+                dialog.grab_release()
+            except:
+                pass
             dialog.destroy()
             # Restore focus to prevent input lock
             self.after(100, lambda: self.search_entry.focus_set())
         
         dialog.protocol("WM_DELETE_WINDOW", close_dialog)
         
-        # Scrollable frame
-        scroll_frame = ctk.CTkScrollableFrame(dialog, fg_color="#1a1a2e")
-        scroll_frame.pack(fill="both", expand=True, padx=15, pady=15)
-        
-        # Title
-        ctk.CTkLabel(
-            scroll_frame,
-            text="💵 Balance Settlement",
-            font=ctk.CTkFont(size=24, weight="bold"),
-            text_color="#8C00FF"
-        ).pack(pady=(0, 20))
-        
-        # Original booking info section
-        info_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
-        info_frame.pack(fill="x", pady=(0, 20), padx=10)
+        # === PURPLE HEADER BAR ===
+        title_frame = ctk.CTkFrame(dialog, fg_color="#8C00FF", corner_radius=20)
+        title_frame.pack(fill="x", padx=20, pady=20)
         
         ctk.CTkLabel(
-            info_frame,
-            text="Original Booking Details",
-            font=ctk.CTkFont(size=16, weight="bold"),
-            text_color="#8C00FF"
-        ).pack(pady=(15, 10))
+            title_frame,
+            text="💳 Balance Settlement",
+            font=ctk.CTkFont(size=22, weight="bold"),
+            text_color="white"
+        ).pack(pady=15)
         
-        # Booking info grid
-        info_grid = ctk.CTkFrame(info_frame, fg_color="transparent")
-        info_grid.pack(fill="x", padx=20, pady=(0, 15))
+        # Scrollable content
+        scroll_frame = ctk.CTkScrollableFrame(
+            dialog,
+            fg_color="#0d0d1a",
+            corner_radius=20,
+            border_width=2,
+            border_color="#444444"
+        )
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         full_amount = float(booking['full_amount'])
         advance_paid = float(booking['advance_payment'])
@@ -1246,46 +1574,55 @@ class BookingManagementFrame(BaseFrame):
         # Format service name
         service_display = self.format_service_name(booking['photoshoot_category'])
         
-        info_data = [
-            ("Customer Name:", booking['customer_name']),
-            ("Mobile Number:", booking['mobile_number']),
-            ("Service:", service_display),
-            ("Booking Date:", booking['booking_date']),
-            ("Location:", booking['location'] or 'N/A'),
-        ]
-        
-        for idx, (label, value) in enumerate(info_data):
-            ctk.CTkLabel(
-                info_grid,
-                text=label,
-                font=ctk.CTkFont(size=12, weight="bold"),
-                anchor="w"
-            ).grid(row=idx, column=0, sticky="w", pady=5, padx=(0, 10))
-            
-            ctk.CTkLabel(
-                info_grid,
-                text=str(value),
-                font=ctk.CTkFont(size=12),
-                anchor="w"
-            ).grid(row=idx, column=1, sticky="w", pady=5)
-        
-        # Financial summary section
-        financial_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
-        financial_frame.pack(fill="x", pady=(0, 20), padx=10)
+        # === ORIGINAL BOOKING DETAILS (GREEN BORDER) ===
+        details_section = ctk.CTkFrame(scroll_frame, fg_color="#1e3a2f", corner_radius=15, border_width=2, border_color="#00ff88")
+        details_section.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
-            financial_frame,
-            text="Financial Summary",
+            details_section,
+            text="📋 Original Booking Details",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#00ff88"
+        ).pack(pady=10)
+        
+        # Parse date to show original advance date clearly
+        original_date = booking['booking_date']
+        if ' ' in original_date:
+            advance_date = original_date.split(' ')[0]  # Get date part only
+        else:
+            advance_date = original_date
+        
+        booking_info = f"""Booking ID: {booking['id']}
+Original Advance Date: {advance_date}
+Customer: {booking['customer_name']}
+Mobile: {booking['mobile_number']}
+Service: {service_display}"""
+        
+        ctk.CTkLabel(
+            details_section,
+            text=booking_info,
+            font=ctk.CTkFont(size=12),
+            text_color="white",
+            justify="left"
+        ).pack(padx=20, pady=10)
+        
+        # === FINANCIAL SUMMARY SECTION (YELLOW BORDER) ===
+        financial_section = ctk.CTkFrame(scroll_frame, fg_color="#1a1a3e", corner_radius=15, border_width=2, border_color="#ffd93d")
+        financial_section.pack(fill="x", padx=15, pady=10)
+        
+        ctk.CTkLabel(
+            financial_section,
+            text="\ud83d\udcb0 Financial Summary",
             font=ctk.CTkFont(size=16, weight="bold"),
             text_color="#8C00FF"
         ).pack(pady=(15, 10))
         
-        # Financial grid
-        financial_grid = ctk.CTkFrame(financial_frame, fg_color="transparent")
-        financial_grid.pack(fill="x", padx=20, pady=(0, 15))
+        # Financial grid with larger text
+        financial_grid = ctk.CTkFrame(financial_section, fg_color="transparent")
+        financial_grid.pack(fill="x", padx=20, pady=(5, 15))
         
         financial_items = [
-            ("Full Amount:", f"Rs. {full_amount:,.2f}", "#ffffff"),
+            ("Original Total:", f"Rs. {full_amount:,.2f}", "#ffffff"),
             ("Advance Paid:", f"Rs. {advance_paid:,.2f}", "#00ff88"),
             ("Balance Due:", f"Rs. {balance_due:,.2f}", "#ff4757"),
         ]
@@ -1301,55 +1638,55 @@ class BookingManagementFrame(BaseFrame):
             ctk.CTkLabel(
                 financial_grid,
                 text=value,
-                font=ctk.CTkFont(size=14, weight="bold"),
+                font=ctk.CTkFont(size=15, weight="bold"),
                 text_color=color,
                 anchor="e"
             ).grid(row=idx, column=1, sticky="e", pady=8)
         
         financial_grid.columnconfigure(1, weight=1)
         
-        # Payment input section
-        payment_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
-        payment_frame.pack(fill="x", pady=(0, 20), padx=10)
+        # === PAYMENT DETAILS SECTION (PURPLE BORDER) ===
+        payment_section = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=15, border_width=2, border_color="#8C00FF")
+        payment_section.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
-            payment_frame,
-            text="Final Payment",
+            payment_section,
+            text="\ud83d\udcb5 Payment Details",
             font=ctk.CTkFont(size=16, weight="bold"),
             text_color="#8C00FF"
         ).pack(pady=(15, 10))
         
-        payment_grid = ctk.CTkFrame(payment_frame, fg_color="transparent")
+        payment_grid = ctk.CTkFrame(payment_section, fg_color="transparent")
         payment_grid.pack(fill="x", padx=20, pady=(0, 15))
         
-        # Cash received input
+        # Cash received input with clear labeling
         ctk.CTkLabel(
             payment_grid,
             text="Cash Received:",
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=14, weight="bold")
         ).grid(row=0, column=0, sticky="w", pady=10, padx=(0, 10))
         
         cash_entry = ctk.CTkEntry(
             payment_grid,
-            width=200,
-            height=40,
-            font=ctk.CTkFont(size=14),
+            width=180,
+            height=45,
+            font=ctk.CTkFont(size=16, weight="bold"),
             corner_radius=10,
             border_width=2,
-            border_color="#8C00FF"
+            border_color="#8C00FF",
+            placeholder_text="0.00"
         )
         cash_entry.grid(row=0, column=1, sticky="ew", pady=10)
         cash_entry.insert(0, f"{balance_due:.2f}")
-        cash_entry.focus()
         
-        # Change display
+        # Change display - real-time calculation
         change_label = ctk.CTkLabel(
             payment_grid,
             text="Change: Rs. 0.00",
-            font=ctk.CTkFont(size=14, weight="bold"),
+            font=ctk.CTkFont(size=15, weight="bold"),
             text_color="#00ff88"
         )
-        change_label.grid(row=1, column=0, columnspan=2, pady=10)
+        change_label.grid(row=1, column=0, columnspan=2, pady=(5, 10))
         
         payment_grid.columnconfigure(1, weight=1)
         
@@ -1358,17 +1695,20 @@ class BookingManagementFrame(BaseFrame):
                 cash_received = float(cash_entry.get() or 0)
                 change = cash_received - balance_due
                 if change >= 0:
-                    change_label.configure(text=f"Change: Rs. {change:,.2f}", text_color="#00ff88")
+                    change_label.configure(text=f"\u2713 Change: Rs. {change:,.2f}", text_color="#00ff88")
                 else:
-                    change_label.configure(text=f"Insufficient: Rs. {abs(change):,.2f}", text_color="#ff4757")
+                    change_label.configure(text=f"\u26a0 Insufficient: Rs. {abs(change):,.2f}", text_color="#ff4757")
             except:
-                change_label.configure(text="Change: Rs. 0.00", text_color="#00ff88")
+                change_label.configure(text="Change: Rs. 0.00", text_color="#888888")
         
         cash_entry.bind("<KeyRelease>", calculate_change)
         
-        # Action buttons
+        # Set focus to cash entry after dialog is fully displayed
+        dialog.after(100, cash_entry.focus)
+        
+        # Action buttons (large and touch-friendly)
         btn_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
-        btn_frame.pack(pady=20)
+        btn_frame.pack(pady=(0, 20))
         
         def process_settlement():
             try:
@@ -1380,6 +1720,9 @@ class BookingManagementFrame(BaseFrame):
             if cash_received < balance_due:
                 MessageDialog.show_error("Error", f"Cash received (Rs. {cash_received:,.2f}) is less than balance due (Rs. {balance_due:,.2f})")
                 return
+            
+            # Close the parent dialog first
+            close_dialog()
             
             # Update booking status to Completed
             success = self.db_manager.update_booking(
@@ -1397,6 +1740,7 @@ class BookingManagementFrame(BaseFrame):
             
             if not success:
                 MessageDialog.show_error("Error", "Failed to update booking status")
+                self.load_bookings()
                 return
             
             # Generate settlement invoice
@@ -1414,39 +1758,65 @@ class BookingManagementFrame(BaseFrame):
                 'change_given': cash_received - balance_due,
                 'location': booking['location'],
                 'description': booking['description'],
-                'created_by_name': self.auth_manager.get_username()
+                'created_by_name': self.auth_manager.get_user_name()
             }
             
-            pdf_path = self.invoice_generator.generate_booking_settlement_invoice(settlement_data)
-            
-            MessageDialog.show_success("Success", "Balance settled successfully!\nSettlement receipt generated.")
-            close_dialog()
-            self.load_bookings()  # Refresh to show updated status
-            
-            # Open the settlement receipt
-            self.invoice_generator.open_bill(pdf_path)
+            try:
+                pdf_path = self.invoice_generator.generate_booking_settlement_invoice(settlement_data)
+                
+                # Create invoice record in database for settlement
+                settlement_invoice_number = f"SETTLE-BK-{booking['id']}"
+                customer = self.db_manager.get_customer_by_mobile(booking['mobile_number'])
+                customer_id = customer['id'] if customer else None
+                
+                # Insert settlement invoice into invoices table
+                invoice_id = self.db_manager.create_invoice(
+                    invoice_number=settlement_invoice_number,
+                    customer_id=customer_id,
+                    subtotal=full_amount,
+                    discount=0,
+                    total_amount=full_amount,
+                    paid_amount=full_amount,  # Fully paid after settlement
+                    balance_amount=0,  # No balance after settlement
+                    created_by=self.auth_manager.get_user_id(),
+                    category_service_cost=full_amount,
+                    advance_payment=advance_paid,
+                    guest_name=booking['customer_name'] if not customer_id else None,
+                    booking_id=booking['id']
+                )
+                
+                # Show settlement action popup with Download/Print options after a brief delay
+                self.after(100, lambda: self.show_settlement_action_popup(pdf_path, settlement_data))
+                
+                self.load_bookings()  # Refresh to show updated status
+            except Exception as e:
+                MessageDialog.show_error("Error", f"Failed to generate settlement invoice: {str(e)}")
+                print(f"Settlement invoice error: {e}")
+                import traceback
+                traceback.print_exc()
+                self.load_bookings()
         
         ctk.CTkButton(
             btn_frame,
-            text="Cancel",
+            text="\u274c Cancel",
             command=close_dialog,
-            width=150,
-            height=45,
+            width=170,
+            height=50,
             fg_color="#555555",
             hover_color="#444444",
             corner_radius=20,
-            font=ctk.CTkFont(size=14, weight="bold")
+            font=ctk.CTkFont(size=15, weight="bold")
         ).pack(side="left", padx=10)
         
         ctk.CTkButton(
             btn_frame,
-            text="✔ Process Settlement",
+            text="\u2714 Process Settlement",
             command=process_settlement,
-            width=220,
-            height=45,
+            width=250,
+            height=50,
             fg_color="#00ff88",
             text_color="#1a1a2e",
             hover_color="#00dd77",
             corner_radius=20,
-            font=ctk.CTkFont(size=14, weight="bold")
+            font=ctk.CTkFont(size=15, weight="bold")
         ).pack(side="left", padx=10)

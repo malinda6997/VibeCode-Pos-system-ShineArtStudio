@@ -41,7 +41,10 @@ class InvoiceHistoryFrame(BaseFrame):
         
         self.filter_status = ctk.StringVar(value="All")
         
-        ctk.CTkButton(
+        # Store filter buttons for styling
+        self.filter_buttons = {}
+        
+        btn_all = ctk.CTkButton(
             filter_left,
             text="All",
             command=lambda: self.filter_by_status("All"),
@@ -50,42 +53,48 @@ class InvoiceHistoryFrame(BaseFrame):
             fg_color="#8C00FF",
             hover_color="#7300D6",
             corner_radius=20
-        ).pack(side="left", padx=2)
+        )
+        btn_all.pack(side="left", padx=2)
+        self.filter_buttons["All"] = btn_all
         
-        ctk.CTkButton(
+        btn_pending = ctk.CTkButton(
             filter_left,
             text="Pending",
             command=lambda: self.filter_by_status("Pending"),
             width=75,
             height=35,
-            fg_color="#ffa500",
-            text_color="#1a1a2e",
-            hover_color="#ff8c00",
+            fg_color="#333333",
+            hover_color="#ffa500",
             corner_radius=20
-        ).pack(side="left", padx=2)
+        )
+        btn_pending.pack(side="left", padx=2)
+        self.filter_buttons["Pending"] = btn_pending
         
-        ctk.CTkButton(
+        btn_completed = ctk.CTkButton(
             filter_left,
             text="Completed",
             command=lambda: self.filter_by_status("Completed"),
             width=85,
             height=35,
-            fg_color="#8C00FF",
-            text_color="#ffffff",
-            hover_color="#7300D6",
+            fg_color="#333333",
+            hover_color="#00ff88",
             corner_radius=20
-        ).pack(side="left", padx=2)
+        )
+        btn_completed.pack(side="left", padx=2)
+        self.filter_buttons["Completed"] = btn_completed
         
-        ctk.CTkButton(
+        btn_cancelled = ctk.CTkButton(
             filter_left,
             text="Cancelled",
             command=lambda: self.filter_by_status("Cancelled"),
             width=80,
             height=35,
-            fg_color="#ff4757",
-            hover_color="#ff3344",
+            fg_color="#333333",
+            hover_color="#ff4757",
             corner_radius=20
-        ).pack(side="left", padx=2)
+        )
+        btn_cancelled.pack(side="left", padx=2)
+        self.filter_buttons["Cancelled"] = btn_cancelled
         
         # Middle - Search
         search_middle = ctk.CTkFrame(controls_frame, fg_color="transparent")
@@ -218,6 +227,9 @@ class InvoiceHistoryFrame(BaseFrame):
         self.tree.tag_configure('oddrow', background='#060606', foreground='#e0e0e0')
         self.tree.tag_configure('evenrow', background='#0d0d1a', foreground='#e0e0e0')
         self.tree.tag_configure('hasbalance', background='#3a2e1e', foreground='#ffd93d')
+        self.tree.tag_configure('completed', background='#1e3a2f', foreground='#00ff88')
+        self.tree.tag_configure('pending', background='#3a2e1e', foreground='#FFA500')
+        self.tree.tag_configure('cancelled', background='#3a1e1e', foreground='#ff6b6b')
         
         scrollbar = ttk.Scrollbar(table_container, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
@@ -277,8 +289,18 @@ class InvoiceHistoryFrame(BaseFrame):
         
         for i, invoice in enumerate(invoices):
             balance = invoice['balance_amount']
-            # Highlight invoices with pending balance
-            if balance > 0:
+            
+            # Get booking status for tag styling
+            booking_status = self.get_booking_status(invoice.get('booking_id'))
+            
+            # Tag based on booking status
+            if booking_status == 'Completed':
+                tag = 'completed'
+            elif booking_status == 'Pending' and balance > 0:
+                tag = 'pending'
+            elif booking_status == 'Cancelled':
+                tag = 'cancelled'
+            elif balance > 0:
                 tag = 'hasbalance'
             else:
                 tag = 'evenrow' if i % 2 == 0 else 'oddrow'
@@ -333,7 +355,18 @@ class InvoiceHistoryFrame(BaseFrame):
         
         for i, invoice in enumerate(invoices):
             balance = invoice['balance_amount']
-            if balance > 0:
+            
+            # Get booking status for tag styling
+            booking_status = self.get_booking_status(invoice.get('booking_id'))
+            
+            # Tag based on booking status
+            if booking_status == 'Completed':
+                tag = 'completed'
+            elif booking_status == 'Pending' and balance > 0:
+                tag = 'pending'
+            elif booking_status == 'Cancelled':
+                tag = 'cancelled'
+            elif balance > 0:
                 tag = 'hasbalance'
             else:
                 tag = 'evenrow' if i % 2 == 0 else 'oddrow'
@@ -365,6 +398,23 @@ class InvoiceHistoryFrame(BaseFrame):
         """Filter invoices by booking status"""
         self.current_filter = status
         self.filter_status.set(status)
+        
+        # Update button colors to show active filter
+        filter_colors = {
+            "All": "#8C00FF",
+            "Pending": "#FFA500",
+            "Completed": "#00ff88",
+            "Cancelled": "#ff4757"
+        }
+        
+        for filter_name, btn in self.filter_buttons.items():
+            if filter_name == status:
+                # Active filter - use its color
+                btn.configure(fg_color=filter_colors[filter_name])
+            else:
+                # Inactive filter - use gray
+                btn.configure(fg_color="#333333")
+        
         self.load_invoices()
     
     def view_invoice_details(self):
@@ -507,7 +557,7 @@ Balance: LKR {invoice['balance_amount']:.2f}
         ).pack(pady=10)
     
     def reprint_invoice(self):
-        """Reprint selected invoice"""
+        """Reprint selected invoice - shows settlement invoice for completed bookings"""
         selection = self.tree.selection()
         if not selection:
             MessageDialog.show_error("Error", "Please select an invoice to reprint")
@@ -530,7 +580,42 @@ Balance: LKR {invoice['balance_amount']:.2f}
         try:
             # Check if this is a booking invoice (starts with 'BK-')
             if invoice_number.startswith('BK-'):
-                # Get booking data for booking invoice
+                booking_id = invoice.get('booking_id')
+                
+                # Check if this is a completed booking - show settlement invoice
+                if booking_id:
+                    booking = self.db_manager.get_booking_by_id(booking_id)
+                    if booking and booking['status'] == 'Completed':
+                        # Generate/open settlement invoice for completed booking
+                        import os
+                        settlement_file = f"SETTLE_BK_{booking_id}.pdf"
+                        settlement_path = os.path.join(self.invoice_generator.invoice_folder, settlement_file)
+                        
+                        # If settlement invoice doesn't exist, generate it
+                        if not os.path.exists(settlement_path):
+                            settlement_data = {
+                                'booking_id': booking['id'],
+                                'customer_name': booking['customer_name'],
+                                'mobile_number': booking['mobile_number'],
+                                'photoshoot_category': booking['photoshoot_category'],
+                                'original_booking_date': booking['booking_date'],
+                                'settlement_date': booking.get('updated_at', booking['created_at']),
+                                'full_amount': float(booking['full_amount']),
+                                'original_advance': float(invoice.get('advance_payment', 0) or invoice['paid_amount']),
+                                'final_payment': float(booking['full_amount']) - float(invoice.get('advance_payment', 0) or invoice['paid_amount']),
+                                'cash_received': float(booking['full_amount']),
+                                'change_given': 0,
+                                'location': booking.get('location', ''),
+                                'description': booking.get('description', ''),
+                                'created_by_name': invoice.get('created_by_name', 'Staff')
+                            }
+                            settlement_path = self.invoice_generator.generate_booking_settlement_invoice(settlement_data)
+                        
+                        MessageDialog.show_success("Success", f"Settlement invoice opened for completed booking")
+                        self.invoice_generator.open_bill(settlement_path)
+                        return
+                
+                # For pending/cancelled bookings, use regular booking invoice
                 booking_data = {
                     'customer_name': invoice['full_name'] or invoice.get('guest_name', 'Guest'),
                     'mobile_number': invoice['mobile_number'] or 'N/A',
@@ -551,9 +636,12 @@ Balance: LKR {invoice['balance_amount']:.2f}
                 pdf_path = self.invoice_generator.generate_invoice(invoice, items, customer)
             
             MessageDialog.show_success("Success", f"Invoice {invoice_number} reprinted successfully!")
-            self.invoice_generator.open_invoice(pdf_path)
+            self.invoice_generator.open_bill(pdf_path)
         except Exception as e:
             MessageDialog.show_error("Error", f"Failed to reprint invoice: {str(e)}")
+            print(f"Reprint error: {e}")
+            import traceback
+            traceback.print_exc()
     
     def delete_selected_invoice(self):
         """Delete selected invoice (Admin only)"""

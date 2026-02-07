@@ -107,9 +107,8 @@ class InvoiceGenerator:
         story.append(Spacer(1, 5*mm))
         
         # === COMPANY & CLIENT INFO SECTION ===
-        # Left: Company details
+        # Left: Company contact details (no duplicate name as logo contains it)
         company_info = Table([
-            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
             [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
             [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
@@ -428,7 +427,6 @@ class InvoiceGenerator:
         
         # === COMPANY & CLIENT INFO ===
         company_info = Table([
-            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
             [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
             [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
@@ -843,8 +841,8 @@ class InvoiceGenerator:
         story.append(Spacer(1, 5*mm))
         
         # === COMPANY & CLIENT INFO ===
+        # No duplicate studio name - it's in the logo
         company_info = Table([
-            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
             [Paragraph("<b>Reg No:</b> 26/3610", ParagraphStyle('Reg', fontSize=10, textColor=colors.HexColor('#444444')))],
             [Paragraph("No:52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
             [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
@@ -1015,8 +1013,7 @@ class InvoiceGenerator:
         return filepath
     
     def generate_booking_settlement_invoice(self, settlement_data):
-        """Generate final settlement invoice for booking with linked original data"""
-        from reportlab.lib.pagesizes import A4
+        """Generate A4 professional settlement invoice for booking"""
         from reportlab.lib.units import mm
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
@@ -1025,13 +1022,13 @@ class InvoiceGenerator:
         from datetime import datetime
         import os
         
-        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         booking_id = settlement_data['booking_id']
         invoice_number = f"SETTLE-BK-{booking_id}"
         
         filename = f"SETTLE_BK_{booking_id}.pdf"
         filepath = os.path.join(self.invoice_folder, filename)
         
+        # A4 size like other invoices
         doc = SimpleDocTemplate(
             filepath, 
             pagesize=A4,
@@ -1044,9 +1041,9 @@ class InvoiceGenerator:
         story = []
         from reportlab.lib.styles import getSampleStyleSheet
         styles = getSampleStyleSheet()
-        page_width = A4[0] - 30*mm
+        page_width = A4[0] - 30*mm  # Available width after margins
         
-        # === HEADER: Wide Logo Left, INVOICE + Meta Right ===
+        # === HEADER: Logo + Address Left, INVOICE + Meta Right ===
         logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
         if os.path.exists(logo_path):
             try:
@@ -1056,29 +1053,29 @@ class InvoiceGenerator:
         else:
             logo = Paragraph("", styles['Normal'])
         
-        # Right side: FINAL SETTLEMENT title + meta
-        title = Paragraph("<b>FINAL SETTLEMENT</b>", ParagraphStyle('Title', fontSize=24, textColor=colors.HexColor('#1a1a2e'), alignment=TA_RIGHT, fontName='Helvetica-Bold'))
+        # Company address below logo
+        addr_line1 = Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))
+        addr_line2 = Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))
+        left_content = Table([[logo], [Spacer(1, 2*mm)], [addr_line1], [addr_line2]], colWidths=[70*mm])
+        left_content.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'), ('VALIGN', (0, 0), (-1, -1), 'TOP')]))
+        
+        # Right side: INVOICE title + meta
+        title = Paragraph("<b>INVOICE</b>", ParagraphStyle('Title', fontSize=24, textColor=colors.HexColor('#1a1a2e'), alignment=TA_RIGHT, fontName='Helvetica-Bold'))
         meta_style = ParagraphStyle('Meta', fontSize=11, alignment=TA_RIGHT, leading=15)
         receipt_no = Paragraph(f"Invoice No: <b>{invoice_number}</b>", meta_style)
+        original_invoice = Paragraph(f"Original Booking Invoice: <b>INV-BK-{booking_id}</b>", ParagraphStyle('OrigInv', fontSize=10, alignment=TA_RIGHT, leading=15, textColor=colors.HexColor('#555555')))
         receipt_date = Paragraph(f"Settlement Date: {settlement_data['settlement_date']}", meta_style)
-        original_date = Paragraph(f"Original Booking: {settlement_data['original_booking_date']}", ParagraphStyle('OrigDate', fontSize=10, alignment=TA_RIGHT, leading=15, textColor=colors.HexColor('#555555')))
+        original_date = Paragraph(f"Advance Date: {settlement_data['original_booking_date']}", ParagraphStyle('OrigDate', fontSize=10, alignment=TA_RIGHT, leading=15, textColor=colors.HexColor('#555555')))
         
-        right_content = Table([[title], [Spacer(1, 2*mm)], [receipt_no], [receipt_date], [original_date]], colWidths=[page_width*0.45])
+        right_content = Table([[title], [Spacer(1, 2*mm)], [receipt_no], [original_invoice], [receipt_date], [original_date]], colWidths=[page_width*0.45])
         right_content.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'), ('VALIGN', (0, 0), (-1, -1), 'TOP')]))
         
-        header_table = Table([[logo, right_content]], colWidths=[page_width*0.55, page_width*0.45])
+        header_table = Table([[left_content, right_content]], colWidths=[page_width*0.55, page_width*0.45])
         header_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'MIDDLE'), ('ALIGN', (0, 0), (0, 0), 'LEFT'), ('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
         story.append(header_table)
         story.append(Spacer(1, 5*mm))
         
-        # === COMPANY & CLIENT INFO ===
-        company_info = Table([
-            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
-            [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
-            [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
-        ], colWidths=[page_width*0.5])
-        company_info.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'), ('BOTTOMPADDING', (0, 0), (-1, -1), 2)]))
-        
+        # === CLIENT INFO (RIGHT-ALIGNED) ===
         bill_to_info = Table([
             [Paragraph("<b>Bill To:</b>", ParagraphStyle('BillTo', fontSize=12, fontName='Helvetica-Bold'))],
             [Paragraph(f"Customer: {settlement_data['customer_name']}", ParagraphStyle('Cust', fontSize=11))],
@@ -1087,9 +1084,9 @@ class InvoiceGenerator:
         ], colWidths=[page_width*0.5])
         bill_to_info.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'), ('BOTTOMPADDING', (0, 0), (-1, -1), 2)]))
         
-        info_table = Table([[company_info, bill_to_info]], colWidths=[page_width*0.5, page_width*0.5])
-        info_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')]))
-        story.append(info_table)
+        info_container = Table([[Spacer(1, 1), bill_to_info]], colWidths=[page_width*0.5, page_width*0.5])
+        info_container.setStyle(TableStyle([('ALIGN', (1, 0), (1, 0), 'RIGHT'), ('VALIGN', (0, 0), (-1, -1), 'TOP')]))
+        story.append(info_container)
         story.append(Spacer(1, 8*mm))
         
         # === SETTLEMENT DETAILS TABLE ===
@@ -1118,13 +1115,13 @@ class InvoiceGenerator:
         items_table = Table(table_data, colWidths=col_widths)
         
         table_style = [
-            ('BACKGROUND', (0, 0), (-1, 0), colors.black),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.black),  # Black header background
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),  # White text on black header
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
             ('TOPPADDING', (0, 0), (-1, 0), 10),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-            ('BOX', (0, 0), (-1, -1), 1, colors.black),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#888888')),
+            ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#888888')),
             ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
             ('TOPPADDING', (0, 1), (-1, -1), 8),
             ('LEFTPADDING', (0, 0), (-1, -1), 6),
@@ -1144,20 +1141,22 @@ class InvoiceGenerator:
         paid_style = ParagraphStyle('Paid', fontSize=11, alignment=TA_RIGHT, fontName='Helvetica-Bold', textColor=colors.HexColor('#27ae60'))
         
         summary_data = [
-            [Paragraph("Original Total:", summary_style), Paragraph(f"Rs. {full_amount:,.2f}", summary_style)],
-            [Paragraph(f"Advance Paid ({settlement_data['original_booking_date']}):", summary_style), Paragraph(f"Rs. {original_advance:,.2f}", summary_style)],
-            [Paragraph("<b>Final Payment Today:</b>", summary_bold), Paragraph(f"<b>Rs. {final_payment:,.2f}</b>", paid_style)],
+            [Paragraph("Original Total Amount:", summary_style), Paragraph(f"Rs. {full_amount:,.2f}", summary_style)],
+            [Paragraph(f"Advance Already Paid ({settlement_data['original_booking_date']}):", summary_style), Paragraph(f"Rs. {original_advance:,.2f}", summary_style)],
+            [Paragraph("<b>Current Settlement (Paid Today):</b>", summary_bold), Paragraph(f"<b>Rs. {final_payment:,.2f}</b>", paid_style)],
             [Paragraph("<b>TOTAL PAID:</b>", summary_bold), Paragraph(f"<b>Rs. {full_amount:,.2f}</b>", summary_bold)],
-            [Paragraph("Balance Due:", summary_style), Paragraph("Rs. 0.00", paid_style)],
+            [Paragraph("<b>Balance Due:</b>", summary_bold), Paragraph("<b>Rs. 0.00</b>", paid_style)],
         ]
         
-        # Add cash received and change if applicable
+        # Add cash received and change if applicable (Transaction Details)
         cash_received = float(settlement_data.get('cash_received', final_payment))
         change_given = float(settlement_data.get('change_given', 0))
         
         if change_given > 0:
-            summary_data.append([Paragraph("Cash Received:", summary_style), Paragraph(f"Rs. {cash_received:,.2f}", summary_style)])
-            summary_data.append([Paragraph("Change Given:", summary_style), Paragraph(f"Rs. {change_given:,.2f}", summary_style)])
+            summary_data.append([Paragraph("", summary_style), Paragraph("", summary_style)])  # Empty row for spacing
+            summary_data.append([Paragraph("<b>Transaction Details:</b>", summary_bold), Paragraph("", summary_style)])
+            summary_data.append([Paragraph("Cash Received from Customer:", summary_style), Paragraph(f"Rs. {cash_received:,.2f}", summary_style)])
+            summary_data.append([Paragraph("Change Returned:", summary_style), Paragraph(f"Rs. {change_given:,.2f}", summary_style)])
         
         summary_table = Table(summary_data, colWidths=[50*mm, 40*mm])
         summary_table.setStyle(TableStyle([
@@ -1173,9 +1172,19 @@ class InvoiceGenerator:
         story.append(summary_container)
         story.append(Spacer(1, 10*mm))
         
-        # === STATUS LABEL ===
-        status_style = ParagraphStyle('Status', fontSize=12, fontName='Helvetica-Bold', alignment=TA_CENTER, textColor=colors.HexColor('#27ae60'))
-        story.append(Paragraph("✓ <b>FULLY PAID - BOOKING COMPLETED</b>", status_style))
+        # === DYNAMIC STATUS LABEL ===
+        # Calculate final balance after settlement
+        balance_after = full_amount - (original_advance + final_payment)
+        
+        if balance_after <= 0:
+            status_text = "✓ <b>STATUS: FULLY PAID</b>"
+            status_color = colors.HexColor('#27ae60')  # Green
+        else:
+            status_text = "⚠ <b>[STATUS: ADVANCE PAYMENT]</b>"
+            status_color = colors.HexColor('#FFA500')  # Orange
+        
+        status_style = ParagraphStyle('Status', fontSize=14, fontName='Helvetica-Bold', alignment=TA_CENTER, textColor=status_color)
+        story.append(Paragraph(status_text, status_style))
         story.append(Spacer(1, 8*mm))
         
         # === TERMS & CONDITIONS ===
@@ -1190,7 +1199,7 @@ class InvoiceGenerator:
         
         # === FOOTER ===
         footer_style = ParagraphStyle('Footer', fontSize=9, alignment=TA_CENTER, textColor=colors.HexColor('#333333'))
-        story.append(Paragraph("STUDIO SHINE ART | No: 52/1/1, Maravila Road, Nattandiya | 0767898604 / 0322051680", footer_style))
+        story.append(Paragraph("No: 52/1/1, Maravila Road, Nattandiya | Tel: 0767898604 / 0322051680", footer_style))
         story.append(Spacer(1, 2*mm))
         
         dev_style = ParagraphStyle('Dev', fontSize=8, alignment=TA_CENTER, textColor=colors.HexColor('#888888'))
