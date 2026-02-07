@@ -870,6 +870,151 @@ class BookingManagementFrame(BaseFrame):
         # Handle window close
         preview.protocol("WM_DELETE_WINDOW", close_preview)
     
+    def show_settlement_preview_popup(self, filepath, cash_entry):
+        """Show settlement receipt preview with Download/Print options"""
+        # Create preview popup
+        preview = ctk.CTkToplevel(self)
+        preview.title("Settlement Receipt")
+        preview.geometry("650x600")
+        preview.resizable(False, False)
+        preview.configure(fg_color="#1a1a2e")
+        
+        # Make modal
+        preview.transient(self.winfo_toplevel())
+        preview.grab_set()
+        
+        # Center on screen
+        preview.update_idletasks()
+        x = (preview.winfo_screenwidth() // 2) - 325
+        y = (preview.winfo_screenheight() // 2) - 300
+        preview.geometry(f"650x600+{x}+{y}")
+        
+        # Main container
+        main_frame = ctk.CTkFrame(preview, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
+        main_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        # Header
+        ctk.CTkLabel(
+            main_frame,
+            text="✅",
+            font=ctk.CTkFont(size=40)
+        ).pack(pady=(20, 5))
+        
+        ctk.CTkLabel(
+            main_frame,
+            text="Settlement Completed!",
+            font=ctk.CTkFont(size=20, weight="bold"),
+            text_color="#00ff88"
+        ).pack(pady=(0, 10))
+        
+        ctk.CTkLabel(
+            main_frame,
+            text="Balance Fully Paid • Booking Completed",
+            font=ctk.CTkFont(size=13),
+            text_color="#888888"
+        ).pack(pady=(0, 20))
+        
+        # Info frame
+        info_frame = ctk.CTkFrame(main_frame, fg_color="#0d0d1a", corner_radius=10)
+        info_frame.pack(fill="x", padx=25, pady=10)
+        
+        # File info
+        import os
+        filename = os.path.basename(filepath)
+        ctk.CTkLabel(
+            info_frame,
+            text=f"📄 Settlement Receipt",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color="#00ff88"
+        ).pack(pady=(15, 5))
+        
+        ctk.CTkLabel(
+            info_frame,
+            text=f"File: {filename}",
+            font=ctk.CTkFont(size=11),
+            text_color="#888888"
+        ).pack(pady=(0, 15))
+        
+        # Separator
+        sep = ctk.CTkFrame(main_frame, height=2, fg_color="#333333")
+        sep.pack(fill="x", padx=40, pady=20)
+        
+        # Instructions
+        ctk.CTkLabel(
+            main_frame,
+            text="What would you like to do next?",
+            font=ctk.CTkFont(size=13),
+            text_color="#cccccc"
+        ).pack(pady=(10, 20))
+        
+        # Buttons frame
+        btn_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        btn_frame.pack(pady=20)
+        
+        def download_receipt():
+            """Open receipt for download/save"""
+            self.invoice_generator.open_bill(filepath)
+            Toast.success(self, "Receipt opened!")
+        
+        def print_receipt():
+            """Send receipt to printer"""
+            try:
+                self.invoice_generator.print_invoice(filepath)
+                Toast.success(self, "Receipt sent to printer!")
+            except Exception as e:
+                Toast.error(self, f"Print error: {str(e)}")
+        
+        def close_and_reset():
+            """Close preview and reset input"""
+            cash_entry.delete(0, 'end')  # Reset cash input
+            preview.destroy()
+            Toast.success(self, "Settlement process completed!")
+        
+        # Download button
+        ctk.CTkButton(
+            btn_frame,
+            text="💾 Download",
+            command=download_receipt,
+            width=140,
+            height=50,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            fg_color="#8C00FF",
+            text_color="white",
+            hover_color="#7300D6",
+            corner_radius=20
+        ).pack(side="left", padx=8)
+        
+        # Print button
+        ctk.CTkButton(
+            btn_frame,
+            text="🖨️ Print Now",
+            command=print_receipt,
+            width=140,
+            height=50,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
+            corner_radius=20
+        ).pack(side="left", padx=8)
+        
+        # Close button
+        ctk.CTkButton(
+            btn_frame,
+            text="✓ Done",
+            command=close_and_reset,
+            width=120,
+            height=50,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            fg_color="#00ff88",
+            text_color="#1a1a2e",
+            hover_color="#00dd77",
+            corner_radius=20
+        ).pack(side="left", padx=8)
+        
+        # Handle window close
+        preview.protocol("WM_DELETE_WINDOW", close_and_reset)
+    
     def update_booking(self):
         """Update selected booking"""
         if not self.selected_booking_id:
@@ -1419,12 +1564,11 @@ class BookingManagementFrame(BaseFrame):
             
             pdf_path = self.invoice_generator.generate_booking_settlement_invoice(settlement_data)
             
-            MessageDialog.show_success("Success", "Balance settled successfully!\nSettlement receipt generated.")
+            # Show settlement preview popup
+            self.show_settlement_preview_popup(pdf_path, cash_entry)
+            
             close_dialog()
             self.load_bookings()  # Refresh to show updated status
-            
-            # Open the settlement receipt
-            self.invoice_generator.open_bill(pdf_path)
         
         ctk.CTkButton(
             btn_frame,

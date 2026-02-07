@@ -1015,36 +1015,37 @@ class InvoiceGenerator:
         return filepath
     
     def generate_booking_settlement_invoice(self, settlement_data):
-        """Generate final settlement invoice for booking with linked original data"""
-        from reportlab.lib.pagesizes import A4
+        """Generate thermal-style settlement receipt for booking (80mm width, high contrast)"""
         from reportlab.lib.units import mm
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
         from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
         from reportlab.lib import colors
+        from reportlab.graphics.shapes import Drawing, Line as RLLine
         from datetime import datetime
         import os
         
-        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         booking_id = settlement_data['booking_id']
         invoice_number = f"SETTLE-BK-{booking_id}"
         
         filename = f"SETTLE_BK_{booking_id}.pdf"
         filepath = os.path.join(self.invoice_folder, filename)
         
+        # Thermal receipt size: 80mm width (standard thermal printer)
+        page_width = 80 * mm
+        page_height = 250 * mm  # Dynamic, will expand as needed
+        
         doc = SimpleDocTemplate(
             filepath, 
-            pagesize=A4,
-            leftMargin=15*mm,
-            rightMargin=15*mm,
-            topMargin=12*mm,
-            bottomMargin=12*mm
+            pagesize=(page_width, page_height),
+            leftMargin=3*mm,
+            rightMargin=3*mm,
+            topMargin=3*mm,
+            bottomMargin=3*mm
         )
         
         story = []
-        from reportlab.lib.styles import getSampleStyleSheet
-        styles = getSampleStyleSheet()
-        page_width = A4[0] - 30*mm
+        content_width = 74*mm  # Usable width
         
         # === HEADER: Wide Logo Left, INVOICE + Meta Right ===
         logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
@@ -1071,29 +1072,20 @@ class InvoiceGenerator:
         story.append(header_table)
         story.append(Spacer(1, 5*mm))
         
-        # === COMPANY & CLIENT INFO ===
-        company_info = Table([
-            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
-            [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
-            [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
-        ], colWidths=[page_width*0.5])
-        company_info.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'), ('BOTTOMPADDING', (0, 0), (-1, -1), 2)]))
-        
+        # === CLIENT INFO ONLY (Company info already in header logo) ===
         bill_to_info = Table([
             [Paragraph("<b>Bill To:</b>", ParagraphStyle('BillTo', fontSize=12, fontName='Helvetica-Bold'))],
             [Paragraph(f"Customer: {settlement_data['customer_name']}", ParagraphStyle('Cust', fontSize=11))],
             [Paragraph(f"Mobile: {settlement_data['mobile_number']}", ParagraphStyle('Mob', fontSize=11))],
             [Paragraph(f"Booking ID: {settlement_data['booking_id']}", ParagraphStyle('BookID', fontSize=11, textColor=colors.HexColor('#555555')))],
-        ], colWidths=[page_width*0.5])
+        ], colWidths=[content_width])
         bill_to_info.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'), ('BOTTOMPADDING', (0, 0), (-1, -1), 2)]))
         
-        info_table = Table([[company_info, bill_to_info]], colWidths=[page_width*0.5, page_width*0.5])
-        info_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')]))
-        story.append(info_table)
+        story.append(bill_to_info)
         story.append(Spacer(1, 8*mm))
         
         # === SETTLEMENT DETAILS TABLE ===
-        header_style = ParagraphStyle('Header', fontSize=11, leading=13, textColor=colors.white, fontName='Helvetica-Bold')
+        header_style = ParagraphStyle('Header', fontSize=11, leading=13, textColor=colors.black, fontName='Helvetica-Bold')
         desc_style = ParagraphStyle('Desc', fontSize=11, leading=13)
         right_style = ParagraphStyle('Right', fontSize=11, alignment=TA_RIGHT)
         
@@ -1110,7 +1102,7 @@ class InvoiceGenerator:
         final_payment = float(settlement_data['final_payment'])
         
         table_data = [
-            [Paragraph("Description", header_style), Paragraph("Amount", ParagraphStyle('HRight', fontSize=11, alignment=TA_RIGHT, textColor=colors.white, fontName='Helvetica-Bold'))],
+            [Paragraph("Description", header_style), Paragraph("Amount", ParagraphStyle('HRight', fontSize=11, alignment=TA_RIGHT, textColor=colors.black, fontName='Helvetica-Bold'))],
             [Paragraph(service_name, desc_style), Paragraph(f"Rs. {full_amount:,.2f}", right_style)],
         ]
         
@@ -1118,8 +1110,8 @@ class InvoiceGenerator:
         items_table = Table(table_data, colWidths=col_widths)
         
         table_style = [
-            ('BACKGROUND', (0, 0), (-1, 0), colors.black),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#CCCCCC')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
             ('TOPPADDING', (0, 0), (-1, 0), 10),
