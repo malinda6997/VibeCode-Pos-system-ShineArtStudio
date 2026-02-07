@@ -340,7 +340,21 @@ class BillHistoryFrame(BaseFrame):
                 width=180,
                 height=35,
                 font=ctk.CTkFont(size=12)
-            ).pack(padx=5, pady=(3, 5))
+            ).pack(padx=5, pady=(3, 5 if not self.auth_manager.is_admin() else 3))
+            
+            # Delete button (Admin only)
+            if self.auth_manager.is_admin():
+                ctk.CTkButton(
+                    menu_frame,
+                    text="🗑️ Delete Bill",
+                    command=lambda: [menu.destroy(), self.delete_selected_bill()],
+                    fg_color="#ff4444",
+                    hover_color="#cc0000",
+                    corner_radius=15,
+                    width=180,
+                    height=35,
+                    font=ctk.CTkFont(size=12, weight="bold")
+                ).pack(padx=5, pady=(3, 5))
             
             # Close menu when clicking elsewhere
             def close_menu(e=None):

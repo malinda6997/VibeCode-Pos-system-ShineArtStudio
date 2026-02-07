@@ -1043,7 +1043,7 @@ class InvoiceGenerator:
         styles = getSampleStyleSheet()
         page_width = A4[0] - 30*mm  # Available width after margins
         
-        # === HEADER: Wide Logo Left, INVOICE + Meta Right ===
+        # === HEADER: Logo + Address Left, INVOICE + Meta Right ===
         logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
         if os.path.exists(logo_path):
             try:
@@ -1053,8 +1053,14 @@ class InvoiceGenerator:
         else:
             logo = Paragraph("", styles['Normal'])
         
-        # Right side: FINAL SETTLEMENT title + meta
-        title = Paragraph("<b>FINAL SETTLEMENT</b>", ParagraphStyle('Title', fontSize=24, textColor=colors.HexColor('#1a1a2e'), alignment=TA_RIGHT, fontName='Helvetica-Bold'))
+        # Company address below logo
+        addr_line1 = Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))
+        addr_line2 = Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))
+        left_content = Table([[logo], [Spacer(1, 2*mm)], [addr_line1], [addr_line2]], colWidths=[70*mm])
+        left_content.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'), ('VALIGN', (0, 0), (-1, -1), 'TOP')]))
+        
+        # Right side: INVOICE title + meta
+        title = Paragraph("<b>INVOICE</b>", ParagraphStyle('Title', fontSize=24, textColor=colors.HexColor('#1a1a2e'), alignment=TA_RIGHT, fontName='Helvetica-Bold'))
         meta_style = ParagraphStyle('Meta', fontSize=11, alignment=TA_RIGHT, leading=15)
         receipt_no = Paragraph(f"Invoice No: <b>{invoice_number}</b>", meta_style)
         original_invoice = Paragraph(f"Original Booking Invoice: <b>INV-BK-{booking_id}</b>", ParagraphStyle('OrigInv', fontSize=10, alignment=TA_RIGHT, leading=15, textColor=colors.HexColor('#555555')))
@@ -1064,10 +1070,24 @@ class InvoiceGenerator:
         right_content = Table([[title], [Spacer(1, 2*mm)], [receipt_no], [original_invoice], [receipt_date], [original_date]], colWidths=[page_width*0.45])
         right_content.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'), ('VALIGN', (0, 0), (-1, -1), 'TOP')]))
         
-        header_table = Table([[logo, right_content]], colWidths=[page_width*0.55, page_width*0.45])
+        header_table = Table([[left_content, right_content]], colWidths=[page_width*0.55, page_width*0.45])
         header_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'MIDDLE'), ('ALIGN', (0, 0), (0, 0), 'LEFT'), ('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
         story.append(header_table)
         story.append(Spacer(1, 5*mm))
+        
+        # === CLIENT INFO (RIGHT-ALIGNED) ===
+        bill_to_info = Table([
+            [Paragraph("<b>Bill To:</b>", ParagraphStyle('BillTo', fontSize=12, fontName='Helvetica-Bold'))],
+            [Paragraph(f"Customer: {settlement_data['customer_name']}", ParagraphStyle('Cust', fontSize=11))],
+            [Paragraph(f"Mobile: {settlement_data['mobile_number']}", ParagraphStyle('Mob', fontSize=11))],
+            [Paragraph(f"Booking ID: {settlement_data['booking_id']}", ParagraphStyle('BookID', fontSize=11, textColor=colors.HexColor('#555555')))],
+        ], colWidths=[page_width*0.5])
+        bill_to_info.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT'), ('BOTTOMPADDING', (0, 0), (-1, -1), 2)]))
+        
+        info_container = Table([[Spacer(1, 1), bill_to_info]], colWidths=[page_width*0.5, page_width*0.5])
+        info_container.setStyle(TableStyle([('ALIGN', (1, 0), (1, 0), 'RIGHT'), ('VALIGN', (0, 0), (-1, -1), 'TOP')]))
+        story.append(info_container)
+        story.append(Spacer(1, 8*mm))
         
         # === SETTLEMENT DETAILS TABLE ===
         header_style = ParagraphStyle('Header', fontSize=11, leading=13, textColor=colors.white, fontName='Helvetica-Bold')
@@ -1095,8 +1115,8 @@ class InvoiceGenerator:
         items_table = Table(table_data, colWidths=col_widths)
         
         table_style = [
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#d3d3d3')),  # Light gray header
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#1a1a2e')),  # Dark text on light header
+            ('BACKGROUND', (0, 0), (-1, 0), colors.black),  # Black header background
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),  # White text on black header
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
             ('TOPPADDING', (0, 0), (-1, 0), 10),

@@ -755,3 +755,23 @@ class DatabaseManager:
         results = self.execute_query(query, (bill_number,))
         return results[0] if results else None
 
+    def delete_bill(self, bill_id: int) -> bool:
+        """Delete a bill and its items (admin only)"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Delete bill items first (foreign key constraint)
+            cursor.execute('DELETE FROM bill_items WHERE bill_id = ?', (bill_id,))
+            
+            # Delete the bill
+            cursor.execute('DELETE FROM bills WHERE id = ?', (bill_id,))
+            
+            conn.commit()
+            conn.close()
+            return True
+            
+        except sqlite3.Error as e:
+            print(f"Delete bill error: {e}")
+            return False
+
