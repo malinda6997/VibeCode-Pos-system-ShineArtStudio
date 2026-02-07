@@ -1516,11 +1516,11 @@ class BookingManagementFrame(BaseFrame):
             MessageDialog.show_info("Cancelled", "This booking has been cancelled.")
     
     def show_settlement_dialog(self, booking):
-        """Show settlement dialog for pending booking with balance"""
+        """Show advanced balance settlement popup matching Bills History UI (Screenshot 404)"""
         # Create modal dialog
         dialog = ctk.CTkToplevel(self)
         dialog.title("Balance Settlement")
-        dialog.geometry("700x800")
+        dialog.geometry("600x700")
         dialog.resizable(False, False)
         dialog.configure(fg_color="#1a1a2e")
         
@@ -1530,44 +1530,41 @@ class BookingManagementFrame(BaseFrame):
         
         # Center on screen
         dialog.update_idletasks()
-        x = (dialog.winfo_screenwidth() // 2) - (700 // 2)
-        y = (dialog.winfo_screenheight() // 2) - (800 // 2)
-        dialog.geometry(f"700x800+{x}+{y}")
+        x = (dialog.winfo_screenwidth() // 2) - 300
+        y = (dialog.winfo_screenheight() // 2) - 350
+        dialog.geometry(f"600x700+{x}+{y}")
         
         def close_dialog():
-            dialog.grab_release()
+            try:
+                dialog.grab_release()
+            except:
+                pass
             dialog.destroy()
             # Restore focus to prevent input lock
             self.after(100, lambda: self.search_entry.focus_set())
         
         dialog.protocol("WM_DELETE_WINDOW", close_dialog)
         
-        # Scrollable frame
-        scroll_frame = ctk.CTkScrollableFrame(dialog, fg_color="#1a1a2e")
-        scroll_frame.pack(fill="both", expand=True, padx=15, pady=15)
-        
-        # Title
-        ctk.CTkLabel(
-            scroll_frame,
-            text="💵 Balance Settlement",
-            font=ctk.CTkFont(size=24, weight="bold"),
-            text_color="#8C00FF"
-        ).pack(pady=(0, 20))
-        
-        # Original booking info section
-        info_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
-        info_frame.pack(fill="x", pady=(0, 20), padx=10)
+        # === PURPLE HEADER BAR ===
+        title_frame = ctk.CTkFrame(dialog, fg_color="#8C00FF", corner_radius=20)
+        title_frame.pack(fill="x", padx=20, pady=20)
         
         ctk.CTkLabel(
-            info_frame,
-            text="Original Booking Details",
-            font=ctk.CTkFont(size=16, weight="bold"),
-            text_color="#8C00FF"
-        ).pack(pady=(15, 10))
+            title_frame,
+            text="💳 Balance Settlement",
+            font=ctk.CTkFont(size=22, weight="bold"),
+            text_color="white"
+        ).pack(pady=15)
         
-        # Booking info grid
-        info_grid = ctk.CTkFrame(info_frame, fg_color="transparent")
-        info_grid.pack(fill="x", padx=20, pady=(0, 15))
+        # Scrollable content
+        scroll_frame = ctk.CTkScrollableFrame(
+            dialog,
+            fg_color="#0d0d1a",
+            corner_radius=20,
+            border_width=2,
+            border_color="#444444"
+        )
+        scroll_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
         
         full_amount = float(booking['full_amount'])
         advance_paid = float(booking['advance_payment'])
@@ -1576,46 +1573,55 @@ class BookingManagementFrame(BaseFrame):
         # Format service name
         service_display = self.format_service_name(booking['photoshoot_category'])
         
-        info_data = [
-            ("Customer Name:", booking['customer_name']),
-            ("Mobile Number:", booking['mobile_number']),
-            ("Service:", service_display),
-            ("Booking Date:", booking['booking_date']),
-            ("Location:", booking['location'] or 'N/A'),
-        ]
-        
-        for idx, (label, value) in enumerate(info_data):
-            ctk.CTkLabel(
-                info_grid,
-                text=label,
-                font=ctk.CTkFont(size=12, weight="bold"),
-                anchor="w"
-            ).grid(row=idx, column=0, sticky="w", pady=5, padx=(0, 10))
-            
-            ctk.CTkLabel(
-                info_grid,
-                text=str(value),
-                font=ctk.CTkFont(size=12),
-                anchor="w"
-            ).grid(row=idx, column=1, sticky="w", pady=5)
-        
-        # Financial summary section
-        financial_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
-        financial_frame.pack(fill="x", pady=(0, 20), padx=10)
+        # === ORIGINAL BOOKING DETAILS (GREEN BORDER) ===
+        details_section = ctk.CTkFrame(scroll_frame, fg_color="#1e3a2f", corner_radius=15, border_width=2, border_color="#00ff88")
+        details_section.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
-            financial_frame,
-            text="Financial Summary",
+            details_section,
+            text="📋 Original Booking Details",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#00ff88"
+        ).pack(pady=10)
+        
+        # Parse date to show original advance date clearly
+        original_date = booking['booking_date']
+        if ' ' in original_date:
+            advance_date = original_date.split(' ')[0]  # Get date part only
+        else:
+            advance_date = original_date
+        
+        booking_info = f"""Booking ID: {booking['id']}
+Original Advance Date: {advance_date}
+Customer: {booking['customer_name']}
+Mobile: {booking['mobile_number']}
+Service: {service_display}"""
+        
+        ctk.CTkLabel(
+            details_section,
+            text=booking_info,
+            font=ctk.CTkFont(size=12),
+            text_color="white",
+            justify="left"
+        ).pack(padx=20, pady=10)
+        
+        # === FINANCIAL SUMMARY SECTION (YELLOW BORDER) ===
+        financial_section = ctk.CTkFrame(scroll_frame, fg_color="#1a1a3e", corner_radius=15, border_width=2, border_color="#ffd93d")
+        financial_section.pack(fill="x", padx=15, pady=10)
+        
+        ctk.CTkLabel(
+            financial_section,
+            text="\ud83d\udcb0 Financial Summary",
             font=ctk.CTkFont(size=16, weight="bold"),
             text_color="#8C00FF"
         ).pack(pady=(15, 10))
         
-        # Financial grid
-        financial_grid = ctk.CTkFrame(financial_frame, fg_color="transparent")
-        financial_grid.pack(fill="x", padx=20, pady=(0, 15))
+        # Financial grid with larger text
+        financial_grid = ctk.CTkFrame(financial_section, fg_color="transparent")
+        financial_grid.pack(fill="x", padx=20, pady=(5, 15))
         
         financial_items = [
-            ("Full Amount:", f"Rs. {full_amount:,.2f}", "#ffffff"),
+            ("Original Total:", f"Rs. {full_amount:,.2f}", "#ffffff"),
             ("Advance Paid:", f"Rs. {advance_paid:,.2f}", "#00ff88"),
             ("Balance Due:", f"Rs. {balance_due:,.2f}", "#ff4757"),
         ]
@@ -1631,55 +1637,55 @@ class BookingManagementFrame(BaseFrame):
             ctk.CTkLabel(
                 financial_grid,
                 text=value,
-                font=ctk.CTkFont(size=14, weight="bold"),
+                font=ctk.CTkFont(size=15, weight="bold"),
                 text_color=color,
                 anchor="e"
             ).grid(row=idx, column=1, sticky="e", pady=8)
         
         financial_grid.columnconfigure(1, weight=1)
         
-        # Payment input section
-        payment_frame = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=10)
-        payment_frame.pack(fill="x", pady=(0, 20), padx=10)
+        # === PAYMENT DETAILS SECTION (PURPLE BORDER) ===
+        payment_section = ctk.CTkFrame(scroll_frame, fg_color="#0d0d1a", corner_radius=15, border_width=2, border_color="#8C00FF")
+        payment_section.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
-            payment_frame,
-            text="Final Payment",
+            payment_section,
+            text="\ud83d\udcb5 Payment Details",
             font=ctk.CTkFont(size=16, weight="bold"),
             text_color="#8C00FF"
         ).pack(pady=(15, 10))
         
-        payment_grid = ctk.CTkFrame(payment_frame, fg_color="transparent")
+        payment_grid = ctk.CTkFrame(payment_section, fg_color="transparent")
         payment_grid.pack(fill="x", padx=20, pady=(0, 15))
         
-        # Cash received input
+        # Cash received input with clear labeling
         ctk.CTkLabel(
             payment_grid,
             text="Cash Received:",
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=14, weight="bold")
         ).grid(row=0, column=0, sticky="w", pady=10, padx=(0, 10))
         
         cash_entry = ctk.CTkEntry(
             payment_grid,
-            width=200,
-            height=40,
-            font=ctk.CTkFont(size=14),
+            width=180,
+            height=45,
+            font=ctk.CTkFont(size=16, weight="bold"),
             corner_radius=10,
             border_width=2,
-            border_color="#8C00FF"
+            border_color="#8C00FF",
+            placeholder_text="0.00"
         )
         cash_entry.grid(row=0, column=1, sticky="ew", pady=10)
         cash_entry.insert(0, f"{balance_due:.2f}")
-        cash_entry.focus()
         
-        # Change display
+        # Change display - real-time calculation
         change_label = ctk.CTkLabel(
             payment_grid,
             text="Change: Rs. 0.00",
-            font=ctk.CTkFont(size=14, weight="bold"),
+            font=ctk.CTkFont(size=15, weight="bold"),
             text_color="#00ff88"
         )
-        change_label.grid(row=1, column=0, columnspan=2, pady=10)
+        change_label.grid(row=1, column=0, columnspan=2, pady=(5, 10))
         
         payment_grid.columnconfigure(1, weight=1)
         
@@ -1688,17 +1694,20 @@ class BookingManagementFrame(BaseFrame):
                 cash_received = float(cash_entry.get() or 0)
                 change = cash_received - balance_due
                 if change >= 0:
-                    change_label.configure(text=f"Change: Rs. {change:,.2f}", text_color="#00ff88")
+                    change_label.configure(text=f"\u2713 Change: Rs. {change:,.2f}", text_color="#00ff88")
                 else:
-                    change_label.configure(text=f"Insufficient: Rs. {abs(change):,.2f}", text_color="#ff4757")
+                    change_label.configure(text=f"\u26a0 Insufficient: Rs. {abs(change):,.2f}", text_color="#ff4757")
             except:
-                change_label.configure(text="Change: Rs. 0.00", text_color="#00ff88")
+                change_label.configure(text="Change: Rs. 0.00", text_color="#888888")
         
         cash_entry.bind("<KeyRelease>", calculate_change)
         
-        # Action buttons
+        # Set focus to cash entry after dialog is fully displayed
+        dialog.after(100, cash_entry.focus)
+        
+        # Action buttons (large and touch-friendly)
         btn_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
-        btn_frame.pack(pady=20)
+        btn_frame.pack(pady=(0, 20))
         
         def process_settlement():
             try:
@@ -1767,25 +1776,25 @@ class BookingManagementFrame(BaseFrame):
         
         ctk.CTkButton(
             btn_frame,
-            text="Cancel",
+            text="\u274c Cancel",
             command=close_dialog,
-            width=150,
-            height=45,
+            width=170,
+            height=50,
             fg_color="#555555",
             hover_color="#444444",
             corner_radius=20,
-            font=ctk.CTkFont(size=14, weight="bold")
+            font=ctk.CTkFont(size=15, weight="bold")
         ).pack(side="left", padx=10)
         
         ctk.CTkButton(
             btn_frame,
-            text="✔ Process Settlement",
+            text="\u2714 Process Settlement",
             command=process_settlement,
-            width=220,
-            height=45,
+            width=250,
+            height=50,
             fg_color="#00ff88",
             text_color="#1a1a2e",
             hover_color="#00dd77",
             corner_radius=20,
-            font=ctk.CTkFont(size=14, weight="bold")
+            font=ctk.CTkFont(size=15, weight="bold")
         ).pack(side="left", padx=10)

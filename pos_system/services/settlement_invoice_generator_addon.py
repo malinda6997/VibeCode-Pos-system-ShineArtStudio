@@ -50,10 +50,11 @@ def generate_booking_settlement_invoice(self, settlement_data):
     title = Paragraph("<b>FINAL SETTLEMENT</b>", ParagraphStyle('Title', fontSize=24, textColor=colors.HexColor('#1a1a2e'), alignment=TA_RIGHT, fontName='Helvetica-Bold'))
     meta_style = ParagraphStyle('Meta', fontSize=11, alignment=TA_RIGHT, leading=15)
     receipt_no = Paragraph(f"Invoice No: <b>{invoice_number}</b>", meta_style)
+    original_invoice = Paragraph(f"Original Booking Invoice: <b>INV-BK-{booking_id}</b>", ParagraphStyle('OrigInv', fontSize=10, alignment=TA_RIGHT, leading=15, textColor=colors.HexColor('#555555')))
     receipt_date = Paragraph(f"Settlement Date: {settlement_data['settlement_date']}", meta_style)
-    original_date = Paragraph(f"Original Booking: {settlement_data['original_booking_date']}", ParagraphStyle('OrigDate', fontSize=10, alignment=TA_RIGHT, leading=15, textColor=colors.HexColor('#555555')))
+    original_date = Paragraph(f"Advance Date: {settlement_data['original_booking_date']}", ParagraphStyle('OrigDate', fontSize=10, alignment=TA_RIGHT, leading=15, textColor=colors.HexColor('#555555')))
     
-    right_content = Table([[title], [Spacer(1, 2*mm)], [receipt_no], [receipt_date], [original_date]], colWidths=[page_width*0.45])
+    right_content = Table([[title], [Spacer(1, 2*mm)], [receipt_no], [original_invoice], [receipt_date], [original_date]], colWidths=[page_width*0.45])
     right_content.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'), ('VALIGN', (0, 0), (-1, -1), 'TOP')]))
     
     header_table = Table([[logo, right_content]], colWidths=[page_width*0.55, page_width*0.45])
@@ -107,13 +108,13 @@ def generate_booking_settlement_invoice(self, settlement_data):
     items_table = Table(table_data, colWidths=col_widths)
     
     table_style = [
-        ('BACKGROUND', (0, 0), (-1, 0), colors.black),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#d3d3d3')),  # Light gray header
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#1a1a2e')),  # Dark text on light header
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
         ('TOPPADDING', (0, 0), (-1, 0), 10),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#888888')),
+        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#888888')),
         ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
         ('TOPPADDING', (0, 1), (-1, -1), 8),
         ('LEFTPADDING', (0, 0), (-1, -1), 6),
@@ -133,20 +134,22 @@ def generate_booking_settlement_invoice(self, settlement_data):
     paid_style = ParagraphStyle('Paid', fontSize=11, alignment=TA_RIGHT, fontName='Helvetica-Bold', textColor=colors.HexColor('#27ae60'))
     
     summary_data = [
-        [Paragraph("Original Total:", summary_style), Paragraph(f"Rs. {full_amount:,.2f}", summary_style)],
-        [Paragraph(f"Advance Paid ({settlement_data['original_booking_date']}):", summary_style), Paragraph(f"Rs. {original_advance:,.2f}", summary_style)],
-        [Paragraph("<b>Final Payment Today:</b>", summary_bold), Paragraph(f"<b>Rs. {final_payment:,.2f}</b>", paid_style)],
+        [Paragraph("Original Total Amount:", summary_style), Paragraph(f"Rs. {full_amount:,.2f}", summary_style)],
+        [Paragraph(f"Advance Already Paid ({settlement_data['original_booking_date']}):", summary_style), Paragraph(f"Rs. {original_advance:,.2f}", summary_style)],
+        [Paragraph("<b>Current Settlement (Paid Today):</b>", summary_bold), Paragraph(f"<b>Rs. {final_payment:,.2f}</b>", paid_style)],
         [Paragraph("<b>TOTAL PAID:</b>", summary_bold), Paragraph(f"<b>Rs. {full_amount:,.2f}</b>", summary_bold)],
-        [Paragraph("Balance Due:", summary_style), Paragraph("Rs. 0.00", paid_style)],
+        [Paragraph("<b>Balance Due:</b>", summary_bold), Paragraph("<b>Rs. 0.00</b>", paid_style)],
     ]
     
-    # Add cash received and change if applicable
+    # Add cash received and change if applicable (Transaction Details)
     cash_received = float(settlement_data.get('cash_received', final_payment))
     change_given = float(settlement_data.get('change_given', 0))
     
     if change_given > 0:
-        summary_data.append([Paragraph("Cash Received:", summary_style), Paragraph(f"Rs. {cash_received:,.2f}", summary_style)])
-        summary_data.append([Paragraph("Change Given:", summary_style), Paragraph(f"Rs. {change_given:,.2f}", summary_style)])
+        summary_data.append([Paragraph("", summary_style), Paragraph("", summary_style)])  # Empty row for spacing
+        summary_data.append([Paragraph("<b>Transaction Details:</b>", summary_bold), Paragraph("", summary_style)])
+        summary_data.append([Paragraph("Cash Received from Customer:", summary_style), Paragraph(f"Rs. {cash_received:,.2f}", summary_style)])
+        summary_data.append([Paragraph("Change Returned:", summary_style), Paragraph(f"Rs. {change_given:,.2f}", summary_style)])
     
     summary_table = Table(summary_data, colWidths=[50*mm, 40*mm])
     summary_table.setStyle(TableStyle([
@@ -163,8 +166,8 @@ def generate_booking_settlement_invoice(self, settlement_data):
     story.append(Spacer(1, 10*mm))
     
     # === STATUS LABEL ===
-    status_style = ParagraphStyle('Status', fontSize=12, fontName='Helvetica-Bold', alignment=TA_CENTER, textColor=colors.HexColor('#27ae60'))
-    story.append(Paragraph("✓ <b>FULLY PAID - BOOKING COMPLETED</b>", status_style))
+    status_style = ParagraphStyle('Status', fontSize=14, fontName='Helvetica-Bold', alignment=TA_CENTER, textColor=colors.HexColor('#27ae60'))
+    story.append(Paragraph("\u2713 <b>STATUS: FULLY PAID</b>", status_style))
     story.append(Spacer(1, 8*mm))
     
     # === TERMS & CONDITIONS ===
