@@ -71,8 +71,8 @@ class BillingFrame(BaseFrame):
             offvalue="off",
             command=self.toggle_guest_customer,
             progress_color="#8C00FF",
-            button_color="#00ff88",
-            button_hover_color="#00cc6a"
+            button_color="#8C00FF",
+            button_hover_color="#7300D6"
         )
         self.guest_switch.pack(side="left", padx=5)
 
@@ -140,14 +140,14 @@ class BillingFrame(BaseFrame):
         self.suggestion_buttons = []
 
         # Customer details display card (hidden by default)
-        self.customer_card = ctk.CTkFrame(customer_frame, fg_color="#1e3a2f", corner_radius=10, border_width=2, border_color="#00ff88")
+        self.customer_card = ctk.CTkFrame(customer_frame, fg_color="#1a1a2e", corner_radius=10, border_width=2, border_color="#8C00FF")
 
         # Card content
         card_content = ctk.CTkFrame(self.customer_card, fg_color="transparent")
         card_content.pack(fill="x", padx=15, pady=12)
 
         # Left side - Icon
-        icon_frame = ctk.CTkFrame(card_content, fg_color="#00ff88", width=50, height=50, corner_radius=25)
+        icon_frame = ctk.CTkFrame(card_content, fg_color="#8C00FF", width=50, height=50, corner_radius=25)
         icon_frame.pack(side="left", padx=(0, 15))
         icon_frame.pack_propagate(False)
 
@@ -240,7 +240,7 @@ class BillingFrame(BaseFrame):
         self.item_type.set("Services")  # Default to Services
 
         # Selected category display - ENHANCED
-        self.selected_category_frame = ctk.CTkFrame(items_frame, fg_color="#1e3a2f", corner_radius=10, border_width=2, border_color="#00ff88")
+        self.selected_category_frame = ctk.CTkFrame(items_frame, fg_color="#1a1a2e", corner_radius=10, border_width=2, border_color="#8C00FF")
         
         category_info_frame = ctk.CTkFrame(self.selected_category_frame, fg_color="transparent")
         category_info_frame.pack(side="left", fill="x", expand=True, padx=15, pady=10)
@@ -249,7 +249,7 @@ class BillingFrame(BaseFrame):
             category_info_frame,
             text="No category selected",
             font=ctk.CTkFont(size=14, weight="bold"),
-            text_color="#00ff88",
+            text_color="#8C00FF",
             anchor="w"
         )
         self.selected_category_label.pack(anchor="w")
@@ -259,7 +259,7 @@ class BillingFrame(BaseFrame):
             category_info_frame,
             text="Service Cost: Rs. 0.00",
             font=ctk.CTkFont(size=13, weight="bold"),
-            text_color="#ffd93d",
+            text_color="#8C00FF",
             anchor="w"
         )
         self.category_cost_display.pack(anchor="w", pady=(3, 0))
@@ -269,7 +269,7 @@ class BillingFrame(BaseFrame):
             category_info_frame,
             text="",
             font=ctk.CTkFont(size=11),
-            text_color="#ffd93d",
+            text_color="#888888",
             anchor="w"
         )
         self.free_service_label.pack(anchor="w", pady=(2, 0))
@@ -432,7 +432,7 @@ class BillingFrame(BaseFrame):
         self.subtotal_label.pack(side="right", padx=15, pady=10)
 
         # Service Charge - PROMINENT DISPLAY
-        service_cost_frame = ctk.CTkFrame(right_panel, fg_color="#2d2d1a", corner_radius=10, border_width=2, border_color="#ffd93d")
+        service_cost_frame = ctk.CTkFrame(right_panel, fg_color="#0d0d1a", corner_radius=10, border_width=2, border_color="#444444")
         service_cost_frame.pack(fill="x", padx=15, pady=8)
         
         ctk.CTkLabel(
@@ -445,7 +445,7 @@ class BillingFrame(BaseFrame):
             service_cost_frame,
             text="LKR 0.00",
             font=ctk.CTkFont(size=15, weight="bold"),
-            text_color="#ffd93d"
+            text_color="#8C00FF"
         )
         self.service_cost_label.pack(side="right", padx=15, pady=10)
 
@@ -472,22 +472,22 @@ class BillingFrame(BaseFrame):
         self.discount_entry.pack(side="right", padx=15, pady=10)
         self.discount_entry.bind("<KeyRelease>", lambda e: self.calculate_totals())
 
-        # Total - HIGH CONTRAST DISPLAY
-        total_frame = ctk.CTkFrame(right_panel, fg_color="#1a1a3e", corner_radius=15, border_width=3, border_color="#00ff88")
+        # Total - HIGH CONTRAST DISPLAY (Reduced font size)
+        total_frame = ctk.CTkFrame(right_panel, fg_color="#1a1a2e", corner_radius=15, border_width=2, border_color="#8C00FF")
         total_frame.pack(fill="x", padx=15, pady=15)
         
         ctk.CTkLabel(
             total_frame,
             text="💵 TOTAL AMOUNT:",
-            font=ctk.CTkFont(size=16, weight="bold"),
+            font=ctk.CTkFont(size=14, weight="bold"),
             text_color="white"
-        ).pack(side="left", padx=15, pady=15)
+        ).pack(side="left", padx=15, pady=12)
         
         self.total_label = ctk.CTkLabel(
             total_frame,
             text="LKR 0.00",
-            font=ctk.CTkFont(size=22, weight="bold"),
-            text_color="#00ff88"
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color="#8C00FF"
         )
         self.total_label.pack(side="right", padx=15, pady=15)
 
@@ -513,8 +513,8 @@ class BillingFrame(BaseFrame):
             variable=self.payment_type_var,
             value="full",
             command=self.on_payment_type_change,
-            fg_color="#00ff88",
-            hover_color="#00cc6a",
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
             font=ctk.CTkFont(size=12, weight="bold")
         )
         self.full_payment_radio.pack(side="left", padx=10)
@@ -540,14 +540,15 @@ class BillingFrame(BaseFrame):
         self.advance_entry.pack(side="right")
         self.advance_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
 
-        # Cash Received (for receipt display only)
+        # Cash Received (SMART PAYMENT LOGIC - triggers balance calculation)
         paid_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
         paid_frame.pack(fill="x", padx=20, pady=10)
         self.paid_label_widget = ctk.CTkLabel(paid_frame, text="Cash Received:", font=ctk.CTkFont(size=13))
         self.paid_label_widget.pack(side="left")
-        self.paid_entry = ctk.CTkEntry(paid_frame, width=120, height=35, placeholder_text="For receipt", corner_radius=15, border_width=1)
+        self.paid_entry = ctk.CTkEntry(paid_frame, width=120, height=35, placeholder_text="Enter amount", corner_radius=15, border_width=1)
         self.paid_entry.pack(side="right")
-        # Cash received does not affect calculations, only for receipt printing
+        # Bind to update balance calculation in real-time
+        self.paid_entry.bind("<KeyRelease>", lambda e: self.calculate_balance())
 
         # Remaining Balance
         balance_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
@@ -561,7 +562,7 @@ class BillingFrame(BaseFrame):
             balance_frame,
             text="LKR 0.00",
             font=ctk.CTkFont(size=13, weight="bold"),
-            text_color="yellow"
+            text_color="#8C00FF"
         )
         self.balance_label.pack(side="right")
 
@@ -732,7 +733,7 @@ class BillingFrame(BaseFrame):
                         info_frame,
                         text=f"🎁 Free Service Included: {free_service_name}",
                         font=ctk.CTkFont(size=11, weight="bold"),
-                        text_color="#00ff88",
+                        text_color="#8C00FF",
                         anchor="w"
                     ).pack(anchor="w")
 
@@ -837,14 +838,14 @@ class BillingFrame(BaseFrame):
 
         # Show selected category info for services
         if item_type == "Services" and self.selected_category_name:
-            cat_info = ctk.CTkFrame(popup, fg_color="#1e3a2f", corner_radius=10, border_width=2, border_color="#00ff88")
+            cat_info = ctk.CTkFrame(popup, fg_color="#1a1a2e", corner_radius=10, border_width=2, border_color="#8C00FF")
             cat_info.pack(fill="x", padx=20, pady=(0, 10))
             
             ctk.CTkLabel(
                 cat_info,
                 text=f"📁 Category: {self.selected_category_name}",
                 font=ctk.CTkFont(size=13, weight="bold"),
-                text_color="#00ff88"
+                text_color="#8C00FF"
             ).pack(side="left", padx=15, pady=10)
 
             if self.free_service_name:
@@ -852,7 +853,7 @@ class BillingFrame(BaseFrame):
                     cat_info,
                     text=f"🎁 Free: {self.free_service_name}",
                     font=ctk.CTkFont(size=12),
-                    text_color="#ffd93d"
+                    text_color="#888888"
                 ).pack(side="right", padx=15, pady=10)
         
         # Info label for quantity
@@ -913,10 +914,10 @@ class BillingFrame(BaseFrame):
                     # Price display - highlight free service
                     if price == 0:
                         price_text = "🎁 FREE (Rs. 0.00)"
-                        price_color = "#00ff88"
+                        price_color = "#8C00FF"
                     else:
                         price_text = f"💵 Unit Price: Rs. {price:,.2f}"
-                        price_color = "#ffd93d"
+                        price_color = "#8C00FF"
 
                     ctk.CTkLabel(
                         info_frame,
@@ -942,11 +943,11 @@ class BillingFrame(BaseFrame):
                         info_frame,
                         text=f"Size: {item['size']} | Rs. {price:,.2f}",
                         font=ctk.CTkFont(size=13),
-                        text_color="#ffd93d",
+                        text_color="#8C00FF",
                         anchor="w"
                     ).pack(anchor="w", pady=(3, 0))
 
-                    stock_color = "#00ff88" if stock > 5 else "#ff6b6b"
+                    stock_color = "#8C00FF" if stock > 5 else "#ff6b6b"
                     ctk.CTkLabel(
                         info_frame,
                         text=f"📦 Stock: {stock}",
@@ -990,7 +991,7 @@ class BillingFrame(BaseFrame):
                     self.add_item_to_cart(i, t, qty)
                     close_popup()
                     # Visual feedback - briefly highlight cart
-                    self.cart_frame.configure(border_color="#00ff88")
+                    self.cart_frame.configure(border_color="#8C00FF")
                     self.after(500, lambda: self.cart_frame.configure(border_color="#444444"))
 
                 ctk.CTkButton(
@@ -1584,39 +1585,38 @@ class BillingFrame(BaseFrame):
         self.calculate_balance()
 
     def calculate_balance(self):
-        """Calculate remaining balance based on payment type"""
+        """Calculate remaining balance using SMART PAYMENT LOGIC"""
+        # Get total amount
         total_str = self.total_label.cget("text").replace("LKR ", "").replace(",", "")
         total = float(total_str) if total_str else 0
 
-        if self.payment_type == "full":
-            # Full payment - no balance remaining
+        # Get cash received
+        cash_str = self.paid_entry.get().strip()
+        cash_received = 0.0
+        if cash_str and self.validate_number(cash_str, True):
+            cash_received = float(cash_str)
+
+        # SMART PAYMENT LOGIC:
+        # If cash >= total: Full Payment (balance = 0)
+        # If cash < total: Advance Payment (balance = total - cash)
+        if cash_received >= total:
+            # Full Payment
             remaining = 0.0
-            paid_amount = total
         else:
-            # Advance payment - deduct advance from total
-            advance_str = self.advance_entry.get().strip()
-            advance = 0.0
-            if advance_str and self.validate_number(advance_str, True):
-                advance = float(advance_str)
+            # Advance Payment
+            remaining = max(0, total - cash_received)
 
-            # Validate advance doesn't exceed total
-            if advance > total:
-                self.advance_entry.delete(0, "end")
-                self.advance_entry.insert(0, str(total))
-                advance = total
-
-            remaining = max(0, total - advance)
-            paid_amount = advance
-
+        # Update balance display
         self.balance_label.configure(text=f"LKR {remaining:.2f}")
 
+        # Color coding: Red if balance remaining, Purple if paid
         if remaining > 0:
-            self.balance_label.configure(text_color="#ff6b6b")
+            self.balance_label.configure(text_color="#ff6b6b")  # Red for pending
         else:
-            self.balance_label.configure(text_color="#00ff88")
+            self.balance_label.configure(text_color="#8C00FF")  # Purple for paid
 
     def generate_bill(self):
-        """Generate thermal bill receipt for normal sales (NO booking)"""
+        """Generate thermal bill receipt for normal sales with SMART PAYMENT LOGIC"""
         # Validate customer selection
         if self.is_guest_customer:
             if not self.guest_customer_name:
@@ -1642,42 +1642,41 @@ class BillingFrame(BaseFrame):
 
         total = max(0, subtotal + service_charge - discount)
 
-        # Get cash given (optional, for display only)
+        # Get cash received - REQUIRED for bill generation
         cash_given_str = self.paid_entry.get().strip()
-        cash_given = 0.0
-        if cash_given_str:
-            if not self.validate_number(cash_given_str, True):
-                MessageDialog.show_error("Error", "Please enter valid cash amount")
-                return
-            cash_given = float(cash_given_str)
+        
+        # VALIDATION: Cash received cannot be 0
+        if not cash_given_str or not self.validate_number(cash_given_str, True):
+            MessageDialog.show_error("Error", "Please enter cash received amount")
+            return
+        
+        cash_given = float(cash_given_str)
+        
+        if cash_given <= 0:
+            MessageDialog.show_error("Error", "Cash received must be greater than 0")
+            return
 
-        # Calculate advance amount and balance due based on payment type
+        # === SMART PAYMENT LOGIC ===
+        # Automatically determine Advance vs Full Payment
         advance_amount = 0.0
         balance_due = 0.0
+        payment_status = "FULL"  # Default status
         
-        if self.payment_type == "advance":
-            # Advance payment - validate advance amount
-            advance_str = self.advance_entry.get().strip()
-            if not advance_str or not self.validate_number(advance_str, True):
-                MessageDialog.show_error("Error", "Please enter valid advance payment amount")
-                return
-            
-            advance_amount = float(advance_str)
-            
-            if advance_amount <= 0:
-                MessageDialog.show_error("Error", "Advance payment must be greater than 0")
-                return
-            
-            if advance_amount > total:
-                MessageDialog.show_error("Error", "Advance payment cannot exceed total amount")
-                return
-            
-            balance_due = total - advance_amount
-        else:
-            # Full payment - no advance or balance
+        if cash_given >= total:
+            # SCENARIO A: Full Payment
             advance_amount = total
             balance_due = 0.0
+            payment_status = "FULL"
+        else:
+            # SCENARIO B: Advance Payment
+            advance_amount = cash_given
+            balance_due = total - cash_given
+            payment_status = "ADVANCE"
 
+        # *** FIX: Real-time timestamp - capture exact moment of bill generation ***
+        from datetime import datetime
+        bill_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
         bill_number = self.db_manager.generate_bill_number()
 
         if self.is_guest_customer:
@@ -1687,7 +1686,7 @@ class BillingFrame(BaseFrame):
             customer_id = self.selected_customer['id']
             guest_name = None
 
-        # Create bill in database
+        # Create bill in database with explicit timestamp
         bill_id = self.db_manager.create_bill(
             bill_number,
             customer_id,
@@ -1699,7 +1698,8 @@ class BillingFrame(BaseFrame):
             cash_given,
             guest_name,
             advance_amount,
-            balance_due
+            balance_due,
+            bill_timestamp  # Pass exact timestamp
         )
 
         if not bill_id:
@@ -1761,12 +1761,116 @@ class BillingFrame(BaseFrame):
                 customer_data
             )
 
-            MessageDialog.show_success("Success", f"Bill {bill_number} generated successfully!")
-            self.bill_generator.open_bill(pdf_path)
+            # *** NEW: Show Bill Preview Popup instead of auto-opening PDF ***
+            self.show_bill_preview_popup(pdf_path, bill_number)
             self.clear_all()
 
         except Exception as e:
             MessageDialog.show_error("Error", f"Failed to generate bill PDF: {str(e)}")
+
+    def show_bill_preview_popup(self, pdf_path, bill_number):
+        """Show bill preview popup with Download and Print options"""
+        popup = ctk.CTkToplevel(self)
+        popup.title("Bill Generated Successfully")
+        popup.geometry("500x300")
+        popup.resizable(False, False)
+        popup.grab_set()  # Modal popup
+        
+        # Center the popup
+        popup.update_idletasks()
+        x = (popup.winfo_screenwidth() // 2) - (500 // 2)
+        y = (popup.winfo_screenheight() // 2) - (300 // 2)
+        popup.geometry(f"500x300+{x}+{y}")
+        
+        # Success icon and message
+        success_frame = ctk.CTkFrame(popup, fg_color="transparent")
+        success_frame.pack(pady=(30, 20))
+        
+        ctk.CTkLabel(
+            success_frame,
+            text="✅",
+            font=ctk.CTkFont(size=60)
+        ).pack()
+        
+        ctk.CTkLabel(
+            success_frame,
+            text=f"Bill {bill_number} Generated Successfully!",
+            font=ctk.CTkFont(size=18, weight="bold"),
+            text_color="#2ecc71"
+        ).pack(pady=(10, 5))
+        
+        ctk.CTkLabel(
+            success_frame,
+            text="Choose an action below:",
+            font=ctk.CTkFont(size=13),
+            text_color="#888888"
+        ).pack()
+        
+        # Button frame
+        button_frame = ctk.CTkFrame(popup, fg_color="transparent")
+        button_frame.pack(pady=20)
+        
+        # Download PDF button
+        download_btn = ctk.CTkButton(
+            button_frame,
+            text="📥 Download PDF",
+            command=lambda: self.download_bill_action(pdf_path, popup),
+            width=200,
+            height=50,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            font=ctk.CTkFont(size=15, weight="bold"),
+            corner_radius=20
+        )
+        download_btn.pack(side="left", padx=10)
+        
+        # Print Now button
+        print_btn = ctk.CTkButton(
+            button_frame,
+            text="🖨️ Print Now",
+            command=lambda: self.print_bill_action(pdf_path, popup),
+            width=200,
+            height=50,
+            fg_color="#2ecc71",
+            hover_color="#27ae60",
+            font=ctk.CTkFont(size=15, weight="bold"),
+            corner_radius=20
+        )
+        print_btn.pack(side="left", padx=10)
+        
+        # Close button
+        close_btn = ctk.CTkButton(
+            popup,
+            text="Close",
+            command=popup.destroy,
+            width=100,
+            height=35,
+            fg_color="#555555",
+            hover_color="#444444",
+            font=ctk.CTkFont(size=13),
+            corner_radius=20
+        )
+        close_btn.pack(pady=(10, 20))
+    
+    def download_bill_action(self, pdf_path, popup):
+        """Open PDF in viewer for download/viewing"""
+        try:
+            self.bill_generator.open_bill(pdf_path)
+            MessageDialog.show_success("Success", "Bill opened in PDF viewer")
+            popup.destroy()
+        except Exception as e:
+            MessageDialog.show_error("Error", f"Failed to open PDF: {str(e)}")
+    
+    def print_bill_action(self, pdf_path, popup):
+        """Send bill directly to thermal printer without opening viewer"""
+        try:
+            # Send directly to default printer
+            import os
+            os.startfile(pdf_path, 'print')
+            MessageDialog.show_success("Success", "Bill sent to printer")
+            popup.destroy()
+        except Exception as e:
+            MessageDialog.show_error("Error", f"Failed to print: {str(e)}")
 
     def generate_invoice_from_booking(self, booking_id):
         """Generate A4 invoice for a booking - called from booking frame"""

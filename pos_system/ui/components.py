@@ -2,6 +2,9 @@ import customtkinter as ctk
 from typing import Callable, Optional
 from PIL import Image
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils import resource_path
 
 
 class ModernToast(ctk.CTkToplevel):
@@ -289,7 +292,7 @@ class LoginWindow(ctk.CTkToplevel):
     def _set_window_icon(self):
         """Set the login window icon"""
         try:
-            icon_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "logos", "App logo.jpg")
+            icon_path = resource_path(os.path.join("assets", "logos", "App logo.jpg"))
             if os.path.exists(icon_path):
                 from PIL import ImageTk
                 icon_image = Image.open(icon_path)
@@ -321,8 +324,7 @@ class LoginWindow(ctk.CTkToplevel):
         # Display login image
         self.display_image = None
         try:
-            assets_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "login_images")
-            image_path = os.path.join(assets_path, "loginimage01.jpg")
+            image_path = resource_path(os.path.join("assets", "login_images", "loginimage01.jpg"))
             
             if os.path.exists(image_path):
                 login_img = Image.open(image_path)
@@ -363,7 +365,7 @@ class LoginWindow(ctk.CTkToplevel):
         # Logo - Match dashboard sidebar proportions
         self.logo_image = None
         try:
-            logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "logos", "studio-logo.png")
+            logo_path = resource_path(os.path.join("assets", "logos", "studio-logo.png"))
             if os.path.exists(logo_path):
                 logo_img = Image.open(logo_path)
                 # Use same sizing logic as sidebar dashboard
@@ -561,6 +563,12 @@ class MessageDialog:
         """Show warning toast"""
         if MessageDialog._parent:
             Toast.warning(MessageDialog._parent, message)
+    
+    @staticmethod
+    def show_info(title: str, message: str):
+        """Show info toast"""
+        if MessageDialog._parent:
+            Toast.info(MessageDialog._parent, message)
     
     @staticmethod
     def show_confirm(title: str, message: str) -> bool:

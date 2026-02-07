@@ -6,6 +6,7 @@ from ui.components import LoginWindow, Toast, MessageDialog
 from ui.sidebar import Sidebar
 from PIL import Image
 import os
+from utils import resource_path
 
 # Import all frames
 from ui.customer_frame import CustomerManagementFrame
@@ -136,8 +137,8 @@ class MainApplication(ctk.CTk):
     def _set_window_icon(self):
         """Set the application window icon"""
         try:
-            # Use the uploaded appLogo.ico directly
-            ico_path = os.path.join(os.path.dirname(__file__), "assets", "logos", "appLogo.ico")
+            # Use resource_path for PyInstaller compatibility
+            ico_path = resource_path(os.path.join("assets", "logos", "appLogo.ico"))
             
             if os.path.exists(ico_path):
                 # Set the window icon using iconbitmap for Windows taskbar

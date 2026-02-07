@@ -10,6 +10,7 @@ class InvoiceHistoryFrame(BaseFrame):
     def __init__(self, parent, auth_manager, db_manager):
         super().__init__(parent, auth_manager, db_manager)
         self.invoice_generator = InvoiceGenerator()
+        self.current_filter = "All"  # Show all records by default
         self.create_widgets()
         self.load_invoices()
     
@@ -28,73 +29,141 @@ class InvoiceHistoryFrame(BaseFrame):
         controls_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
         controls_frame.pack(fill="x", padx=20, pady=(0, 20))
         
+        # Left side - Status Filters
+        filter_left = ctk.CTkFrame(controls_frame, fg_color="transparent")
+        filter_left.pack(side="left", padx=15, pady=15)
+        
         ctk.CTkLabel(
-            controls_frame,
+            filter_left,
+            text="Status:",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(side="left", padx=(0, 5))
+        
+        self.filter_status = ctk.StringVar(value="All")
+        
+        ctk.CTkButton(
+            filter_left,
+            text="All",
+            command=lambda: self.filter_by_status("All"),
+            width=60,
+            height=35,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            corner_radius=20
+        ).pack(side="left", padx=2)
+        
+        ctk.CTkButton(
+            filter_left,
+            text="Pending",
+            command=lambda: self.filter_by_status("Pending"),
+            width=75,
+            height=35,
+            fg_color="#ffa500",
+            text_color="#1a1a2e",
+            hover_color="#ff8c00",
+            corner_radius=20
+        ).pack(side="left", padx=2)
+        
+        ctk.CTkButton(
+            filter_left,
+            text="Completed",
+            command=lambda: self.filter_by_status("Completed"),
+            width=85,
+            height=35,
+            fg_color="#8C00FF",
+            text_color="#ffffff",
+            hover_color="#7300D6",
+            corner_radius=20
+        ).pack(side="left", padx=2)
+        
+        ctk.CTkButton(
+            filter_left,
+            text="Cancelled",
+            command=lambda: self.filter_by_status("Cancelled"),
+            width=80,
+            height=35,
+            fg_color="#ff4757",
+            hover_color="#ff3344",
+            corner_radius=20
+        ).pack(side="left", padx=2)
+        
+        # Middle - Search
+        search_middle = ctk.CTkFrame(controls_frame, fg_color="transparent")
+        search_middle.pack(side="left", padx=15, pady=15, fill="x", expand=True)
+        
+        ctk.CTkLabel(
+            search_middle,
             text="Search:",
             font=ctk.CTkFont(size=13, weight="bold")
-        ).pack(side="left", padx=15, pady=15)
+        ).pack(side="left", padx=(0, 5))
         
-        self.search_entry = ctk.CTkEntry(controls_frame, width=300, height=35, corner_radius=15, border_width=1)
-        self.search_entry.pack(side="left", padx=10, pady=15)
+        self.search_entry = ctk.CTkEntry(search_middle, width=200, height=35, corner_radius=15, border_width=1)
+        self.search_entry.pack(side="left", padx=5, pady=15)
         self.search_entry.bind("<KeyRelease>", lambda e: self.search_invoices())
         
+        # Right side - Action buttons
+        actions_right = ctk.CTkFrame(controls_frame, fg_color="transparent")
+        actions_right.pack(side="right", padx=15, pady=15)
+        
         ctk.CTkButton(
-            controls_frame,
+            actions_right,
             text="Refresh",
             command=self.load_invoices,
-            width=120,
+            width=100,
             height=35,
             fg_color="#8C00FF",
             hover_color="#7300D6",
             corner_radius=20
-        ).pack(side="left", padx=10)
+        ).pack(side="left", padx=5)
         
         ctk.CTkButton(
-            controls_frame,
+            actions_right,
             text="View Details",
             command=self.view_invoice_details,
-            width=120,
+            width=110,
             height=35,
             fg_color="#8C00FF",
             hover_color="#7300D6",
             corner_radius=20
-        ).pack(side="left", padx=10)
+        ).pack(side="left", padx=5)
         
         ctk.CTkButton(
-            controls_frame,
+            actions_right,
             text="Reprint Invoice",
             command=self.reprint_invoice,
-            width=140,
+            width=120,
             height=35,
             fg_color="#8C00FF",
             text_color="white",
             hover_color="#7300D6",
             corner_radius=20
-        ).pack(side="left", padx=10)
+        ).pack(side="left", padx=5)
         
         # Admin-only delete buttons
         if self.auth_manager.current_user and self.auth_manager.current_user.get('role') == 'Admin':
             ctk.CTkButton(
-                controls_frame,
+                actions_right,
                 text="Delete Selected",
                 command=self.delete_selected_invoice,
-                width=140,
+                width=120,
                 height=35,
                 fg_color="#ff4444",
                 text_color="white",
-                hover_color="#cc0000"
-            ).pack(side="left", padx=10)
+                hover_color="#cc0000",
+                corner_radius=20
+            ).pack(side="left", padx=5)
             
             ctk.CTkButton(
-                controls_frame,
+                actions_right,
                 text="Delete All",
                 command=self.delete_all_invoices,
-                width=120,
+                width=100,
                 height=35,
                 fg_color="#aa0000",
                 text_color="white",
-                hover_color="#880000"
-            ).pack(side="left", padx=10)
+                hover_color="#880000",
+                corner_radius=20
+            ).pack(side="left", padx=5)
         
         # Invoices table
         table_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
@@ -159,14 +228,52 @@ class InvoiceHistoryFrame(BaseFrame):
         # Double-click to view
         self.tree.bind("<Double-Button-1>", lambda e: self.view_invoice_details())
     
+    def format_service_name(self, service_name):
+        """Format service name: remove 'Booking - ' prefix and 'Photoshoot'/'Photography' suffix"""
+        if not service_name or service_name == 'N/A':
+            return service_name
+        
+        # Remove 'Booking - ' prefix
+        if service_name.startswith('Booking - '):
+            service_name = service_name[10:]  # len('Booking - ') = 10
+        
+        # Remove 'Photoshoot' or 'Photography' suffix (case-insensitive)
+        service_name = service_name.strip()
+        if service_name.lower().endswith(' photoshoot'):
+            service_name = service_name[:-11].strip()  # len(' photoshoot') = 11
+        elif service_name.lower().endswith(' photography'):
+            service_name = service_name[:-12].strip()  # len(' photography') = 12
+        
+        return service_name
+    
+    def get_booking_status(self, booking_id):
+        """Get booking status if this is a booking invoice"""
+        if not booking_id:
+            return "Completed"  # Default for non-booking invoices
+        
+        booking = self.db_manager.get_booking_by_id(booking_id)
+        if booking:
+            return booking.get('status', 'Completed')
+        return "Completed"
+    
     def load_invoices(self):
-        """Load only booking invoices (not bills)"""
+        """Load booking invoices (respects current filter)"""
         for item in self.tree.get_children():
             self.tree.delete(item)
         
         # Get only booking invoices (invoice_number starts with 'BK-' or has booking_id)
         all_invoices = self.db_manager.get_all_invoices(limit=200)
-        invoices = [inv for inv in all_invoices if inv['invoice_number'].startswith('BK-') or inv.get('booking_id')]
+        booking_invoices = [inv for inv in all_invoices if inv['invoice_number'].startswith('BK-') or inv.get('booking_id')]
+        
+        # Apply status filter
+        if self.current_filter != "All":
+            invoices = []
+            for inv in booking_invoices:
+                booking_status = self.get_booking_status(inv.get('booking_id'))
+                if booking_status == self.current_filter:
+                    invoices.append(inv)
+        else:
+            invoices = booking_invoices
         
         for i, invoice in enumerate(invoices):
             balance = invoice['balance_amount']
@@ -182,9 +289,8 @@ class InvoiceHistoryFrame(BaseFrame):
                 booking = self.db_manager.get_booking_by_id(invoice['booking_id'])
                 if booking:
                     service_name = booking.get('photoshoot_category', 'N/A')
-                    # Remove "Category - " prefix if it exists
-                    if ' - ' in service_name:
-                        service_name = service_name.split(' - ', 1)[1]
+                    # Format service name
+                    service_name = self.format_service_name(service_name)
             
             self.tree.insert("", "end", values=(
                 invoice['invoice_number'],
@@ -201,7 +307,7 @@ class InvoiceHistoryFrame(BaseFrame):
         self.record_count_label.configure(text=f"{len(invoices)} records")
     
     def search_invoices(self):
-        """Search booking invoices only"""
+        """Search booking invoices (respects current filter)"""
         search_term = self.search_entry.get().strip()
         
         for item in self.tree.get_children():
@@ -213,7 +319,17 @@ class InvoiceHistoryFrame(BaseFrame):
         
         all_invoices = self.db_manager.search_invoices(search_term)
         # Filter to only booking invoices
-        invoices = [inv for inv in all_invoices if inv['invoice_number'].startswith('BK-') or inv.get('booking_id')]
+        booking_invoices = [inv for inv in all_invoices if inv['invoice_number'].startswith('BK-') or inv.get('booking_id')]
+        
+        # Apply status filter
+        if self.current_filter != "All":
+            invoices = []
+            for inv in booking_invoices:
+                booking_status = self.get_booking_status(inv.get('booking_id'))
+                if booking_status == self.current_filter:
+                    invoices.append(inv)
+        else:
+            invoices = booking_invoices
         
         for i, invoice in enumerate(invoices):
             balance = invoice['balance_amount']
@@ -228,9 +344,8 @@ class InvoiceHistoryFrame(BaseFrame):
                 booking = self.db_manager.get_booking_by_id(invoice['booking_id'])
                 if booking:
                     service_name = booking.get('photoshoot_category', 'N/A')
-                    # Remove "Category - " prefix if it exists
-                    if ' - ' in service_name:
-                        service_name = service_name.split(' - ', 1)[1]
+                    # Format service name
+                    service_name = self.format_service_name(service_name)
             
             self.tree.insert("", "end", values=(
                 invoice['invoice_number'],
@@ -245,6 +360,12 @@ class InvoiceHistoryFrame(BaseFrame):
         
         # Update record count
         self.record_count_label.configure(text=f"{len(invoices)} records")
+    
+    def filter_by_status(self, status):
+        """Filter invoices by booking status"""
+        self.current_filter = status
+        self.filter_status.set(status)
+        self.load_invoices()
     
     def view_invoice_details(self):
         """View detailed invoice information"""

@@ -279,6 +279,8 @@ class CategoryManagementFrame(BaseFrame):
             MessageDialog.show_success("Success", "Category added successfully")
             self.clear_form()
             self.load_categories()
+            # Set focus back to search entry to prevent input lock
+            self.after(100, lambda: self.search_entry.focus_set())
         else:
             MessageDialog.show_error("Error", "Failed to add category")
     
@@ -323,6 +325,8 @@ class CategoryManagementFrame(BaseFrame):
             MessageDialog.show_success("Success", "Category updated successfully")
             self.clear_form()
             self.load_categories()
+            # Set focus back to search entry to prevent input lock
+            self.after(100, lambda: self.search_entry.focus_set())
         else:
             MessageDialog.show_error("Error", "Failed to update category")
     
@@ -345,6 +349,8 @@ class CategoryManagementFrame(BaseFrame):
             MessageDialog.show_success("Success", "Category deleted successfully")
             self.clear_form()
             self.load_categories()
+            # Set focus back to search entry to prevent input lock
+            self.after(100, lambda: self.search_entry.focus_set())
         else:
             MessageDialog.show_error("Error", "Failed to delete category")
     

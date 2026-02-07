@@ -9,6 +9,9 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from typing import Dict, List, Tuple, Any
 import re
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils import resource_path
 
 # ReportLab imports
 from reportlab.lib.pagesizes import A4
@@ -83,7 +86,7 @@ class ExecutiveReportGenerator:
     FONT_TINY = 7
     
     # Company info
-    COMPANY_NAME = "Studio Shine Art"
+    COMPANY_NAME = "STUDIO SHINE ART"
     COMPANY_REG = "Reg No: 26/3610"
     COMPANY_ADDRESS = "No: 52/1/1, Maravila Road, Nattandiya"
     COMPANY_CONTACT = "0767898604 / 0322051680"
@@ -337,7 +340,7 @@ class ExecutiveReportGenerator:
         story.append(Spacer(1, 40*mm))
         
         # Logo
-        logo_path = 'assets/logos/logo.png'
+        logo_path = resource_path('assets/logos/logo.png')
         if os.path.exists(logo_path):
             logo = Image(logo_path, width=80*mm, height=32*mm)
             logo.hAlign = 'CENTER'

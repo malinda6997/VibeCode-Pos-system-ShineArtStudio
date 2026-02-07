@@ -137,6 +137,146 @@ class SettingsFrame(ctk.CTkFrame):
         self.tax_entry.pack(side="left", padx=15)
         self.tax_entry.insert(0, "0")
         
+        # ==================== BILLING SEQUENCE SECTION (NEW) ====================
+        sequence_section = self.create_section(main_scroll, "Billing Sequence Control")
+        
+        # Info label
+        ctk.CTkLabel(
+            sequence_section,
+            text="⚙️ Configure starting numbers for Bills and Invoices. Next generated documents will use these values.",
+            font=ctk.CTkFont(size=11),
+            text_color="#aaaaaa",
+            wraplength=700,
+            justify="left"
+        ).pack(anchor="w", pady=(5, 15))
+        
+        # Current Status Display
+        status_frame = ctk.CTkFrame(sequence_section, fg_color="#1a1a2e", corner_radius=10, border_width=1, border_color="#444444")
+        status_frame.pack(fill="x", pady=(0, 15))
+        
+        ctk.CTkLabel(
+            status_frame,
+            text="📊 Current Status",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color="#8C00FF"
+        ).pack(anchor="w", padx=15, pady=(10, 5))
+        
+        # Get current last used numbers from database
+        from database.db_manager import DatabaseManager
+        temp_db = DatabaseManager()
+        
+        # Get last bill number
+        last_bill = temp_db.execute_query('SELECT MAX(id) as max_id FROM bills')
+        last_bill_id = last_bill[0]['max_id'] if last_bill and last_bill[0]['max_id'] else 0
+        last_bill_number = f"BILL{str(last_bill_id).zfill(6)}" if last_bill_id > 0 else "None"
+        
+        # Get last invoice number  
+        last_invoice = temp_db.execute_query('SELECT MAX(id) as max_id FROM invoices')
+        last_invoice_id = last_invoice[0]['max_id'] if last_invoice and last_invoice[0]['max_id'] else 0
+        last_invoice_number = f"BK-INV-{str(last_invoice_id).zfill(4)}" if last_invoice_id > 0 else "None"
+        
+        status_info_frame = ctk.CTkFrame(status_frame, fg_color="transparent")
+        status_info_frame.pack(fill="x", padx=15, pady=(5, 10))
+        
+        self.last_bill_label = ctk.CTkLabel(
+            status_info_frame,
+            text=f"Last Bill Number: {last_bill_number} (ID: {last_bill_id})",
+            font=ctk.CTkFont(size=12),
+            text_color="#00ff88"
+        )
+        self.last_bill_label.pack(anchor="w", pady=3)
+        
+        self.last_invoice_label = ctk.CTkLabel(
+            status_info_frame,
+            text=f"Last Invoice Number: {last_invoice_number} (ID: {last_invoice_id})",
+            font=ctk.CTkFont(size=12),
+            text_color="#00ff88"
+        )
+        self.last_invoice_label.pack(anchor="w", pady=3)
+        
+        # Starting Bill Number
+        ctk.CTkLabel(
+            sequence_section,
+            text="Next Bill Starting ID:",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(anchor="w", pady=(10, 5))
+        
+        bill_id_frame = ctk.CTkFrame(sequence_section, fg_color="transparent")
+        bill_id_frame.pack(fill="x", pady=(0, 5))
+        
+        self.next_bill_id_entry = ctk.CTkEntry(
+            bill_id_frame, 
+            width=150, 
+            height=40, 
+            font=ctk.CTkFont(size=13), 
+            corner_radius=15, 
+            border_width=1,
+            placeholder_text="e.g., 1000"
+        )
+        self.next_bill_id_entry.pack(side="left")
+        self.next_bill_id_entry.insert(0, str(last_bill_id + 1))
+        
+        ctk.CTkLabel(
+            bill_id_frame,
+            text=f"→ Will generate: BILL{str(last_bill_id + 1).zfill(6)}",
+            font=ctk.CTkFont(size=11),
+            text_color="#888888"
+        ).pack(side="left", padx=15)
+        
+        ctk.CTkLabel(
+            sequence_section,
+            text="💡 Note: This sets the ID for the next bill. Format: BILLXXXXXX (6 digits)",
+            font=ctk.CTkFont(size=10),
+            text_color="#666666"
+        ).pack(anchor="w", pady=(0, 10))
+        
+        # Starting Invoice Number
+        ctk.CTkLabel(
+            sequence_section,
+            text="Next Invoice Starting ID:",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(anchor="w", pady=(10, 5))
+        
+        invoice_id_frame = ctk.CTkFrame(sequence_section, fg_color="transparent")
+        invoice_id_frame.pack(fill="x", pady=(0, 5))
+        
+        self.next_invoice_id_entry = ctk.CTkEntry(
+            invoice_id_frame,
+            width=150,
+            height=40,
+            font=ctk.CTkFont(size=13),
+            corner_radius=15,
+            border_width=1,
+            placeholder_text="e.g., 1000"
+        )
+        self.next_invoice_id_entry.pack(side="left")
+        self.next_invoice_id_entry.insert(0, str(last_invoice_id + 1))
+        
+        ctk.CTkLabel(
+            invoice_id_frame,
+            text=f"→ Will generate: BK-INV-{str(last_invoice_id + 1).zfill(4)}",
+            font=ctk.CTkFont(size=11),
+            text_color="#888888"
+        ).pack(side="left", padx=15)
+        
+        ctk.CTkLabel(
+            sequence_section,
+            text="💡 Note: This sets the ID for the next booking invoice. Format: BK-INV-XXXX (4 digits)",
+            font=ctk.CTkFont(size=10),
+            text_color="#666666"
+        ).pack(anchor="w", pady=(0, 10))
+        
+        # Warning message
+        warning_frame = ctk.CTkFrame(sequence_section, fg_color="#3d1f1f", corner_radius=10, border_width=1, border_color="#ff4444")
+        warning_frame.pack(fill="x", pady=(10, 0))
+        
+        ctk.CTkLabel(
+            warning_frame,
+            text="⚠️ Warning: Changing these values may cause numbering conflicts. Use with caution!",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            text_color="#ff6b6b"
+        ).pack(padx=15, pady=10)
+        
         # Appearance Section
         appearance_section = self.create_section(main_scroll, "Appearance")
         
@@ -298,6 +438,32 @@ class SettingsFrame(ctk.CTkFrame):
         
         self.low_stock_entry.delete(0, "end")
         self.low_stock_entry.insert(0, get_val("low_stock_threshold", "5"))
+        
+        # Load billing sequence values
+        self.next_bill_id_entry.delete(0, "end")
+        self.next_bill_id_entry.insert(0, get_val("next_bill_id", "1"))
+        
+        self.next_invoice_id_entry.delete(0, "end")
+        self.next_invoice_id_entry.insert(0, get_val("next_invoice_id", "1"))
+    
+    def refresh_sequence_status(self):
+        """Refresh the current billing sequence status display"""
+        from database.db_manager import DatabaseManager
+        temp_db = DatabaseManager()
+        
+        # Get last bill number
+        last_bill = temp_db.execute_query('SELECT MAX(id) as max_id FROM bills')
+        last_bill_id = last_bill[0]['max_id'] if last_bill and last_bill[0]['max_id'] else 0
+        last_bill_number = f"BILL{str(last_bill_id).zfill(6)}" if last_bill_id > 0 else "None"
+        
+        # Get last invoice number  
+        last_invoice = temp_db.execute_query('SELECT MAX(id) as max_id FROM invoices')
+        last_invoice_id = last_invoice[0]['max_id'] if last_invoice and last_invoice[0]['max_id'] else 0
+        last_invoice_number = f"BK-INV-{str(last_invoice_id).zfill(4)}" if last_invoice_id > 0 else "None"
+        
+        # Update labels
+        self.last_bill_label.configure(text=f"Last Bill Number: {last_bill_number} (ID: {last_bill_id})")
+        self.last_invoice_label.configure(text=f"Last Invoice Number: {last_invoice_number} (ID: {last_invoice_id})")
     
     def save_settings(self):
         """Save all settings"""
@@ -310,11 +476,16 @@ class SettingsFrame(ctk.CTkFrame):
             "invoice_footer": self.footer_text.get("1.0", "end-1c").strip(),
             "tax_rate": self.tax_entry.get().strip(),
             "theme_mode": self.theme_combo.get(),
-            "low_stock_threshold": self.low_stock_entry.get().strip()
+            "low_stock_threshold": self.low_stock_entry.get().strip(),
+            "next_bill_id": self.next_bill_id_entry.get().strip(),
+            "next_invoice_id": self.next_invoice_id_entry.get().strip()
         }
         
         self.settings_service.update_multiple_settings(settings)
-        Toast.success(self, "Settings saved successfully!")
+        Toast.success(self, "Settings saved successfully!\nBilling sequence will take effect on next document generation.")
+        
+        # Refresh the status display
+        self.refresh_sequence_status()
     
     def reset_settings(self):
         """Reset to default settings"""

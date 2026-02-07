@@ -23,6 +23,7 @@ class PermissionsFrame(ctk.CTkFrame):
             ("can_access_frames", "🖼 Photo Frames", "Manage photo frame inventory"),
             ("can_access_bookings", "📅 Bookings", "Manage customer bookings"),
             ("can_access_invoices", "📄 Invoices", "View invoice history"),
+            ("can_manage_expenses", "💸 Manage Expenses", "Add and view manual expenses"),
             ("can_access_support", "💬 Support", "Access support page"),
             ("can_access_user_guide", "📖 User Guide", "Access user guide"),
         ]
