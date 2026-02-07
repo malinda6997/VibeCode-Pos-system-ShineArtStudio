@@ -109,7 +109,7 @@ class InvoiceGenerator:
         # === COMPANY & CLIENT INFO SECTION ===
         # Left: Company details
         company_info = Table([
-            [Paragraph("<b>Studio Shine Art</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
+            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
             [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
             [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
@@ -428,7 +428,7 @@ class InvoiceGenerator:
         
         # === COMPANY & CLIENT INFO ===
         company_info = Table([
-            [Paragraph("<b>Studio Shine Art</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
+            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
             [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
             [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
@@ -1073,7 +1073,7 @@ class InvoiceGenerator:
         
         # === COMPANY & CLIENT INFO ===
         company_info = Table([
-            [Paragraph("<b>Studio Shine Art</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
+            [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
             [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
             [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
         ], colWidths=[page_width*0.5])
@@ -1190,7 +1190,7 @@ class InvoiceGenerator:
         
         # === FOOTER ===
         footer_style = ParagraphStyle('Footer', fontSize=9, alignment=TA_CENTER, textColor=colors.HexColor('#333333'))
-        story.append(Paragraph("Studio Shine Art | No: 52/1/1, Maravila Road, Nattandiya | 0767898604 / 0322051680", footer_style))
+        story.append(Paragraph("STUDIO SHINE ART | No: 52/1/1, Maravila Road, Nattandiya | 0767898604 / 0322051680", footer_style))
         story.append(Spacer(1, 2*mm))
         
         dev_style = ParagraphStyle('Dev', fontSize=8, alignment=TA_CENTER, textColor=colors.HexColor('#888888'))

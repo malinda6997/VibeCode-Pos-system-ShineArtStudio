@@ -63,7 +63,7 @@ def generate_booking_settlement_invoice(self, settlement_data):
     
     # === COMPANY & CLIENT INFO ===
     company_info = Table([
-        [Paragraph("<b>Studio Shine Art</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
+        [Paragraph("<b>STUDIO SHINE ART</b>", ParagraphStyle('Co', fontSize=13, fontName='Helvetica-Bold'))],
         [Paragraph("No: 52/1/1, Maravila Road, Nattandiya", ParagraphStyle('Addr', fontSize=10, textColor=colors.HexColor('#555555')))],
         [Paragraph("Tel: 0767898604 / 0322051680", ParagraphStyle('Tel', fontSize=10, textColor=colors.HexColor('#555555')))],
     ], colWidths=[page_width*0.5])

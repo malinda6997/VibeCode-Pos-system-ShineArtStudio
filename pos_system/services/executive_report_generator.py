@@ -86,7 +86,7 @@ class ExecutiveReportGenerator:
     FONT_TINY = 7
     
     # Company info
-    COMPANY_NAME = "Studio Shine Art"
+    COMPANY_NAME = "STUDIO SHINE ART"
     COMPANY_REG = "Reg No: 26/3610"
     COMPANY_ADDRESS = "No: 52/1/1, Maravila Road, Nattandiya"
     COMPANY_CONTACT = "0767898604 / 0322051680"

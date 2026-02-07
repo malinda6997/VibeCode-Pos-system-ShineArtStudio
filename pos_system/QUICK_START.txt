@@ -1,0 +1,152 @@
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║           SHINE ART STUDIO POS - QUICK START GUIDE            ║
+║                Single EXE Build Instructions                   ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+🎯 OBJECTIVE: Create one portable EXE file that runs anywhere
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 STEP 1: INSTALL REQUIREMENTS (One-Time Setup)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Open Command Prompt or PowerShell and run:
+
+    pip install customtkinter Pillow reportlab pyinstaller
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 STEP 2: BUILD THE EXE (Choose ONE method)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+METHOD A: Double-Click (Easiest)
+    
+    1. Double-click: BUILD_EXE.bat
+    2. Wait 2-5 minutes
+    3. Done!
+
+METHOD B: Python Script
+
+    1. Open terminal in pos_system folder
+    2. Run: python build_standalone_exe.py
+    3. Wait 2-5 minutes
+    4. Done!
+
+METHOD C: Manual PyInstaller
+
+    pyinstaller --noconfirm --onefile --windowed ^
+                --add-data "assets;assets" ^
+                --icon="assets/logos/app_icon.ico" ^
+                --name "ShineArt_POS" main.py
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📁 STEP 3: FIND YOUR EXE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+After build completes, your EXE is here:
+
+    📂 pos_system/
+       └── 📂 dist/
+           └── 📄 ShineArt_POS.exe  ⭐ THIS IS IT!
+
+File size: ~80-120 MB
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ STEP 4: TEST THE EXE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Copy ShineArt_POS.exe to a NEW folder (e.g., Desktop)
+2. Double-click ShineArt_POS.exe
+3. Login window should appear with:
+   ✓ Studio logo
+   ✓ Background image
+   ✓ Username field auto-focused (ready to type)
+4. Login with admin credentials
+5. Check that:
+   ✓ Sidebar logo displays
+   ✓ Generate a test invoice with logo
+   ✓ Database file (pos_database.db) created automatically
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 DEPLOYMENT (For End Users)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+To deploy to a user's PC:
+
+1. Copy ShineArt_POS.exe to their computer
+2. Tell them to double-click it
+3. Database auto-creates on first run
+4. That's it! No installation needed.
+
+The user can place the EXE anywhere:
+✓ Desktop
+✓ Documents folder
+✓ USB drive
+✓ Network drive
+✓ Any location with write permission
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PROBLEM: "pyinstaller not found"
+SOLUTION: pip install pyinstaller
+
+PROBLEM: Build fails with import errors
+SOLUTION: pip install customtkinter Pillow reportlab
+
+PROBLEM: EXE won't run on target PC
+SOLUTION: 
+    - Install Microsoft Visual C++ Redistributable
+    - Download: https://aka.ms/vs/17/release/vc_redist.x64.exe
+    - Check antivirus settings
+
+PROBLEM: Images not showing in EXE
+SOLUTION: Rebuild with command exactly as shown above
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 ADDITIONAL DOCUMENTATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+For detailed information, see:
+    
+    📄 BUILD_GUIDE.md
+        Complete build instructions and troubleshooting
+    
+    📄 STANDALONE_EXE_COMPLETION_REPORT.md
+        Full technical report of all changes made
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎉 SUCCESS!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Your application is now:
+    ✅ Single-file EXE
+    ✅ Fully portable
+    ✅ No installation required
+    ✅ All assets embedded
+    ✅ Database auto-creates
+    ✅ Professional appearance
+    ✅ Ready for deployment
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 SUPPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Developer: Malinda Prabath
+Application: STUDIO SHINE ART POS System
+Year: 2025
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Made with ❤️ for STUDIO SHINE ART
+© 2025 Photography Studio Management System
