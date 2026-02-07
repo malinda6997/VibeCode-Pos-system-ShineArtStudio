@@ -565,6 +565,12 @@ class MessageDialog:
             Toast.warning(MessageDialog._parent, message)
     
     @staticmethod
+    def show_info(title: str, message: str):
+        """Show info toast"""
+        if MessageDialog._parent:
+            Toast.info(MessageDialog._parent, message)
+    
+    @staticmethod
     def show_confirm(title: str, message: str) -> bool:
         """Show confirmation dialog"""
         if MessageDialog._parent:

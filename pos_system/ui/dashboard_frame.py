@@ -277,7 +277,18 @@ class DashboardFrame(ctk.CTkFrame):
         self.cards_frame.pack(fill="both", expand=True)
         
         # ==================== MANUAL EXPENSE ENTRY ====================
+        # Show to Admin OR Staff with expense permission
+        user = self.auth_manager.get_current_user()
+        can_manage_expenses = False
         if self.is_admin():
+            can_manage_expenses = True
+        elif user:
+            # Check permission for staff
+            perms = self.db_manager.get_user_permissions(user['id'])
+            if perms and perms.get('can_manage_expenses', 0) == 1:
+                can_manage_expenses = True
+        
+        if can_manage_expenses:
             expense_frame = ctk.CTkFrame(self.cards_frame, fg_color="#060606", corner_radius=20, border_width=2, border_color="#444444")
             expense_frame.pack(fill="x", pady=(0, 10))
             

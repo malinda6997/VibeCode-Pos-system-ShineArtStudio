@@ -1215,3 +1215,12 @@ class InvoiceGenerator:
         except Exception as e:
             print(f"Error printing invoice: {e}")
             return False
+    
+    def open_bill(self, filepath):
+        """Open invoice/bill PDF in default viewer"""
+        try:
+            os.startfile(filepath)
+            return True
+        except Exception as e:
+            print(f"Error opening invoice: {e}")
+            return False

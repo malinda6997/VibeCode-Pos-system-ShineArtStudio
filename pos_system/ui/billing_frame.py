@@ -1673,6 +1673,10 @@ class BillingFrame(BaseFrame):
             balance_due = total - cash_given
             payment_status = "ADVANCE"
 
+        # *** FIX: Real-time timestamp - capture exact moment of bill generation ***
+        from datetime import datetime
+        bill_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
         bill_number = self.db_manager.generate_bill_number()
 
         if self.is_guest_customer:
@@ -1682,7 +1686,7 @@ class BillingFrame(BaseFrame):
             customer_id = self.selected_customer['id']
             guest_name = None
 
-        # Create bill in database
+        # Create bill in database with explicit timestamp
         bill_id = self.db_manager.create_bill(
             bill_number,
             customer_id,
@@ -1694,7 +1698,8 @@ class BillingFrame(BaseFrame):
             cash_given,
             guest_name,
             advance_amount,
-            balance_due
+            balance_due,
+            bill_timestamp  # Pass exact timestamp
         )
 
         if not bill_id:
@@ -1756,12 +1761,116 @@ class BillingFrame(BaseFrame):
                 customer_data
             )
 
-            MessageDialog.show_success("Success", f"Bill {bill_number} generated successfully!")
-            self.bill_generator.open_bill(pdf_path)
+            # *** NEW: Show Bill Preview Popup instead of auto-opening PDF ***
+            self.show_bill_preview_popup(pdf_path, bill_number)
             self.clear_all()
 
         except Exception as e:
             MessageDialog.show_error("Error", f"Failed to generate bill PDF: {str(e)}")
+
+    def show_bill_preview_popup(self, pdf_path, bill_number):
+        """Show bill preview popup with Download and Print options"""
+        popup = ctk.CTkToplevel(self)
+        popup.title("Bill Generated Successfully")
+        popup.geometry("500x300")
+        popup.resizable(False, False)
+        popup.grab_set()  # Modal popup
+        
+        # Center the popup
+        popup.update_idletasks()
+        x = (popup.winfo_screenwidth() // 2) - (500 // 2)
+        y = (popup.winfo_screenheight() // 2) - (300 // 2)
+        popup.geometry(f"500x300+{x}+{y}")
+        
+        # Success icon and message
+        success_frame = ctk.CTkFrame(popup, fg_color="transparent")
+        success_frame.pack(pady=(30, 20))
+        
+        ctk.CTkLabel(
+            success_frame,
+            text="✅",
+            font=ctk.CTkFont(size=60)
+        ).pack()
+        
+        ctk.CTkLabel(
+            success_frame,
+            text=f"Bill {bill_number} Generated Successfully!",
+            font=ctk.CTkFont(size=18, weight="bold"),
+            text_color="#2ecc71"
+        ).pack(pady=(10, 5))
+        
+        ctk.CTkLabel(
+            success_frame,
+            text="Choose an action below:",
+            font=ctk.CTkFont(size=13),
+            text_color="#888888"
+        ).pack()
+        
+        # Button frame
+        button_frame = ctk.CTkFrame(popup, fg_color="transparent")
+        button_frame.pack(pady=20)
+        
+        # Download PDF button
+        download_btn = ctk.CTkButton(
+            button_frame,
+            text="📥 Download PDF",
+            command=lambda: self.download_bill_action(pdf_path, popup),
+            width=200,
+            height=50,
+            fg_color="#8C00FF",
+            hover_color="#7300D6",
+            font=ctk.CTkFont(size=15, weight="bold"),
+            corner_radius=20
+        )
+        download_btn.pack(side="left", padx=10)
+        
+        # Print Now button
+        print_btn = ctk.CTkButton(
+            button_frame,
+            text="🖨️ Print Now",
+            command=lambda: self.print_bill_action(pdf_path, popup),
+            width=200,
+            height=50,
+            fg_color="#2ecc71",
+            hover_color="#27ae60",
+            font=ctk.CTkFont(size=15, weight="bold"),
+            corner_radius=20
+        )
+        print_btn.pack(side="left", padx=10)
+        
+        # Close button
+        close_btn = ctk.CTkButton(
+            popup,
+            text="Close",
+            command=popup.destroy,
+            width=100,
+            height=35,
+            fg_color="#555555",
+            hover_color="#444444",
+            font=ctk.CTkFont(size=13),
+            corner_radius=20
+        )
+        close_btn.pack(pady=(10, 20))
+    
+    def download_bill_action(self, pdf_path, popup):
+        """Open PDF in viewer for download/viewing"""
+        try:
+            self.bill_generator.open_bill(pdf_path)
+            MessageDialog.show_success("Success", "Bill opened in PDF viewer")
+            popup.destroy()
+        except Exception as e:
+            MessageDialog.show_error("Error", f"Failed to open PDF: {str(e)}")
+    
+    def print_bill_action(self, pdf_path, popup):
+        """Send bill directly to thermal printer without opening viewer"""
+        try:
+            # Send directly to default printer
+            import os
+            os.startfile(pdf_path, 'print')
+            MessageDialog.show_success("Success", "Bill sent to printer")
+            popup.destroy()
+        except Exception as e:
+            MessageDialog.show_error("Error", f"Failed to print: {str(e)}")
 
     def generate_invoice_from_booking(self, booking_id):
         """Generate A4 invoice for a booking - called from booking frame"""

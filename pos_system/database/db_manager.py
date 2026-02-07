@@ -642,19 +642,31 @@ class DatabaseManager:
                    discount: float, total_amount: float, created_by: int,
                    service_charge: float = 0, cash_given: float = 0,
                    guest_name: str = None, advance_amount: float = 0,
-                   balance_due: float = 0) -> Optional[int]:
+                   balance_due: float = 0, created_at: str = None) -> Optional[int]:
         """Create a new bill (thermal receipt) for normal sales.
         For guest customers, customer_id is None and guest_name is provided.
-        Supports both full and advance payment."""
-        query = '''
-            INSERT INTO bills (bill_number, customer_id, guest_name, subtotal, discount,
-                             service_charge, total_amount, cash_given, advance_amount, 
-                             balance_due, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        '''
-        return self.execute_insert(query, (bill_number, customer_id, guest_name, subtotal,
-                                          discount, service_charge, total_amount, 
-                                          cash_given, advance_amount, balance_due, created_by))
+        Supports both full and advance payment.
+        created_at: Optional custom timestamp (YYYY-MM-DD HH:MM:SS format)"""
+        if created_at:
+            query = '''
+                INSERT INTO bills (bill_number, customer_id, guest_name, subtotal, discount,
+                                 service_charge, total_amount, cash_given, advance_amount, 
+                                 balance_due, created_by, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            '''
+            return self.execute_insert(query, (bill_number, customer_id, guest_name, subtotal,
+                                              discount, service_charge, total_amount, 
+                                              cash_given, advance_amount, balance_due, created_by, created_at))
+        else:
+            query = '''
+                INSERT INTO bills (bill_number, customer_id, guest_name, subtotal, discount,
+                                 service_charge, total_amount, cash_given, advance_amount, 
+                                 balance_due, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            '''
+            return self.execute_insert(query, (bill_number, customer_id, guest_name, subtotal,
+                                              discount, service_charge, total_amount, 
+                                              cash_given, advance_amount, balance_due, created_by))
     
     def add_bill_item(self, bill_id: int, item_type: str, item_id: int,
                      item_name: str, quantity: int, unit_price: float,

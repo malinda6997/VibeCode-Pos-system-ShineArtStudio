@@ -165,14 +165,29 @@ class BillHistoryFrame(BaseFrame):
         if self.auth_manager.current_user and self.auth_manager.current_user.get('role') == 'Admin':
             ctk.CTkButton(
                 controls_frame,
-                text="Delete Selected",
+                text="🗑️ Delete Selected",
                 command=self.delete_selected_bill,
-                width=140,
+                width=150,
                 height=35,
                 fg_color="#ff4444",
                 text_color="white",
-                hover_color="#cc0000"
+                hover_color="#cc0000",
+                corner_radius=20,
+                font=ctk.CTkFont(size=13, weight="bold")
             ).pack(side="left", padx=10)
+            
+            ctk.CTkButton(
+                controls_frame,
+                text="🗑️ Delete All Bills",
+                command=self.delete_all_bills,
+                width=150,
+                height=35,
+                fg_color="#aa0000",
+                text_color="white",
+                hover_color="#880000",
+                corner_radius=20,
+                font=ctk.CTkFont(size=13, weight="bold")
+            ).pack(side="left", padx=5)
         
         # Bills table
         table_frame = ctk.CTkFrame(self, fg_color="#060606", border_width=2, border_color="#444444", corner_radius=15)
@@ -680,6 +695,65 @@ Balance Due: LKR {balance:.2f}
             self.load_bills()
         except Exception as e:
             MessageDialog.show_error("Error", f"Failed to delete bill: {str(e)}")
+        
+        # Restore focus to main window
+        self.restore_focus()
+    
+    def delete_all_bills(self):
+        """Delete all bills (Admin only) - with strong confirmation"""
+        # Verify admin role
+        if not self.auth_manager.current_user or self.auth_manager.current_user.get('role') != 'Admin':
+            MessageDialog.show_error("Permission Denied", "Only administrators can delete all bills")
+            return
+        
+        # Get total count
+        all_bills = self.db_manager.get_all_bills(limit=10000)
+        total_count = len(all_bills)
+        
+        if total_count == 0:
+            MessageDialog.show_info("No Bills", "There are no bills to delete")
+            return
+        
+        # Double confirmation for safety
+        first_confirm = MessageDialog.show_confirm(
+            "⚠️ DELETE ALL BILLS?",
+            f"This will PERMANENTLY DELETE all {total_count} bills from the system!\n\n"
+            f"This action CANNOT be undone!\n\n"
+            f"Are you absolutely sure you want to continue?"
+        )
+        
+        if not first_confirm:
+            return
+        
+        # Second confirmation
+        second_confirm = MessageDialog.show_confirm(
+            "⚠️ FINAL WARNING",
+            f"LAST CHANCE TO CANCEL!\n\n"
+            f"You are about to delete {total_count} bills permanently.\n\n"
+            f"Click OK to proceed with deletion, or Cancel to abort."
+        )
+        
+        if not second_confirm:
+            MessageDialog.show_info("Cancelled", "Delete operation cancelled. No bills were deleted.")
+            return
+        
+        # Proceed with deletion
+        try:
+            deleted_count = 0
+            for bill in all_bills:
+                # Delete bill items first
+                self.db_manager.execute_query('DELETE FROM bill_items WHERE bill_id = ?', (bill['id'],))
+                # Delete bill
+                self.db_manager.execute_query('DELETE FROM bills WHERE id = ?', (bill['id'],))
+                deleted_count += 1
+            
+            MessageDialog.show_success(
+                "Success", 
+                f"Successfully deleted {deleted_count} bills from the system."
+            )
+            self.load_bills()
+        except Exception as e:
+            MessageDialog.show_error("Error", f"Failed to delete bills: {str(e)}")
         
         # Restore focus to main window
         self.restore_focus()
