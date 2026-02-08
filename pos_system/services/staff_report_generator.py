@@ -1,11 +1,14 @@
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import inch
+from reportlab.lib.units import inch, mm
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, HRFlowable
 from reportlab.lib import colors
 from datetime import datetime
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils import resource_path
 
 
 class StaffReportGenerator:
@@ -30,74 +33,78 @@ class StaffReportGenerator:
         filepath = os.path.join(self.report_folder, filename)
         
         # Create PDF document
-        doc = SimpleDocTemplate(filepath, pagesize=A4)
+        doc = SimpleDocTemplate(
+            filepath,
+            pagesize=A4,
+            leftMargin=15*mm,
+            rightMargin=15*mm,
+            topMargin=15*mm,
+            bottomMargin=15*mm
+        )
         story = []
-        
-        # Styles
         styles = getSampleStyleSheet()
+        page_width = A4[0] - 30*mm
         
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=24,
-            textColor=colors.HexColor('#1f538d'),
-            spaceAfter=10,
-            alignment=TA_CENTER
+        # ==================== PROFESSIONAL HEADER ====================
+        # Logo at top left
+        logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
+        if os.path.exists(logo_path):
+            try:
+                logo = Image(logo_path, width=60*mm, height=24*mm)
+                logo.hAlign = 'LEFT'
+                story.append(logo)
+                story.append(Spacer(1, 5*mm))
+            except:
+                pass
+        
+        # Report Title
+        title = Paragraph(
+            "<b>STAFF DAILY WORK REPORT</b>",
+            ParagraphStyle(
+                'Title',
+                fontSize=22,
+                textColor=colors.HexColor('#8C00FF'),
+                alignment=TA_CENTER,
+                fontName='Helvetica-Bold',
+                spaceBefore=3*mm,
+                spaceAfter=5*mm
+            )
         )
+        story.append(title)
         
-        subtitle_style = ParagraphStyle(
-            'Subtitle',
-            parent=styles['Normal'],
-            fontSize=12,
-            alignment=TA_CENTER,
-            spaceAfter=20,
-            textColor=colors.grey
+        # Separator
+        separator = HRFlowable(
+            width="100%",
+            thickness=2,
+            color=colors.HexColor('#8C00FF'),
+            spaceBefore=2*mm,
+            spaceAfter=8*mm
         )
+        story.append(separator)
         
-        heading_style = ParagraphStyle(
-            'CustomHeading',
-            parent=styles['Heading2'],
-            fontSize=14,
-            textColor=colors.HexColor('#1f538d'),
-            spaceAfter=12,
-            spaceBefore=20
-        )
-        
-        normal_style = styles["Normal"]
-        
-        # Header - Studio name
-        story.append(Paragraph("Shine Art Studio", title_style))
-        story.append(Paragraph("Staff Daily Work Report", subtitle_style))
-        
-        # Report info box
-        report_date = datetime.now().strftime('%Y-%m-%d %H:%M')
-        story.append(Paragraph(f"<b>Report Generated:</b> {report_date}", normal_style))
-        story.append(Spacer(1, 0.2 * inch))
-        
-        # Staff info section
-        story.append(Paragraph("Staff Information", heading_style))
-        
+        # Staff Information Box - clearly separated
+        formatted_date = datetime.strptime(date, '%Y-%m-%d').strftime('%B %d, %Y')
         staff_info_data = [
-            ['Staff Name:', staff_data['full_name']],
-            ['Username:', f"@{staff_data['username']}"],
-            ['Role:', staff_data.get('role', 'Staff')],
-            ['Report Date:', date],
+            ['Staff Name:', staff_data['full_name'], 'Username:', f"@{staff_data['username']}"],
+            ['Role:', staff_data.get('role', 'Staff'), 'Report Date:', formatted_date]
         ]
         
-        staff_table = Table(staff_info_data, colWidths=[2*inch, 4*inch])
+        staff_table = Table(staff_info_data, colWidths=[page_width * 0.22, page_width * 0.28, page_width * 0.22, page_width * 0.28])
         staff_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f0f0f0')),
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#F0F0F0')),
+            ('BACKGROUND', (2, 0), (2, -1), colors.HexColor('#F0F0F0')),
             ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, -1), 10),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
             ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('GRID', (0, 0), (-1, -1), 0.75, colors.grey),
+            ('BOX', (0, 0), (-1, -1), 1.5, colors.black),
         ]))
         story.append(staff_table)
+        story.append(Spacer(1, 10*mm))
         
-        # Summary section
-        story.append(Paragraph("Daily Summary", heading_style))
-        
+        # ==================== PERFORMANCE DASHBOARD ====================
         invoices = work_records.get('invoices', [])
         bookings = work_records.get('bookings', [])
         customers = work_records.get('customers', [])
@@ -107,33 +114,84 @@ class StaffReportGenerator:
         total_booking_amount = sum(b.get('full_amount', 0) for b in bookings)
         total_advance = sum(b.get('advance_payment', 0) for b in bookings)
         
-        summary_data = [
-            ['Metric', 'Count', 'Amount (LKR)'],
-            ['Invoices Created', str(len(invoices)), f"{total_invoice_amount:,.2f}"],
-            ['Payments Received', '-', f"{total_paid:,.2f}"],
-            ['Bookings Created', str(len(bookings)), f"{total_booking_amount:,.2f}"],
-            ['Advance Collected', '-', f"{total_advance:,.2f}"],
-            ['Customers Added', str(len(customers)), '-'],
+        # Dashboard title
+        dashboard_title = Paragraph(
+            "<b>PERFORMANCE DASHBOARD</b>",
+            ParagraphStyle(
+                'DashboardTitle',
+                fontSize=14,
+                textColor=colors.HexColor('#8C00FF'),
+                fontName='Helvetica-Bold',
+                spaceBefore=3*mm,
+                spaceAfter=5*mm
+            )
+        )
+        story.append(dashboard_title)
+        
+        # 2-Column Grid Layout for metrics
+        dashboard_data = [
+            ['INVOICES CREATED', 'PAYMENTS RECEIVED (LKR)'],
+            [str(len(invoices)), f"{total_paid:,.2f}"],
+            ['BOOKINGS CREATED', 'ADVANCE COLLECTED (LKR)'],
+            [str(len(bookings)), f"{total_advance:,.2f}"],
+            ['CUSTOMERS ADDED', ''],
+            [str(len(customers)), '']
         ]
         
-        summary_table = Table(summary_data, colWidths=[2.5*inch, 1.5*inch, 2*inch])
-        summary_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1f538d')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+        dashboard_table = Table(dashboard_data, colWidths=[page_width * 0.5, page_width * 0.5])
+        dashboard_table.setStyle(TableStyle([
+            # Headers (rows 0, 2, 4)
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#F0F0F0')),
+            ('BACKGROUND', (0, 2), (-1, 2), colors.HexColor('#F0F0F0')),
+            ('BACKGROUND', (0, 4), (0, 4), colors.HexColor('#F0F0F0')),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f9f9f9')),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ]))
-        story.append(summary_table)
-        
-        # Invoices detail section
-        if invoices:
-            story.append(Paragraph("Invoices Created", heading_style))
+            ('FONTNAME', (0, 2), (-1, 2), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 4), (0, 4), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 11),
             
+            # Values (rows 1, 3, 5)
+            ('FONTNAME', (0, 1), (-1, 1), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 3), (-1, 3), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 5), (0, 5), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 1), (-1, 1), 16),
+            ('FONTSIZE', (0, 3), (-1, 3), 16),
+            ('FONTSIZE', (0, 5), (0, 5), 16),
+            ('TEXTCOLOR', (0, 1), (-1, 1), colors.HexColor('#8C00FF')),
+            ('TEXTCOLOR', (0, 3), (-1, 3), colors.HexColor('#8C00FF')),
+            ('TEXTCOLOR', (0, 5), (0, 5), colors.HexColor('#8C00FF')),
+            
+            # Alignment
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            
+            # Padding
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+            ('TOPPADDING', (0, 0), (-1, -1), 10),
+            
+            # Borders
+            ('GRID', (0, 0), (-1, -1), 0.75, colors.grey),
+            ('BOX', (0, 0), (-1, -1), 1.5, colors.black),
+        ]))
+        story.append(dashboard_table)
+        story.append(Spacer(1, 10*mm))
+        
+        # ==================== DETAILED ACTIVITY SECTIONS ====================
+        
+        # INVOICES CREATED Section
+        section_header = Paragraph(
+            "<b>INVOICES CREATED</b>",
+            ParagraphStyle(
+                'SectionHeader',
+                fontSize=13,
+                textColor=colors.HexColor('#8C00FF'),
+                fontName='Helvetica-Bold',
+                spaceBefore=5*mm,
+                spaceAfter=3*mm
+            )
+        )
+        story.append(section_header)
+        
+        if invoices:
             inv_data = [['#', 'Invoice No.', 'Customer', 'Total (LKR)', 'Paid (LKR)', 'Time']]
             for idx, inv in enumerate(invoices, 1):
                 created_time = inv.get('created_at', '')
@@ -142,67 +200,133 @@ class StaffReportGenerator:
                 inv_data.append([
                     str(idx),
                     inv.get('invoice_number', '-'),
-                    inv.get('customer_name', '-')[:20],
+                    inv.get('customer_name', '-')[:25],
                     f"{inv.get('total_amount', 0):,.2f}",
                     f"{inv.get('paid_amount', 0):,.2f}",
                     created_time
                 ])
             
-            inv_table = Table(inv_data, colWidths=[0.4*inch, 1.2*inch, 1.8*inch, 1.2*inch, 1.2*inch, 0.8*inch])
+            inv_table = Table(
+                inv_data,
+                colWidths=[page_width * 0.08, page_width * 0.20, page_width * 0.32, 
+                          page_width * 0.18, page_width * 0.18, page_width * 0.10]
+            )
             inv_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#27ae60')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                # Black Header with White Text
+                ('BACKGROUND', (0, 0), (-1, 0), colors.black),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('ALIGN', (2, 1), (2, -1), 'LEFT'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, 0), (-1, -1), 9),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-                ('TOPPADDING', (0, 0), (-1, -1), 6),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#e8f5e9')),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 7),
+                ('TOPPADDING', (0, 0), (-1, -1), 7),
+                
+                # Alternating row colors
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')]),
+                
+                # Borders
+                ('GRID', (0, 0), (-1, -1), 0.75, colors.grey),
+                ('BOX', (0, 0), (-1, -1), 1.5, colors.black),
             ]))
             story.append(inv_table)
         else:
-            story.append(Paragraph("Invoices Created", heading_style))
-            story.append(Paragraph("<i>No invoices created on this date.</i>", normal_style))
+            no_data = Paragraph(
+                "<i>No records found for this period</i>",
+                ParagraphStyle(
+                    'NoData',
+                    fontSize=10,
+                    textColor=colors.grey,
+                    alignment=TA_CENTER,
+                    spaceBefore=5*mm,
+                    spaceAfter=5*mm
+                )
+            )
+            story.append(no_data)
         
-        # Bookings detail section
+        story.append(Spacer(1, 8*mm))
+        
+        # BOOKINGS CREATED Section
+        section_header = Paragraph(
+            "<b>BOOKINGS CREATED</b>",
+            ParagraphStyle(
+                'SectionHeader',
+                fontSize=13,
+                textColor=colors.HexColor('#8C00FF'),
+                fontName='Helvetica-Bold',
+                spaceBefore=5*mm,
+                spaceAfter=3*mm
+            )
+        )
+        story.append(section_header)
+        
         if bookings:
-            story.append(Paragraph("Bookings Created", heading_style))
-            
             book_data = [['#', 'Customer', 'Category', 'Date', 'Amount (LKR)', 'Advance (LKR)']]
             for idx, b in enumerate(bookings, 1):
                 book_data.append([
                     str(idx),
-                    b.get('customer_name', '-')[:18],
-                    b.get('photoshoot_category', '-')[:15],
+                    b.get('customer_name', '-')[:20],
+                    b.get('photoshoot_category', '-')[:18],
                     b.get('booking_date', '-'),
                     f"{b.get('full_amount', 0):,.2f}",
                     f"{b.get('advance_payment', 0):,.2f}"
                 ])
             
-            book_table = Table(book_data, colWidths=[0.4*inch, 1.4*inch, 1.2*inch, 1*inch, 1.2*inch, 1.2*inch])
+            book_table = Table(
+                book_data,
+                colWidths=[page_width * 0.08, page_width * 0.24, page_width * 0.22,
+                          page_width * 0.16, page_width * 0.15, page_width * 0.15]
+            )
             book_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498db')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                # Black Header with White Text
+                ('BACKGROUND', (0, 0), (-1, 0), colors.black),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('ALIGN', (1, 1), (2, -1), 'LEFT'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, 0), (-1, -1), 9),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-                ('TOPPADDING', (0, 0), (-1, -1), 6),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#e3f2fd')),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 7),
+                ('TOPPADDING', (0, 0), (-1, -1), 7),
+                
+                # Alternating row colors
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')]),
+                
+                # Borders
+                ('GRID', (0, 0), (-1, -1), 0.75, colors.grey),
+                ('BOX', (0, 0), (-1, -1), 1.5, colors.black),
             ]))
             story.append(book_table)
         else:
-            story.append(Paragraph("Bookings Created", heading_style))
-            story.append(Paragraph("<i>No bookings created on this date.</i>", normal_style))
+            no_data = Paragraph(
+                "<i>No records found for this period</i>",
+                ParagraphStyle(
+                    'NoData',
+                    fontSize=10,
+                    textColor=colors.grey,
+                    alignment=TA_CENTER,
+                    spaceBefore=5*mm,
+                    spaceAfter=5*mm
+                )
+            )
+            story.append(no_data)
         
-        # Customers added section
+        story.append(Spacer(1, 8*mm))
+        
+        # NEW CUSTOMERS Section
+        section_header = Paragraph(
+            "<b>NEW CUSTOMERS</b>",
+            ParagraphStyle(
+                'SectionHeader',
+                fontSize=13,
+                textColor=colors.HexColor('#8C00FF'),
+                fontName='Helvetica-Bold',
+                spaceBefore=5*mm,
+                spaceAfter=3*mm
+            )
+        )
+        story.append(section_header)
+        
         if customers:
-            story.append(Paragraph("Customers Added", heading_style))
-            
             cust_data = [['#', 'Customer Name', 'Mobile Number', 'Added At']]
             for idx, c in enumerate(customers, 1):
                 created_time = c.get('created_at', '')
@@ -215,31 +339,81 @@ class StaffReportGenerator:
                     created_time
                 ])
             
-            cust_table = Table(cust_data, colWidths=[0.5*inch, 2.5*inch, 1.5*inch, 1.5*inch])
+            cust_table = Table(
+                cust_data,
+                colWidths=[page_width * 0.10, page_width * 0.45, page_width * 0.25, page_width * 0.20]
+            )
             cust_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#9b59b6')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                # Black Header with White Text
+                ('BACKGROUND', (0, 0), (-1, 0), colors.black),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('ALIGN', (1, 1), (1, -1), 'LEFT'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, 0), (-1, -1), 9),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-                ('TOPPADDING', (0, 0), (-1, -1), 6),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f3e5f5')),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 7),
+                ('TOPPADDING', (0, 0), (-1, -1), 7),
+                
+                # Alternating row colors
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')]),
+                
+                # Borders
+                ('GRID', (0, 0), (-1, -1), 0.75, colors.grey),
+                ('BOX', (0, 0), (-1, -1), 1.5, colors.black),
             ]))
             story.append(cust_table)
         else:
-            story.append(Paragraph("Customers Added", heading_style))
-            story.append(Paragraph("<i>No customers added on this date.</i>", normal_style))
+            no_data = Paragraph(
+                "<i>No records found for this period</i>",
+                ParagraphStyle(
+                    'NoData',
+                    fontSize=10,
+                    textColor=colors.grey,
+                    alignment=TA_CENTER,
+                    spaceBefore=5*mm,
+                    spaceAfter=5*mm
+                )
+            )
+            story.append(no_data)
         
-        # Footer
-        story.append(Spacer(1, 0.5 * inch))
-        story.append(Paragraph("─" * 60, ParagraphStyle('Line', alignment=TA_CENTER)))
-        story.append(Paragraph(
-            "This report was automatically generated by Shine Art Studio POS System",
-            ParagraphStyle('Footer', parent=normal_style, fontSize=9, alignment=TA_CENTER, textColor=colors.grey)
-        ))
+        # ==================== FOOTER ====================
+        story.append(Spacer(1, 15*mm))
+        
+        footer_separator = HRFlowable(
+            width="100%",
+            thickness=1,
+            color=colors.grey,
+            spaceBefore=5*mm,
+            spaceAfter=3*mm
+        )
+        story.append(footer_separator)
+        
+        # Standard contact details
+        footer_text = Paragraph(
+            "<b>Shine Art Studio</b> | Professional Photography & Framing Services<br/>"
+            "No: 52/1/1, Maravila Road, Nattandiya<br/>"
+            "Contact: +94 XXX XXX XXX | Email: info@shineartstudio.lk",
+            ParagraphStyle(
+                'Footer',
+                fontSize=9,
+                textColor=colors.grey,
+                alignment=TA_CENTER,
+                spaceAfter=3*mm
+            )
+        )
+        story.append(footer_text)
+        
+        # Auto-generation tag
+        auto_gen = Paragraph(
+            "<i>This report was automatically generated by Shine Art Studio POS System</i>",
+            ParagraphStyle(
+                'AutoGen',
+                fontSize=8,
+                textColor=colors.grey,
+                alignment=TA_CENTER
+            )
+        )
+        story.append(auto_gen)
         
         # Build PDF
         doc.build(story)

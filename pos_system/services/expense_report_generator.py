@@ -98,6 +98,9 @@ class ExpenseReportGenerator:
         # Calculate totals
         total_expenses = sum(item['amount'] for item in expenses_data)
         
+        # Get admin name for verification
+        admin_name = "Administrator"
+        
         # Create PDF
         doc = SimpleDocTemplate(
             filepath,
@@ -113,133 +116,87 @@ class ExpenseReportGenerator:
         page_width = A4[0] - 30*mm
         
         # ==================== HEADER ====================
-        # Logo - Centered
+        # Logo at top left
         logo_path = resource_path(os.path.join('assets', 'logos', 'invoiceLogo.png'))
         if os.path.exists(logo_path):
             try:
-                logo = Image(logo_path, width=80*mm, height=32*mm)
-                logo.hAlign = 'CENTER'
+                logo = Image(logo_path, width=60*mm, height=24*mm)
+                logo.hAlign = 'LEFT'
                 story.append(logo)
-                story.append(Spacer(1, 3*mm))
+                story.append(Spacer(1, 5*mm))
             except:
                 pass
         
-        # Studio Name
-        studio_title = Paragraph(
-            "<b>SHINE ART STUDIO</b>",
+        # Centered Report Title - EXPENSE ANALYTICS REPORT
+        report_title = Paragraph(
+            "<b>EXPENSE ANALYTICS REPORT</b>",
             ParagraphStyle(
-                'StudioTitle',
-                fontSize=26,
+                'ReportTitle',
+                fontSize=22,
                 textColor=colors.HexColor('#8C00FF'),
                 alignment=TA_CENTER,
                 fontName='Helvetica-Bold',
-                spaceAfter=2*mm
+                spaceBefore=3*mm,
+                spaceAfter=3*mm
             )
         )
-        story.append(studio_title)
+        story.append(report_title)
+        
+        # Subtitle - Report Period
+        period_subtitle = Paragraph(
+            f"<b>Report Period:</b> {period_label}",
+            ParagraphStyle(
+                'Period',
+                fontSize=13,
+                alignment=TA_CENTER,
+                fontName='Helvetica',
+                spaceBefore=2*mm,
+                spaceAfter=8*mm
+            )
+        )
+        story.append(period_subtitle)
         
         # Separator line
         separator = HRFlowable(
             width="100%",
             thickness=2,
             color=colors.HexColor('#8C00FF'),
-            spaceBefore=2*mm,
-            spaceAfter=5*mm
+            spaceBefore=3*mm,
+            spaceAfter=8*mm
         )
         story.append(separator)
         
-        # Report Title
-        report_title = Paragraph(
-            f"<b>EXPENSE REPORT - {period_type.upper()}</b>",
-            ParagraphStyle(
-                'ReportTitle',
-                fontSize=18,
-                textColor=colors.HexColor('#000000'),
-                alignment=TA_CENTER,
-                fontName='Helvetica-Bold',
-                spaceBefore=5*mm,
-                spaceAfter=2*mm
-            )
-        )
-        story.append(report_title)
-        
-        # Period Label
-        period_para = Paragraph(
-            f"<b>Period:</b> {period_label}",
-            ParagraphStyle(
-                'Period',
-                fontSize=12,
-                alignment=TA_CENTER,
-                spaceBefore=2*mm,
-                spaceAfter=5*mm
-            )
-        )
-        story.append(period_para)
-        
-        # Generation timestamp
-        timestamp = Paragraph(
-            f"<i>Generated on: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}</i>",
-            ParagraphStyle(
-                'Timestamp',
-                fontSize=9,
-                textColor=colors.grey,
-                alignment=TA_CENTER,
-                spaceAfter=8*mm
-            )
-        )
-        story.append(timestamp)
-        
-        # ==================== SUMMARY SECTION ====================
-        summary_title = Paragraph(
-            "<b>SUMMARY</b>",
-            ParagraphStyle(
-                'SectionTitle',
-                fontSize=14,
-                textColor=colors.HexColor('#8C00FF'),
-                fontName='Helvetica-Bold',
-                spaceBefore=5*mm,
-                spaceAfter=3*mm
-            )
-        )
-        story.append(summary_title)
-        
-        # Summary table
+        # ==================== SUMMARY BOX ====================
+        # Clean shaded box with key metrics
         summary_data = [
-            ['Total Expenses:', f'LKR {total_expenses:,.2f}'],
-            ['Number of Entries:', str(len(expenses_data))]
+            ['TOTAL EXPENDITURE', f'LKR {total_expenses:,.2f}'],
+            ['TRANSACTION COUNT', str(len(expenses_data))]
         ]
         
-        summary_table = Table(summary_data, colWidths=[page_width * 0.5, page_width * 0.5])
+        summary_table = Table(summary_data, colWidths=[page_width * 0.45, page_width * 0.55])
         summary_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#F0F0F0')),
-            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            # Background shading
+            ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F5F5F5')),
+            # Text styling
+            ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#333333')),
+            ('TEXTCOLOR', (1, 0), (1, -1), colors.HexColor('#8C00FF')),
             ('ALIGN', (0, 0), (0, -1), 'LEFT'),
             ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 11),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
-            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (1, 0), (1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (0, -1), 12),
+            ('FONTSIZE', (1, 0), (1, -1), 16),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+            ('TOPPADDING', (0, 0), (-1, -1), 12),
+            ('BOX', (0, 0), (-1, -1), 2, colors.HexColor('#8C00FF')),
+            ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor('#DDDDDD')),
         ]))
         story.append(summary_table)
-        story.append(Spacer(1, 8*mm))
+        story.append(Spacer(1, 10*mm))
         
-        # ==================== EXPENSE DETAILS ====================
+        # ==================== DATA TABLE ====================
         if expenses_data:
-            details_title = Paragraph(
-                "<b>EXPENSE DETAILS</b>",
-                ParagraphStyle(
-                    'SectionTitle',
-                    fontSize=14,
-                    textColor=colors.HexColor('#8C00FF'),
-                    fontName='Helvetica-Bold',
-                    spaceBefore=3*mm,
-                    spaceAfter=3*mm
-                )
-            )
-            story.append(details_title)
-            
-            # Expense table headers
+            # Expense table headers with Black background and White text
             expense_table_data = [
                 ['Date', 'Description', 'Added By', 'Amount (LKR)']
             ]
@@ -249,43 +206,42 @@ class ExpenseReportGenerator:
                 expense_date = datetime.strptime(item['expense_date'], '%Y-%m-%d').strftime('%b %d, %Y')
                 expense_table_data.append([
                     expense_date,
-                    item['description'][:40] + '...' if len(item['description']) > 40 else item['description'],
+                    item['description'][:45] + '...' if len(item['description']) > 45 else item['description'],
                     item['created_by_name'],
                     f"{item['amount']:,.2f}"
                 ])
             
-            # Create expense table
+            # Create expense table with professional styling
             expense_table = Table(
                 expense_table_data,
-                colWidths=[page_width * 0.18, page_width * 0.42, page_width * 0.22, page_width * 0.18]
+                colWidths=[page_width * 0.18, page_width * 0.44, page_width * 0.20, page_width * 0.18]
             )
             expense_table.setStyle(TableStyle([
-                # Header styling
+                # Header styling - Solid Black with White Text
                 ('BACKGROUND', (0, 0), (-1, 0), colors.black),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
                 ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 10),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                ('TOPPADDING', (0, 0), (-1, 0), 8),
+                ('FONTSIZE', (0, 0), (-1, 0), 11),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+                ('TOPPADDING', (0, 0), (-1, 0), 10),
                 
                 # Data rows styling
-                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
                 ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
                 ('ALIGN', (0, 1), (0, -1), 'CENTER'),  # Date center
                 ('ALIGN', (1, 1), (1, -1), 'LEFT'),    # Description left
                 ('ALIGN', (2, 1), (2, -1), 'CENTER'),  # Added By center
                 ('ALIGN', (3, 1), (3, -1), 'RIGHT'),   # Amount right
                 ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 1), (-1, -1), 9),
-                ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
-                ('TOPPADDING', (0, 1), (-1, -1), 6),
+                ('FONTSIZE', (0, 1), (-1, -1), 10),
+                ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
+                ('TOPPADDING', (0, 1), (-1, -1), 8),
                 
-                # Alternating row colors
-                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')]),
+                # Alternating row colors (Light Gray)
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F0F0F0')]),
                 
-                # Grid
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                # Grid and borders
+                ('GRID', (0, 0), (-1, -1), 0.75, colors.grey),
                 ('BOX', (0, 0), (-1, -1), 1.5, colors.black),
             ]))
             story.append(expense_table)
@@ -294,7 +250,7 @@ class ExpenseReportGenerator:
                 "<i>No expense records found for this period.</i>",
                 ParagraphStyle(
                     'NoData',
-                    fontSize=11,
+                    fontSize=12,
                     textColor=colors.grey,
                     alignment=TA_CENTER,
                     spaceBefore=10*mm,
@@ -304,7 +260,23 @@ class ExpenseReportGenerator:
             story.append(no_data)
         
         # ==================== FOOTER ====================
-        story.append(Spacer(1, 10*mm))
+        story.append(Spacer(1, 12*mm))
+        
+        # Generation and Verification info
+        generation_info = Paragraph(
+            f"<b>Generated on:</b> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}<br/>"
+            f"<b>Verified by:</b> {admin_name}",
+            ParagraphStyle(
+                'GenerationInfo',
+                fontSize=10,
+                textColor=colors.black,
+                alignment=TA_LEFT,
+                spaceBefore=5*mm,
+                spaceAfter=8*mm
+            )
+        )
+        story.append(generation_info)
+        
         footer_separator = HRFlowable(
             width="100%",
             thickness=1,
@@ -314,13 +286,14 @@ class ExpenseReportGenerator:
         )
         story.append(footer_separator)
         
+        # Standard contact details
         footer_text = Paragraph(
             "<b>Shine Art Studio</b> | Professional Photography & Framing Services<br/>"
+            "No: 52/1/1, Maravila Road, Nattandiya<br/>"
             "Contact: +94 XXX XXX XXX | Email: info@shineartstudio.lk",
             ParagraphStyle(
                 'Footer',
-                fontSize=8,
-                textColor=colors.grey,
+                fontSize=9,
                 alignment=TA_CENTER
             )
         )
