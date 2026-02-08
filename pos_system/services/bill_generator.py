@@ -155,18 +155,18 @@ class BillGenerator:
                 logo = Image(logo_path, width=60*mm, height=22*mm)
                 logo.hAlign = 'CENTER'
                 story.append(logo)
-                story.append(Spacer(1, 3*mm))
+                story.append(Spacer(1, 1*mm))
             except Exception as e:
                 print(f"Logo error: {e}")
         
         # Centered studio identity (removed duplicate studio name as it's in logo)
         story.append(Paragraph("No: 52/1/1, Maravila Road, Nattandiya", subheader_style))
         story.append(Paragraph("Reg No: 26/3610 | Tel: 0767898604 / 0322051680", subheader_style))
-        story.append(Spacer(1, 3*mm))
+        story.append(Spacer(1, 1.5*mm))
         
         # Solid BLACK separator (no gray)
         story.append(create_black_separator())
-        story.append(Spacer(1, 3*mm))
+        story.append(Spacer(1, 2*mm))
         
         # === BODY & TRANSACTION DETAILS (LEFT-ALIGNED) ===
         # Extract date and time
@@ -196,7 +196,7 @@ class BillGenerator:
         if mobile and mobile != 'Guest Customer':
             story.append(Paragraph(f"<b>Mobile:</b> {mobile}", left_meta_style))
         
-        story.append(Spacer(1, 3*mm))
+        story.append(Spacer(1, 2*mm))
         story.append(create_black_separator())
         story.append(Spacer(1, 3*mm))
         

@@ -414,7 +414,7 @@ class StaffReportsFrame(ctk.CTkFrame):
     def view_records(self):
         """View records for selected staff and date"""
         if not self.selected_user_id:
-            Toast.show_toast(self, "Error", "Please select a staff member.", "error")
+            Toast.error(self, "Please select a staff member.")
             return
         
         selected_date = self.date_entry.get_date().strftime('%Y-%m-%d')
@@ -479,16 +479,16 @@ class StaffReportsFrame(ctk.CTkFrame):
             'customers': customers
         }
         
-        Toast.show_toast(self, "Records Loaded", f"Showing records for {selected_date}", "success")
+        Toast.success(self, f"Showing records for {selected_date}")
     
     def download_report(self):
         """Generate and download PDF report"""
         if not self.selected_user_id or not self.selected_user_data:
-            Toast.show_toast(self, "Error", "Please select a staff member.", "error")
+            Toast.error(self, "Please select a staff member.")
             return
         
         if not hasattr(self, 'current_records'):
-            Toast.show_toast(self, "Error", "Please view records first.", "warning")
+            Toast.warning(self, "Please view records first.")
             return
         
         selected_date = self.date_entry.get_date().strftime('%Y-%m-%d')
@@ -502,7 +502,7 @@ class StaffReportsFrame(ctk.CTkFrame):
             
             # Open the PDF
             self.report_generator.open_report(filepath)
-            Toast.show_toast(self, "Success", "PDF report generated successfully!", "success")
+            Toast.success(self, "PDF report generated successfully!")
             
         except Exception as e:
-            Toast.show_toast(self, "Error", f"Failed to generate report: {str(e)}", "error")
+            Toast.error(self, f"Failed to generate report: {str(e)}")

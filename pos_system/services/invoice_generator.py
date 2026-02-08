@@ -56,7 +56,7 @@ class InvoiceGenerator:
             pagesize=A4,
             leftMargin=15*mm,
             rightMargin=15*mm,
-            topMargin=12*mm,
+            topMargin=8*mm,
             bottomMargin=12*mm
         )
         
@@ -104,7 +104,7 @@ class InvoiceGenerator:
             ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
         ]))
         story.append(header_table)
-        story.append(Spacer(1, 5*mm))
+        story.append(Spacer(1, 3*mm))
         
         # === COMPANY & CLIENT INFO SECTION ===
         # Left: Company contact details (no duplicate name as logo contains it)
@@ -138,7 +138,7 @@ class InvoiceGenerator:
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ]))
         story.append(info_table)
-        story.append(Spacer(1, 8*mm))
+        story.append(Spacer(1, 5*mm))
         
         # === ITEMS TABLE (PREMIUM BLACK THEME WITH ZEBRA STRIPING) ===
         # Header styles - white text for black background
@@ -392,7 +392,7 @@ class InvoiceGenerator:
             pagesize=A4,
             leftMargin=15*mm,
             rightMargin=15*mm,
-            topMargin=12*mm,
+            topMargin=8*mm,
             bottomMargin=12*mm
         )
         
@@ -423,7 +423,7 @@ class InvoiceGenerator:
         header_table = Table([[logo, right_content]], colWidths=[page_width*0.55, page_width*0.45])
         header_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'MIDDLE'), ('ALIGN', (0, 0), (0, 0), 'LEFT'), ('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
         story.append(header_table)
-        story.append(Spacer(1, 5*mm))
+        story.append(Spacer(1, 3*mm))
         
         # === COMPANY & CLIENT INFO ===
         company_info = Table([
@@ -443,7 +443,7 @@ class InvoiceGenerator:
         info_table = Table([[company_info, bill_to_info]], colWidths=[page_width*0.5, page_width*0.5])
         info_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')]))
         story.append(info_table)
-        story.append(Spacer(1, 8*mm))
+        story.append(Spacer(1, 5*mm))
         
         # === ITEMS TABLE (PREMIUM BLACK THEME WITH ZEBRA STRIPING) ===
         # Header styles - white text for black background
@@ -618,7 +618,7 @@ class InvoiceGenerator:
             pagesize=A4,
             leftMargin=15*mm,
             rightMargin=15*mm,
-            topMargin=12*mm,
+            topMargin=8*mm,
             bottomMargin=12*mm
         )
         
@@ -648,7 +648,7 @@ class InvoiceGenerator:
         header_table = Table([[logo, right_content]], colWidths=[page_width*0.55, page_width*0.45])
         header_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'MIDDLE'), ('ALIGN', (0, 0), (0, 0), 'LEFT'), ('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
         story.append(header_table)
-        story.append(Spacer(1, 5*mm))
+        story.append(Spacer(1, 3*mm))
         
         # === COMPANY & CLIENT INFO ===
         company_info = Table([
@@ -670,7 +670,7 @@ class InvoiceGenerator:
         info_table = Table([[company_info, bill_to_info]], colWidths=[page_width*0.5, page_width*0.5])
         info_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')]))
         story.append(info_table)
-        story.append(Spacer(1, 8*mm))
+        story.append(Spacer(1, 5*mm))
         
         # === ITEMS TABLE (PREMIUM BLACK THEME WITH ZEBRA STRIPING) ===
         # Header styles - white text for black background
@@ -1034,7 +1034,7 @@ class InvoiceGenerator:
             pagesize=A4,
             leftMargin=15*mm,
             rightMargin=15*mm,
-            topMargin=12*mm,
+            topMargin=8*mm,
             bottomMargin=12*mm
         )
         
@@ -1073,7 +1073,7 @@ class InvoiceGenerator:
         header_table = Table([[left_content, right_content]], colWidths=[page_width*0.55, page_width*0.45])
         header_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'MIDDLE'), ('ALIGN', (0, 0), (0, 0), 'LEFT'), ('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
         story.append(header_table)
-        story.append(Spacer(1, 5*mm))
+        story.append(Spacer(1, 3*mm))
         
         # === CLIENT INFO (RIGHT-ALIGNED) ===
         bill_to_info = Table([
@@ -1087,7 +1087,7 @@ class InvoiceGenerator:
         info_container = Table([[Spacer(1, 1), bill_to_info]], colWidths=[page_width*0.5, page_width*0.5])
         info_container.setStyle(TableStyle([('ALIGN', (1, 0), (1, 0), 'RIGHT'), ('VALIGN', (0, 0), (-1, -1), 'TOP')]))
         story.append(info_container)
-        story.append(Spacer(1, 8*mm))
+        story.append(Spacer(1, 5*mm))
         
         # === SETTLEMENT DETAILS TABLE ===
         header_style = ParagraphStyle('Header', fontSize=11, leading=13, textColor=colors.white, fontName='Helvetica-Bold')

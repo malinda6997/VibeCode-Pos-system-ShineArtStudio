@@ -290,7 +290,7 @@ class ExpenseReportGenerator:
         footer_text = Paragraph(
             "<b>Shine Art Studio</b> | Professional Photography & Framing Services<br/>"
             "No: 52/1/1, Maravila Road, Nattandiya<br/>"
-            "Contact: +94 XXX XXX XXX | Email: info@shineartstudio.lk",
+            "Contact: +94 76 220 6157 | Email: malindaprabath876@gmail.com",
             ParagraphStyle(
                 'Footer',
                 fontSize=9,

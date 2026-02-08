@@ -27,7 +27,7 @@ def generate_booking_settlement_invoice(self, settlement_data):
         pagesize=A4,
         leftMargin=15*mm,
         rightMargin=15*mm,
-        topMargin=12*mm,
+        topMargin=8*mm,
         bottomMargin=12*mm
     )
     
@@ -66,7 +66,7 @@ def generate_booking_settlement_invoice(self, settlement_data):
     header_table = Table([[left_content, right_content]], colWidths=[page_width*0.55, page_width*0.45])
     header_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'MIDDLE'), ('ALIGN', (0, 0), (0, 0), 'LEFT'), ('ALIGN', (1, 0), (1, 0), 'RIGHT')]))
     story.append(header_table)
-    story.append(Spacer(1, 5*mm))
+    story.append(Spacer(1, 3*mm))
     
     # === CLIENT INFO (RIGHT-ALIGNED) ===
     bill_to_info = Table([
@@ -80,7 +80,7 @@ def generate_booking_settlement_invoice(self, settlement_data):
     info_container = Table([[Spacer(1, 1), bill_to_info]], colWidths=[page_width*0.5, page_width*0.5])
     info_container.setStyle(TableStyle([('ALIGN', (1, 0), (1, 0), 'RIGHT'), ('VALIGN', (0, 0), (-1, -1), 'TOP')]))
     story.append(info_container)
-    story.append(Spacer(1, 8*mm))
+    story.append(Spacer(1, 5*mm))
     
     # === SETTLEMENT DETAILS TABLE ===
     header_style = ParagraphStyle('Header', fontSize=11, leading=13, textColor=colors.white, fontName='Helvetica-Bold')
