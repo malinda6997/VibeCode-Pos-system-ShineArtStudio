@@ -240,17 +240,62 @@ Shine Art Studio POS is a comprehensive, **fully offline** point-of-sale and bus
 *Contact information and support options*
 
 ![Support 2](Readme_images/support%20page2.png)
-*FAQ section*
+*FAQ section with common questions*
 
 ![Support 3](Readme_images/support%20page3.png)
-*Additional help resources*
+*Additional FAQ answers*
+
+![Support 4](Readme_images/support%20page4.png)
+*System information and bug reporting*
+
+![Support 5](Readme_images/support%20page5.png)
+*Issue submission and help resources*
 
 ### User Guide
 ![Guide 1](Readme_images/userguidepage1.png)
-*Comprehensive user documentation*
+*Welcome and feature overview*
 
 ![Guide 2](Readme_images/userguidepage2.png)
-*Step-by-step tutorials*
+*Quick start guide and billing instructions*
+
+![Guide 3](Readme_images/userguidepage3.png)
+*Customer management guide*
+
+![Guide 4](Readme_images/userguidepage4.png)
+*Services management documentation*
+
+![Guide 5](Readme_images/userguidepage5.png)
+*Photo frames inventory guide*
+
+![Guide 6](Readme_images/userguidepage6.png)
+*Booking management instructions*
+
+![Guide 7](Readme_images/userguidepage7.png)
+*Invoice history guide*
+
+![Guide 8](Readme_images/userguidepage8.png)
+*User management for administrators*
+
+![Guide 9](Readme_images/userguidepage9.png)
+*Settings and configuration guide*
+
+![Guide 10](Readme_images/userguidepage10.png)
+*Pro tips and best practices*
+
+![Guide 11](Readme_images/userguidepage11.png)
+*Advanced features documentation*
+
+![Guide 12](Readme_images/userguidepage12.png)
+*Expense tracking guide*
+
+![Guide 13](Readme_images/userguidepage13.png)
+*Reports and analytics guide*
+
+![Guide 14](Readme_images/userguidepage14.png)
+*Permissions management guide*
+
+![Guide 15](Readme_images/userguidepage15.png)
+*Additional tips and troubleshooting*
 
 ### Professional Templates
 ![Bills & Invoices](Readme_images/bill&invoice%20templates.jpg)
