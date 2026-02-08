@@ -93,12 +93,15 @@ class FinancialReportGenerator:
         
         # Fetch data
         income_data = self._get_income_data(start_date, end_date)
+        bills_data = self._get_bills_data(start_date, end_date)
         bookings_data = self._get_bookings_data(start_date, end_date)
         expenses_data = self._get_expenses_data(start_date, end_date)
         opening_balance = self._get_opening_balance(start_date)
         
         # Calculate totals
-        total_income = sum(item['amount'] for item in income_data)
+        total_invoices = sum(item['amount'] for item in income_data)
+        total_bills = sum(item['amount'] for item in bills_data)
+        total_income = total_invoices + total_bills
         total_expenses = sum(item['amount'] for item in expenses_data)
         net_balance = total_income - total_expenses
         final_balance = opening_balance + net_balance
@@ -216,11 +219,11 @@ class FinancialReportGenerator:
             ('ROUNDEDCORNERS', [5, 5, 5, 5]),
         ]))
         story.append(opening_card)
-        story.append(Spacer(1, 8*mm))
+        story.append(Spacer(1, 4*mm))
         
         # ==================== INCOME SECTION ====================
         income_header = Paragraph(
-            "<b>💰 INCOME BREAKDOWN</b>",
+            "<b>💰 INVOICES INCOME</b>",
             ParagraphStyle(
                 'SectionHeader',
                 fontSize=14,
@@ -244,7 +247,7 @@ class FinancialReportGenerator:
                     f"LKR {item['amount']:,.2f}"
                 ])
             
-            income_table_data.append(['', '', '<b>TOTAL INCOME</b>', f"<b>LKR {total_income:,.2f}</b>"])
+            income_table_data.append(['', '', '<b>TOTAL INVOICES</b>', f"<b>LKR {total_invoices:,.2f}</b>"])
             
             income_table = Table(income_table_data, colWidths=[30*mm, 35*mm, 70*mm, 35*mm])
             
@@ -286,12 +289,87 @@ class FinancialReportGenerator:
             story.append(income_table)
         else:
             no_income = Paragraph(
-                "<i>No income recorded for this period.</i>",
+                "<i>No invoices recorded for this period.</i>",
                 ParagraphStyle('NoData', fontSize=10, textColor=colors.grey)
             )
             story.append(no_income)
         
-        story.append(Spacer(1, 7*mm))
+        story.append(Spacer(1, 4*mm))
+        
+        # ==================== BILLS SECTION ====================
+        bills_header = Paragraph(
+            "<b>🧾 BILLS INCOME (Walk-in Sales)</b>",
+            ParagraphStyle(
+                'SectionHeader',
+                fontSize=14,
+                textColor=colors.HexColor('#00ff88'),
+                fontName='Helvetica-Bold',
+                spaceAfter=3*mm
+            )
+        )
+        story.append(bills_header)
+        
+        if bills_data:
+            bills_table_data = [
+                ['Date', 'Bill #', 'Customer', 'Amount (LKR)']
+            ]
+            
+            for item in bills_data:
+                bills_table_data.append([
+                    item['date'],
+                    item['bill_number'],
+                    item['customer_name'],
+                    f"LKR {item['amount']:,.2f}"
+                ])
+            
+            bills_table_data.append(['', '', '<b>TOTAL BILLS</b>', f"<b>LKR {total_bills:,.2f}</b>"])
+            
+            bills_table = Table(bills_table_data, colWidths=[30*mm, 35*mm, 70*mm, 35*mm])
+            
+            # Enhanced table styling with better readability
+            table_style = [
+                # Header row
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#00ff88')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#1a1a2e')),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 11),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('TOPPADDING', (0, 0), (-1, 0), 12),
+                
+                # Data rows - increased padding
+                ('TOPPADDING', (0, 1), (-1, -2), 8),
+                ('BOTTOMPADDING', (0, 1), (-1, -2), 8),
+                ('LEFTPADDING', (0, 0), (-1, -1), 8),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+                
+                # Alignment
+                ('ALIGN', (0, 0), (2, -1), 'LEFT'),
+                ('ALIGN', (3, 0), (3, -1), 'RIGHT'),
+                
+                # Grid and borders
+                ('GRID', (0, 0), (-1, -2), 0.5, colors.HexColor('#dddddd')),
+                ('LINEABOVE', (0, 0), (-1, 0), 2, colors.HexColor('#00ff88')),
+                ('LINEBELOW', (0, 0), (-1, 0), 2, colors.HexColor('#00ff88')),
+                
+                # Total row
+                ('LINEABOVE', (0, -1), (-1, -1), 2.5, colors.HexColor('#00ff88')),
+                ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#f0f0f0')),
+                ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, -1), (-1, -1), 12),
+                ('TOPPADDING', (0, -1), (-1, -1), 10),
+                ('BOTTOMPADDING', (0, -1), (-1, -1), 10),
+            ]
+            
+            bills_table.setStyle(TableStyle(table_style))
+            story.append(bills_table)
+        else:
+            no_bills = Paragraph(
+                "<i>No bills recorded for this period.</i>",
+                ParagraphStyle('NoData', fontSize=10, textColor=colors.grey)
+            )
+            story.append(no_bills)
+        
+        story.append(Spacer(1, 4*mm))
         
         # ==================== BOOKINGS SECTION ====================
         bookings_header = Paragraph(
@@ -369,7 +447,7 @@ class FinancialReportGenerator:
             )
             story.append(no_bookings)
         
-        story.append(Spacer(1, 7*mm))
+        story.append(Spacer(1, 4*mm))
         
         # ==================== EXPENSES SECTION ====================
         expenses_header = Paragraph(
@@ -449,7 +527,7 @@ class FinancialReportGenerator:
             )
             story.append(no_expenses)
         
-        story.append(Spacer(1, 10*mm))
+        story.append(Spacer(1, 6*mm))
         
         # ==================== ENHANCED SUMMARY SECTION WITH VISUAL CARDS ====================
         summary_header = Paragraph(
@@ -585,6 +663,8 @@ class FinancialReportGenerator:
             'summary': {
                 'opening_balance': opening_balance,
                 'total_income': total_income,
+                'total_invoices': total_invoices,
+                'total_bills': total_bills,
                 'total_expenses': total_expenses,
                 'net_balance': net_balance,
                 'closing_balance': final_balance
@@ -667,6 +747,32 @@ class FinancialReportGenerator:
             return expenses
         except sqlite3.Error as e:
             print(f"Error fetching expenses data: {e}")
+            return []
+    
+    def _get_bills_data(self, start_date: str, end_date: str) -> list:
+        """Fetch bills data (walk-in sales)"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT 
+                    DATE(b.created_at) as date,
+                    b.bill_number,
+                    COALESCE(c.full_name, b.guest_name, 'Guest') as customer_name,
+                    b.total_amount as amount
+                FROM bills b
+                LEFT JOIN customers c ON b.customer_id = c.id
+                WHERE DATE(b.created_at) BETWEEN ? AND ?
+                ORDER BY b.created_at ASC
+            ''', (start_date, end_date))
+            
+            bills = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+            return bills
+        except sqlite3.Error as e:
+            print(f"Error fetching bills data: {e}")
             return []
     
     def _get_opening_balance(self, date: str) -> float:

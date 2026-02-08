@@ -522,7 +522,7 @@ class DatabaseManager:
             'can_access_dashboard', 'can_access_billing', 'can_access_customers',
             'can_access_categories', 'can_access_services', 'can_access_frames',
             'can_access_bookings', 'can_access_invoices', 'can_access_support',
-            'can_access_user_guide'
+            'can_access_user_guide', 'can_manage_expenses'
         ]
         
         set_clauses = []

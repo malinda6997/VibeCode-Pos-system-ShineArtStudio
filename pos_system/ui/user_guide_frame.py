@@ -58,7 +58,9 @@ class UserGuideFrame(ctk.CTkFrame):
             ("💰", "Billing & Invoices"),
             ("📅", "Booking System"),
             ("🖼", "Frame Inventory"),
-            ("📊", "Reports & Analytics"),
+            ("📊", "Advanced Reports"),
+            ("💵", "Expense Tracking"),
+            ("📜", "Bill History"),
             ("⚙️", "Easy Settings"),
         ]
         
@@ -90,11 +92,13 @@ class UserGuideFrame(ctk.CTkFrame):
             "#ffd93d",
             [
                 ("Search Customer", "Type 5+ digits of phone number to auto-search customers"),
+                ("Guest Customer", "Click 'Guest' for walk-in customers without registration"),
                 ("Add Items", "Browse Services and Frames tabs, click 'Add to Cart'"),
                 ("Manage Cart", "Use +/- buttons for quantity, trash icon to remove"),
                 ("Apply Discount", "Enter discount amount before generating invoice"),
                 ("Generate Invoice", "Click button to create and print invoice PDF"),
                 ("Payment Types", "Full payment or partial with advance amount"),
+                ("Quick Print", "Invoices auto-print after generation"),
             ]
         )
         
@@ -147,10 +151,29 @@ class UserGuideFrame(ctk.CTkFrame):
             "Booking Management",
             "#e67e22",
             [
-                ("Create Booking", "Go to Bookings → Select customer & date → Save"),
-                ("View Schedule", "Calendar view shows all bookings"),
-                ("Update Status", "Mark bookings as pending, confirmed, or completed"),
-                ("Add Notes", "Include special requirements in booking notes"),
+                ("Create Booking", "Go to Bookings → Select customer & category → Enter details"),
+                ("Advance Payment", "Collect advance amount during booking creation"),
+                ("Settlement Invoice", "Create final invoice when customer completes payment"),
+                ("View Schedule", "Table view shows all bookings with payment status"),
+                ("Track Payments", "See advance paid, balance due, and settlement status"),
+                ("Reprint Booking Invoice", "Reprint advance payment receipts anytime"),
+            ]
+        )
+        
+        # Bill History
+        self.create_guide_section(
+            main,
+            "📜",
+            "Bill History",
+            "#3498db",
+            [
+                ("View All Bills", "Go to Bill History to see all past bills"),
+                ("Search", "Find bills by number, customer name, or phone"),
+                ("Date Filter", "Filter bills by date range for specific periods"),
+                ("Guest Filter", "Toggle 'Include Guest' to show/hide guest customer bills"),
+                ("Reprint Bills", "Select bill → Click Reprint to generate PDF"),
+                ("Payment Details", "View payment method, discount, and amount paid"),
+                ("Export Data", "Filter and export bills for accounting purposes"),
             ]
         )
         
@@ -159,12 +182,59 @@ class UserGuideFrame(ctk.CTkFrame):
             main,
             "📄",
             "Invoice History",
-            "#3498db",
+            "#16a085",
             [
-                ("View Invoices", "Go to Invoices to see all past invoices"),
+                ("View Invoices", "Go to Invoices to see all advance and settlement invoices"),
                 ("Search", "Find invoices by number, customer, or date"),
+                ("Invoice Types", "Normal invoices, booking advances, and settlements"),
                 ("Reprint", "Select invoice → Click Reprint to generate PDF"),
                 ("Balance Due", "Track invoices with pending payments"),
+            ]
+        )
+        
+        # Expenses Management
+        self.create_guide_section(
+            main,
+            "💵",
+            "Expense Management",
+            "#c0392b",
+            [
+                ("Add Expense", "Go to Expenses → Enter details → Click Add"),
+                ("Categories", "Categorize expenses: Rent, Utilities, Supplies, etc."),
+                ("Track Spending", "View all expenses with date and category"),
+                ("Monthly Report", "Dashboard shows monthly expense summary"),
+                ("Edit/Delete", "Update or remove expense entries as needed"),
+            ]
+        )
+        
+        # Categories Management
+        self.create_guide_section(
+            main,
+            "📂",
+            "Category Management",
+            "#8e44ad",
+            [
+                ("Service Categories", "Organize services by type (Wedding, Portrait, etc.)"),
+                ("Frame Categories", "Group frames by size or material"),
+                ("Expense Categories", "Create custom expense categories"),
+                ("Easy Organization", "Categories help in reporting and analytics"),
+            ]
+        )
+        
+        # Reports & Analytics
+        self.create_guide_section(
+            main,
+            "📊",
+            "Reports & Analytics",
+            "#2980b9",
+            [
+                ("Dashboard Overview", "Real-time stats: revenue, expenses, profit"),
+                ("Executive Report", "Comprehensive business report with charts and trends"),
+                ("Industrial Report", "Detailed operational report for management"),
+                ("Financial Report", "Income, expenses, and profit analysis"),
+                ("Staff Report", "Individual staff performance tracking"),
+                ("Expense Report", "Detailed expense breakdown by category"),
+                ("Export Reports", "Generate PDF reports for accounting"),
             ]
         )
         
@@ -186,6 +256,20 @@ class UserGuideFrame(ctk.CTkFrame):
             
             self.create_guide_section(
                 main,
+                "🔐",
+                "Permissions (Admin Only)",
+                "#d35400",
+                [
+                    ("Role Management", "Set permissions for Admin and Staff roles"),
+                    ("Feature Access", "Control who can access billing, expenses, reports"),
+                    ("Delete Permissions", "Restrict deletion of customers, services, etc."),
+                    ("Custom Permissions", "Fine-tune access for each feature"),
+                    ("Security", "Protect sensitive data with role-based access"),
+                ]
+            )
+            
+            self.create_guide_section(
+                main,
                 "⚙️",
                 "Settings (Admin Only)",
                 "#95a5a6",
@@ -195,6 +279,7 @@ class UserGuideFrame(ctk.CTkFrame):
                     ("Appearance", "Switch between Dark, Light, or System theme"),
                     ("Backup", "Create database backup for safety"),
                     ("Restore", "Recover from backup if needed"),
+                    ("Profile Settings", "Update your profile and password"),
                 ]
             )
         
@@ -217,13 +302,17 @@ class UserGuideFrame(ctk.CTkFrame):
         
         tips = [
             "🔄 Create regular backups (weekly recommended)",
-            "📊 Check Dashboard daily for business overview",
+            "📊 Check Dashboard daily for business overview and trends",
             "📱 Keep customer phone numbers accurate for easy search",
             "🖼 Monitor frame stock to avoid running out",
-            "📅 Confirm bookings a day before the session",
+            "📅 Use advance payment system for bookings to secure orders",
             "💾 Store backups in a safe external location",
             "🔐 Change default admin password after first login",
-            "📝 Add notes to bookings for special requirements",
+            "📝 Use guest filter in Bill History to analyze walk-in sales",
+            "💵 Track expenses regularly for accurate profit calculation",
+            "📈 Review Executive Reports monthly for business insights",
+            "⚡ Settlement invoices automatically link to original bookings",
+            "🎨 Use categories to organize services and frames efficiently",
         ]
         
         for tip in tips:

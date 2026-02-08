@@ -97,6 +97,7 @@ class Sidebar(ctk.CTkFrame):
             ("users", "👤", "Users", "can_access_users"),
             ("permissions", "🔐", "Permissions", "can_access_permissions"),
             ("staff_reports", "📋", "Staff Reports", "can_access_staff_reports"),
+            ("expenses", "💰", "Expenses", "can_access_expenses"),
             ("settings", "⚙", "Settings", "can_access_settings"),
         ]
         

@@ -41,7 +41,7 @@ class SupportFrame(ctk.CTkFrame):
             "📞",
             "Phone Support",
             "Call us directly for immediate assistance",
-            "+94 77 123 4567",
+            "+94 76 220 6157",
             "#8C00FF",
             self.call_support
         )
@@ -52,7 +52,7 @@ class SupportFrame(ctk.CTkFrame):
             "💬",
             "WhatsApp",
             "Chat with us on WhatsApp",
-            "+94 77 123 4567",
+            "+94 76 220 6157",
             "#25D366",
             self.open_whatsapp
         )
@@ -63,7 +63,7 @@ class SupportFrame(ctk.CTkFrame):
             "📧",
             "Email Support",
             "Send us a detailed message",
-            "support@shineart.lk",
+            "malindaprabath876@gmail.com",
             "#ff6b6b",
             self.open_email
         )
@@ -87,13 +87,14 @@ class SupportFrame(ctk.CTkFrame):
         contact_info.pack(fill="x", padx=25, pady=(0, 20))
         
         contact_items = [
-            ("🏢", "Developer:", "Shine Art Studio Development Team"),
-            ("📧", "Email:", "support@shineart.lk"),
-            ("📱", "Phone:", "+94 77 123 4567"),
-            ("💬", "WhatsApp:", "+94 77 123 4567"),
-            ("🌐", "Website:", "www.shineartstudio.lk"),
-            ("📍", "Location:", "Colombo, Sri Lanka"),
+            ("👨‍💻", "Developer:", "Malinda Prabath"),
+            ("🏢", "Studio:", "Shine Art Studio - Nattandiya"),
+            ("📧", "Email:", "malindaprabath876@gmail.com"),
+            ("📱", "Phone:", "+94 76 220 6157"),
+            ("💬", "WhatsApp:", "+94 76 220 6157"),
+            ("📍", "Location:", "No: 52/1/1, Maravila Road, Nattandiya"),
             ("🕐", "Working Hours:", "Mon - Sat, 9:00 AM - 6:00 PM"),
+            ("📡", "Support:", "Technical support available during working hours"),
         ]
         
         for icon, label, value in contact_items:
@@ -118,19 +119,33 @@ class SupportFrame(ctk.CTkFrame):
             ("How do I create a new invoice?", 
              "Go to Billing → Search customer → Add items to cart → Click Generate Invoice"),
             ("How do I add a new customer?",
-             "Go to Customers → Fill the form → Click Add Customer"),
-            ("How do I manage bookings?",
-             "Go to Bookings → Select date and customer → Add booking details → Save"),
+             "Go to Customers → Fill the form → Click Add Customer. Or use 'New Customer' button in Billing for quick add"),
+            ("How do I create a booking with advance payment?",
+             "Go to Bookings → Fill booking details → Enter advance amount → Save. System generates advance payment invoice automatically"),
+            ("How do I create a settlement invoice for a booking?",
+             "Go to Bookings → Select booking → Click 'Settle' → Enter final payment. Settlement invoice links to original booking"),
+            ("How do I filter guest customers in Bill History?",
+             "Go to Bill History → Use 'Include Guest' toggle to show/hide guest customer bills. Great for tracking walk-in sales"),
             ("How do I backup my data?",
-             "Go to Settings → Backup & Data → Click 'Backup Database'"),
+             "Go to Settings → Backup & Data → Click 'Backup Database'. Store backup file in safe location"),
             ("I forgot my password, what should I do?",
-             "Contact the administrator to reset your password"),
-            ("How do I print an invoice?",
-             "After generating invoice, click Print button to open PDF"),
+             "Contact the administrator to reset your password. Admin can update passwords from User Management"),
+            ("How do I print an invoice or bill?",
+             "Bills and invoices are auto-generated as PDF. They open automatically for printing after creation"),
             ("How do I check low stock items?",
-             "Check Dashboard for alerts or go to Photo Frames to see stock levels"),
+             "Check Dashboard for alerts or go to Photo Frames to see stock levels with color-coded warnings"),
             ("Can I edit an invoice after it's created?",
-             "No, invoices cannot be edited. Create a new one if needed"),
+             "No, invoices cannot be edited for compliance. Create a new one if needed"),
+            ("How do I view Executive or Industrial Reports?",
+             "Go to Executive Reports or Industrial Reports from sidebar. Select date range and generate PDF"),
+            ("How do I track expenses?",
+             "Go to Expenses → Add expense with category → View summary on Dashboard. Dashboard shows profit after expenses"),
+            ("What's the difference between bills and invoices?",
+             "Bills are for walk-in sales. Invoices are for bookings with advance payments and settlements"),
+            ("How do I manage user permissions?",
+             "Admin can go to Permissions → Set role-based access for different features"),
+            ("How do I reprint a bill or invoice?",
+             "Go to Bill History or Invoice History → Select the record → Click Reprint button"),
         ]
         
         faq_content = ctk.CTkFrame(faq_section, fg_color="transparent")
@@ -163,11 +178,13 @@ class SupportFrame(ctk.CTkFrame):
         
         info_items = [
             ("Application", "Shine Art Studio POS"),
-            ("Version", "1.0.0"),
-            ("Release Date", "December 2025"),
+            ("Version", "2.0.0"),
+            ("Release Date", "February 2026"),
             ("Database", "SQLite (Local Storage)"),
             ("Framework", "Python + CustomTkinter"),
             ("Platform", "Windows Desktop"),
+            ("PDF Engine", "ReportLab"),
+            ("Features", "Billing, Bookings, Reports, Expenses, Analytics"),
         ]
         
         for i, (label, value) in enumerate(info_items):
@@ -354,16 +371,16 @@ class SupportFrame(ctk.CTkFrame):
     
     def call_support(self):
         """Open phone dialer"""
-        Toast.info(self, "Call: +94 77 123 4567")
+        Toast.info(self, "Call: +94 76 220 6157")
     
     def open_email(self):
         """Open email client"""
-        webbrowser.open("mailto:support@shineart.lk?subject=POS%20Support%20Request")
+        webbrowser.open("mailto:malindaprabath876@gmail.com?subject=Shine%20Art%20POS%20Support%20Request")
         Toast.success(self, "Opening email client...")
     
     def open_whatsapp(self):
         """Open WhatsApp"""
-        webbrowser.open("https://wa.me/94771234567")
+        webbrowser.open("https://wa.me/94762206157")
         Toast.success(self, "Opening WhatsApp...")
     
     def submit_issue(self):

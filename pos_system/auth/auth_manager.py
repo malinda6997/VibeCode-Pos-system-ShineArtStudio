@@ -78,7 +78,9 @@ class AuthManager:
                 'can_access_settings': True,
                 'can_access_permissions': True,
                 'can_access_staff_reports': True,
-                'can_access_profile': True
+                'can_access_expenses': True,
+                'can_access_profile': True,
+                'can_manage_expenses': True
             }
         else:
             # Load staff permissions from database
@@ -100,6 +102,7 @@ class AuthManager:
                     'can_access_invoices': bool(perm_dict.get('can_access_invoices', 1)),
                     'can_access_support': bool(perm_dict.get('can_access_support', 1)),
                     'can_access_user_guide': bool(perm_dict.get('can_access_user_guide', 1)),
+                    'can_manage_expenses': bool(perm_dict.get('can_manage_expenses', 1)),
                     'can_access_users': False,
                     'can_access_settings': False,
                     'can_access_permissions': False,
@@ -118,6 +121,7 @@ class AuthManager:
                     'can_access_invoices': True,
                     'can_access_support': True,
                     'can_access_user_guide': True,
+                    'can_manage_expenses': True,
                     'can_access_users': False,
                     'can_access_settings': False,
                     'can_access_permissions': False,
